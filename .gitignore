@@ -31,4 +31,4 @@ supabase/.temp
 .env
 .env.*
 !.env.example
-supabase/functions/deno.lock
+deno.lock
