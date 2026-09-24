@@ -10,8 +10,8 @@ export default defineConfig(() => ({
   plugins: [react()],
   resolve: {
     alias: {
-      "@shared": path.resolve(__dirname, "supabase/functions/_shared/logic"),
-      "@": path.resolve(__dirname, "src"),
+      "@shared": path.resolve(import.meta.dirname, "supabase/functions/_shared/logic"),
+      "@": path.resolve(import.meta.dirname, "src"),
     },
   },
   // Options spécifiques à Tauri (port fixe, pas d'effacement de la console)

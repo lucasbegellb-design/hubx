@@ -27,7 +27,7 @@ fn ouvrir_capture_impl(app: &AppHandle) -> tauri::Result<()> {
     }
     WebviewWindowBuilder::new(app, FENETRE_CAPTURE, WebviewUrl::App("index.html#/capture".into()))
         .title("Capture rapide — Hub XTIM")
-        .inner_size(560.0, 176.0)
+        .inner_size(720.0, 184.0)
         .resizable(false)
         .decorations(false)
         .always_on_top(true)

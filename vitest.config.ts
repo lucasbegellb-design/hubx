@@ -4,8 +4,8 @@ import path from "node:path";
 export default defineConfig({
   resolve: {
     alias: {
-      "@shared": path.resolve(__dirname, "supabase/functions/_shared/logic"),
-      "@": path.resolve(__dirname, "src"),
+      "@shared": path.resolve(import.meta.dirname, "supabase/functions/_shared/logic"),
+      "@": path.resolve(import.meta.dirname, "src"),
     },
   },
   test: {
