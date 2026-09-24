@@ -22,9 +22,11 @@ export function json(body: unknown, status = 200): Response {
   });
 }
 
+type Gestionnaire = (req: Request) => Promise<Response>;
+
 /** Enveloppe un handler : CORS, erreurs converties en JSON `{ erreur }`, aucun détail sensible loggé. */
-export function servir(handler: (req: Request) => Promise<Response>) {
-  Deno.serve(async (req) => {
+export function servir(handler: Gestionnaire) {
+  const gerer = async (req: Request): Promise<Response> => {
     if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
     if (req.method !== "POST") return json({ erreur: "Méthode non autorisée." }, 405);
     try {
@@ -35,7 +37,11 @@ export function servir(handler: (req: Request) => Promise<Response>) {
       console.error("Erreur interne", e instanceof Error ? e.name + ": " + e.message.slice(0, 200) : "inconnue");
       return json({ erreur: "Erreur interne du serveur. Réessaie dans un instant." }, 500);
     }
-  });
+  };
+  // Développement local : scripts/fonctions-dev.ts regroupe toutes les fonctions sur un seul port.
+  const registre = (globalThis as { __hubxFonctions?: Gestionnaire[] }).__hubxFonctions;
+  if (registre) registre.push(gerer);
+  else Deno.serve(gerer);
 }
 
 export async function lireCorps<T>(req: Request): Promise<T> {

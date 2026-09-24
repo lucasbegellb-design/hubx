@@ -19,3 +19,10 @@ Une ligne par arbitrage non bloquant.
 - Edge Functions en `verify_jwt = false` + vérification JWT/membre dans le code : compatible nouvelles clés API et appel pg_cron via `x-cron-secret`.
 - Appels IA via le SDK officiel `npm:@anthropic-ai/sdk` + structured outputs (`output_config.format`), pas de fetch brut.
 - Fenêtre de capture : créée à la demande par Rust puis fermée (économie de RAM) ; le raccourci global est enregistré côté JS pour être personnalisable.
+- Process : enregistrement explicite (Ctrl+S) pour ne pas créer une version à chaque frappe ; brouillon local conservé jusqu'à l'enregistrement ; « Dernière révision » renseignée automatiquement.
+- Pack de passation : sommaire cliquable (liens internes) sans numéros de page (non calculables de façon fiable avec react-pdf).
+- PDF : police IBM Plex Sans (sous-ensemble latin) ; les caractères chinois éventuels ne s'affichent pas dans les exports PDF.
+- Documents : analyse lancée par le client juste après le dépôt ; en cas d'échec d'appel, statut « erreur » + message et bouton « Relancer ». Limites : PDF 20 Mo, image 5 Mo, texte 150 000 caractères (analyse sur le début, signalée).
+- Word/PowerPoint/OpenDocument : texte extrait côté fonction (fflate) ; Excel/CSV via SheetJS (CDN officiel, pas le paquet npm obsolète).
+- Glisser-déposer : `dragDropEnabled: false` sur la fenêtre Tauri pour utiliser le drag & drop HTML5.
+- Dév local : `npm run fonctions:dev` sert toutes les Edge Functions via le Deno du poste (quand le conteneur edge-runtime n'a pas d'accès npm) ; activé par `VITE_FUNCTIONS_URL`.
