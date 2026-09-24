@@ -34,3 +34,10 @@ Une ligne par arbitrage non bloquant.
 - Snapshot enregistré si le hash SHA-256 du contenu normalisé change ou si aucun snapshot n'existe pour le jour (Paris). Aucune purge automatique (volumes faibles).
 - Mode démo : actif tant que les secrets Azure sont absents ; fichier d'exemple embarqué en base64 dans la fonction (généré par `npm run fixture:chine`).
 - pg_cron : appels via `net.http_post` + secrets Vault `hubx_url` / `hubx_cron_secret` ; rapports déclenchés à 15 h et 16 h UTC, filtrés sur 17 h heure de Paris (gère l'heure d'été).
+- Rapports : « en cours / en attente / en retard / à venir » reflètent l'état au moment de la génération (pas un état reconstitué à la fin de la période) ; « réalisé » = tâches passées à « fait » pendant la période (done_at, heure de Paris).
+- Projets archivés : exclus des vues en cours/alertes des rapports mais leur travail réalisé reste compté.
+- Période hebdo automatique = semaine civile (lundi → dimanche) ; mensuelle = mois civil ; rapport à la demande limité à 400 jours.
+- L'IA ne produit que la synthèse (3 à 5 lignes, JSON en entrée, consigne de ne rien inventer) ; tout le reste du Markdown est rendu par du code. Échec IA = rapport complet sans synthèse + motif affiché.
+- Rapports automatiques protégés contre les doublons par un index unique (type, période).
+- Graphique unique (Recharts) : tâches réalisées par domaine, une seule teinte d'accent (une série = une couleur), valeurs en bout de barre ; pas d'autre graphique (parcimonie).
+- PDF : interligne explicite sur les grands textes (react-pdf convertit l'interligne de la page en valeur absolue).
