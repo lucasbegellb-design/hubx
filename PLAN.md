@@ -8,7 +8,7 @@ Checklist des phases (cf. cahier des charges §9). Cocher au fur et à mesure.
 - [x] 4. Process (modèle, versions, IA, exports PDF/MD, pack passation) + Documents (upload, analyse IA)
 - [x] 5. Suivi Chine : fixture xlsx, mode mock, sync-chine, visualiseur, mapping, KPI, alertes, diff
 - [x] 6. Rapports : agrégation déterministe, synthèse IA, PDF, pg_cron hebdo/mensuel
-- [ ] 7. Desktop : tray, notifications, raccourci global, autostart, updater, CI release
+- [x] 7. Desktop : tray, notifications, raccourci global, autostart, updater, CI release
 - [ ] 8. Qualité (typecheck, lint, tests, build), docs (README, SETUP, ARCHITECTURE, PASSATION), récap
 
 ## Reprise

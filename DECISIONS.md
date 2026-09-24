@@ -41,3 +41,10 @@ Une ligne par arbitrage non bloquant.
 - Rapports automatiques protégés contre les doublons par un index unique (type, période).
 - Graphique unique (Recharts) : tâches réalisées par domaine, une seule teinte d'accent (une série = une couleur), valeurs en bout de barre ; pas d'autre graphique (parcimonie).
 - PDF : interligne explicite sur les grands textes (react-pdf convertit l'interligne de la page en valeur absolue).
+- Retrait d'un membre = compte bloqué (ban) + suppression de l'appartenance ; ses données restent (affichées « Ancien membre »). Il doit toujours rester un administrateur.
+- Mots de passe : 10 caractères minimum pour les comptes créés par l'admin ; mot de passe provisoire généré aléatoirement.
+- Export complet côté client (fflate) : tables JSON + CSV (« ; », BOM UTF-8) + fichiers du bucket ; pas de fonction serveur (pas de limite de durée).
+- Mises à jour : vérification discrète 20 s après le démarrage ; signature obligatoire. La CI n'active `createUpdaterArtifacts` que si le secret de signature existe (sinon build sans mises à jour, avec avertissement).
+- Icône : mouette stylisée blanche sur fond bleu ardoise (évocation Bionic Bird), générée depuis `assets/icone.svg` (`npx tauri icon`).
+- Mémoire mesurée sous Linux/WebKitGTK sans GPU : ≈ 240 Mo PSS au repos (rendu logiciel, non représentatif de WebView2) ; à mesurer sur le PC de Lucas.
+- Les Edge Functions acceptent la clé serveur historique (`SUPABASE_SERVICE_ROLE_KEY`) ou le nouveau format (`SUPABASE_SECRET_KEYS`).

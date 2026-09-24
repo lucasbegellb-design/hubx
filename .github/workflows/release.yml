@@ -1,0 +1,79 @@
+# Publication d'une version : pousser un tag « v* » (ex. v0.2.0, identique à la version de package.json).
+# Construit l'installeur Windows (NSIS + MSI) et macOS (universel), crée la GitHub Release
+# et publie latest.json pour les mises à jour automatiques.
+#
+# Secrets du dépôt (Settings > Secrets and variables > Actions) — voir SETUP.md :
+#   VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY        : intégrés au build (clé publique uniquement)
+#   TAURI_SIGNING_PRIVATE_KEY, TAURI_SIGNING_PRIVATE_KEY_PASSWORD : signature des mises à jour
+# Sans certificat de signature de code, Windows affiche un avertissement SmartScreen à l'installation.
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build ${{ matrix.nom }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - nom: Windows
+            os: windows-latest
+            args: ""
+          - nom: macOS (universel)
+            os: macos-latest
+            args: "--target universal-apple-darwin"
+    runs-on: ${{ matrix.os }}
+    env:
+      AVEC_SIGNATURE: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY != '' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.os == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri -> target
+
+      - run: npm ci
+
+      - name: Options de build
+        id: options
+        shell: bash
+        run: |
+          ARGS="${{ matrix.args }}"
+          if [ "$AVEC_SIGNATURE" = "true" ]; then
+            ARGS="$ARGS --config src-tauri/tauri.release.conf.json"
+          else
+            echo "::warning::TAURI_SIGNING_PRIVATE_KEY absent : pas d'artefacts de mise à jour automatique (voir SETUP.md)."
+          fi
+          echo "args=$ARGS" >> "$GITHUB_OUTPUT"
+
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: "Hub XTIM ${{ github.ref_name }}"
+          releaseBody: "Installer : télécharger le fichier .exe (Windows) ou .dmg (macOS) ci-dessous. Les postes déjà équipés se mettent à jour automatiquement."
+          releaseDraft: false
+          prerelease: false
+          includeUpdaterJson: ${{ env.AVEC_SIGNATURE == 'true' }}
+          args: ${{ steps.options.outputs.args }}

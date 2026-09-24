@@ -101,8 +101,20 @@ function useRaccourciGlobal() {
   }, [raccourci]);
 }
 
+/** Recherche de mise à jour discrète, 20 s après le démarrage (n'alourdit pas le lancement). */
+function useMisesAJour() {
+  useEffect(() => {
+    if (!estTauri()) return;
+    const t = window.setTimeout(() => {
+      import("@/lib/misesAJour").then((m) => m.verifierAuDemarrage());
+    }, 20_000);
+    return () => window.clearTimeout(t);
+  }, []);
+}
+
 export function ServicesArrierePlan() {
   const { userId } = useAuth();
+  useMisesAJour();
   useRappels(userId);
   useNotificationsRapports();
   useRaccourciGlobal();

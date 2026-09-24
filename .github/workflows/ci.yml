@@ -1,0 +1,44 @@
+# Vérifications à chaque push et pull request : types, lint, tests, build du front, Edge Functions.
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  front:
+    name: Front (typecheck, lint, tests, build)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test
+      - run: npx vite build
+
+  fonctions:
+    name: Edge Functions (deno check)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Vérification des types
+        working-directory: supabase/functions
+        run: |
+          for f in */index.ts; do
+            echo "::group::$f"
+            deno check --allow-import --node-modules-dir=none "$f"
+            echo "::endgroup::"
+          done
