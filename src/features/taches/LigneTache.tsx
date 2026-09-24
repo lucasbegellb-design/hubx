@@ -12,7 +12,7 @@ import { useReferentiels } from "@/features/referentiels/api";
 export function libelleEcheance(echeance: string, aujourdhui: string): { texte: string; retard: boolean } {
   if (echeance < aujourdhui) {
     const j = joursDeRetard(echeance, aujourdhui);
-    return { texte: j === 1 ? "hier" : `${dateCourte(echeance)} · ${j} j de retard`, retard: true };
+    return { texte: j === 1 ? "hier" : `${dateCourte(echeance)} · +${j} j`, retard: true };
   }
   if (echeance === aujourdhui) return { texte: "aujourd'hui", retard: false };
   if (echeance === ajouterJours(aujourdhui, 1)) return { texte: "demain", retard: false };

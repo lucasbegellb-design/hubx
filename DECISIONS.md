@@ -26,3 +26,11 @@ Une ligne par arbitrage non bloquant.
 - Word/PowerPoint/OpenDocument : texte extrait côté fonction (fflate) ; Excel/CSV via SheetJS (CDN officiel, pas le paquet npm obsolète).
 - Glisser-déposer : `dragDropEnabled: false` sur la fenêtre Tauri pour utiliser le drag & drop HTML5.
 - Dév local : `npm run fonctions:dev` sert toutes les Edge Functions via le Deno du poste (quand le conteneur edge-runtime n'a pas d'accès npm) ; activé par `VITE_FUNCTIONS_URL`.
+- Suivi Chine : mapping multi-onglets (`{ onglets: [{ onglet, colonnes }] }`, ancien format mono-onglet accepté) ; colonnes référencées par libellé d'en-tête.
+- Détection d'en-tête : ligne la plus « textuelle » parmi les 15 premières (tolère un titre au-dessus du tableau) ; en-têtes vides → « Colonne N », doublons suffixés.
+- Payé = date de paiement renseignée ou statut « payé/réglé/soldé/paid » (hors « impayé/à payer ») ; livré = date réelle ou statut « livré/reçu/delivered ».
+- KPI par devise (jamais de conversion de change) ; alertes = paiements non réglés échus ou dus sous 7 jours + livraisons prévues dépassées sans date réelle.
+- Diff de snapshots : clé = n° PO mappé s'il est unique, sinon première colonne aux valeurs uniques, sinon ligne entière ; colonnes réalignées par libellé.
+- Snapshot enregistré si le hash SHA-256 du contenu normalisé change ou si aucun snapshot n'existe pour le jour (Paris). Aucune purge automatique (volumes faibles).
+- Mode démo : actif tant que les secrets Azure sont absents ; fichier d'exemple embarqué en base64 dans la fonction (généré par `npm run fixture:chine`).
+- pg_cron : appels via `net.http_post` + secrets Vault `hubx_url` / `hubx_cron_secret` ; rapports déclenchés à 15 h et 16 h UTC, filtrés sur 17 h heure de Paris (gère l'heure d'été).

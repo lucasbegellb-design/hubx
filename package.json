@@ -14,7 +14,8 @@
     "format": "prettier --write .",
     "test": "vitest run",
     "check": "npm run typecheck && npm run lint && npm test",
-    "fonctions:dev": "deno run --node-modules-dir=none --allow-net --allow-env --allow-read --allow-import --env-file=supabase/functions/.env.local scripts/fonctions-dev.ts"
+    "fonctions:dev": "deno run --node-modules-dir=none --allow-net --allow-env --allow-read --allow-import --env-file=supabase/functions/.env.local scripts/fonctions-dev.ts",
+    "fixture:chine": "node --experimental-strip-types --no-warnings scripts/generer-fixture-chine.ts"
   },
   "dependencies": {
     "@fontsource/ibm-plex-sans": "^5.3.0",
