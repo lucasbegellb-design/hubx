@@ -265,7 +265,7 @@ export function dateFr(iso: string | null | undefined): string {
 
 export function montantFr(v: number | null, devise: string): string {
   if (v === null) return "";
-  const n = v.toLocaleString("fr-FR", { minimumFractionDigits: 0, maximumFractionDigits: 2 }).replace(/ | /g, " ");
+  const n = v.toLocaleString("fr-FR", { minimumFractionDigits: 0, maximumFractionDigits: 2 }).replace(/\u202f|\u00a0/g, " ");
   return `${n} ${devise}`.trim();
 }
 
