@@ -44,11 +44,15 @@ export async function pdfRapport(d: DonneesRapport, synthese: string | null, par
         <Text style={s.h1}>{titre}</Text>
         <Text style={s.meta}>
           {periode} · généré le {dateFr(d.genere_le)} {par ? `par ${par}` : "automatiquement"}
-          {d.filtres.domaines.length || d.filtres.projets.length ? ` · filtres : ${[...d.filtres.domaines, ...d.filtres.projets].join(", ")}` : ""}
+          {d.filtres.domaines.length || d.filtres.projets.length
+            ? ` · filtres : ${[...d.filtres.domaines, ...d.filtres.projets].join(", ")}`
+            : ""}
         </Text>
 
         <Text style={s.h2}>Synthèse</Text>
-        <Text style={synthese ? s.p : st.vide}>{synthese ?? "Synthèse rédigée indisponible (IA non configurée). Les chiffres ci-dessous sont complets."}</Text>
+        <Text style={synthese ? s.p : st.vide}>
+          {synthese ?? "Synthèse rédigée indisponible (IA non configurée). Les chiffres ci-dessous sont complets."}
+        </Text>
         <View style={st.compteurs}>
           {(
             [
@@ -81,11 +85,23 @@ export async function pdfRapport(d: DonneesRapport, synthese: string | null, par
         )}
 
         <Text style={s.h2}>En cours et en attente</Text>
-        <Taches items={d.en_cours} vide="Rien en cours." droite={(t) => (t.echeance ? `échéance ${dateFr(t.echeance)}` : "")} />
-        <Taches items={d.en_attente} vide="Rien en attente." droite={(t) => (t.en_attente_de ? `attend : ${t.en_attente_de}` : "en attente")} />
+        <Taches
+          items={d.en_cours}
+          vide="Rien en cours."
+          droite={(t) => (t.echeance ? `échéance ${dateFr(t.echeance)}` : "")}
+        />
+        <Taches
+          items={d.en_attente}
+          vide="Rien en attente."
+          droite={(t) => (t.en_attente_de ? `attend : ${t.en_attente_de}` : "en attente")}
+        />
 
         <Text style={s.h2}>En retard</Text>
-        <Taches items={d.en_retard} vide="Aucune tâche en retard." droite={(t) => `${dateFr(t.echeance)} · ${t.jours_retard} j`} />
+        <Taches
+          items={d.en_retard}
+          vide="Aucune tâche en retard."
+          droite={(t) => `${dateFr(t.echeance)} · ${t.jours_retard} j`}
+        />
 
         <Text style={s.h2}>Chine</Text>
         {!d.chine.disponible ? (
@@ -105,7 +121,8 @@ export async function pdfRapport(d: DonneesRapport, synthese: string | null, par
             {d.chine.message ? <Text style={st.vide}>{d.chine.message}</Text> : null}
             {d.chine.kpi.map((k) => (
               <Text key={k.devise} style={{ marginTop: 2 }}>
-                {k.devise} : engagé {montantFr(k.engage, k.devise)} · payé {montantFr(k.paye, k.devise)} · reste {montantFr(k.reste, k.devise)}
+                {k.devise} : engagé {montantFr(k.engage, k.devise)} · payé {montantFr(k.paye, k.devise)} · reste{" "}
+                {montantFr(k.reste, k.devise)}
               </Text>
             ))}
             {d.chine.echeances.length ? (
@@ -124,7 +141,8 @@ export async function pdfRapport(d: DonneesRapport, synthese: string | null, par
             ) : null}
             {d.chine.livraisons_en_retard.length ? (
               <Text style={{ color: C.retard, marginTop: 4 }}>
-                Livraisons en retard : {d.chine.livraisons_en_retard.map((l) => `${l.po ?? "?"} (${l.jours} j)`).join(", ")}
+                Livraisons en retard :{" "}
+                {d.chine.livraisons_en_retard.map((l) => `${l.po ?? "?"} (${l.jours} j)`).join(", ")}
               </Text>
             ) : null}
           </View>

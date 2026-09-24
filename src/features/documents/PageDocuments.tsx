@@ -40,7 +40,10 @@ export default function PageDocuments() {
   useRaccourci("n", () => input.current?.click());
 
   const categories = useMemo(
-    () => [...new Set((docs.data ?? []).map((d) => d.categorie).filter(Boolean) as string[])].sort((a, b) => a.localeCompare(b, "fr")),
+    () =>
+      [...new Set((docs.data ?? []).map((d) => d.categorie).filter(Boolean) as string[])].sort((a, b) =>
+        a.localeCompare(b, "fr"),
+      ),
     [docs.data],
   );
 
@@ -51,7 +54,11 @@ export default function PageDocuments() {
         if (domaine !== TOUS && d.domaine_id !== domaine) return false;
         if (projet !== TOUS && d.projet_id !== projet) return false;
         if (categorie !== TOUS && d.categorie !== categorie) return false;
-        if (t && !normaliser(`${d.nom} ${d.categorie ?? ""} ${d.resume ?? ""} ${JSON.stringify(d.infos_cles)}`).includes(t)) return false;
+        if (
+          t &&
+          !normaliser(`${d.nom} ${d.categorie ?? ""} ${d.resume ?? ""} ${JSON.stringify(d.infos_cles)}`).includes(t)
+        )
+          return false;
         return true;
       })
       .sort((a, b) => Number(b.epingle) - Number(a.epingle));
@@ -103,7 +110,14 @@ export default function PageDocuments() {
           sousTitre="Glisse-dépose des fichiers n'importe où sur cette page"
           actions={
             <>
-              <input ref={input} type="file" multiple accept={ACCEPT} className="hidden" onChange={(e) => (envoyer(e.target.files), (e.target.value = ""))} />
+              <input
+                ref={input}
+                type="file"
+                multiple
+                accept={ACCEPT}
+                className="hidden"
+                onChange={(e) => (envoyer(e.target.files), (e.target.value = ""))}
+              />
               <Button onClick={() => input.current?.click()} disabled={!peutEcrire || deposer.isPending}>
                 {deposer.isPending ? <Loader2 className="animate-spin" aria-hidden /> : <Upload aria-hidden />}
                 {deposer.isPending ? "Envoi…" : "Déposer des fichiers"}
@@ -113,8 +127,18 @@ export default function PageDocuments() {
         />
         <div className="flex flex-wrap items-center gap-2 border-b bg-card px-6 py-3">
           <div className="relative w-72">
-            <Search className="pointer-events-none absolute left-2.5 top-2.5 size-4 text-muted-foreground" aria-hidden />
-            <Input ref={refRecherche} value={q} onChange={(e) => setQ(e.target.value)} placeholder="Rechercher (nom, résumé, infos clés)" aria-label="Rechercher un document" className="h-9 pl-8" />
+            <Search
+              className="pointer-events-none absolute left-2.5 top-2.5 size-4 text-muted-foreground"
+              aria-hidden
+            />
+            <Input
+              ref={refRecherche}
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="Rechercher (nom, résumé, infos clés)"
+              aria-label="Rechercher un document"
+              className="h-9 pl-8"
+            />
           </div>
           <Select value={domaine} onValueChange={setDomaine}>
             <SelectTrigger className="h-9 w-auto min-w-40" aria-label="Domaine">
@@ -189,22 +213,32 @@ export default function PageDocuments() {
                     <button
                       type="button"
                       onClick={() => ouvrir(d.id)}
-                      className={cn("flex w-full items-center gap-3 px-3 py-2.5 text-left hover:bg-accent/50", d.id === ouvert && "bg-accent")}
+                      className={cn(
+                        "flex w-full items-center gap-3 px-3 py-2.5 text-left hover:bg-accent/50",
+                        d.id === ouvert && "bg-accent",
+                      )}
                     >
                       <Icone className="size-4 shrink-0 text-muted-foreground" aria-hidden />
                       <span className="min-w-0 flex-1">
                         <span className="flex items-center gap-1.5">
-                          {d.epingle ? <Pin className="size-3 shrink-0 text-muted-foreground" aria-label="Épinglé" /> : null}
+                          {d.epingle ? (
+                            <Pin className="size-3 shrink-0 text-muted-foreground" aria-label="Épinglé" />
+                          ) : null}
                           <span className="truncate font-medium">{d.nom}</span>
                         </span>
-                        {d.resume ? <span className="block truncate text-sm text-muted-foreground">{d.resume}</span> : null}
+                        {d.resume ? (
+                          <span className="block truncate text-sm text-muted-foreground">{d.resume}</span>
+                        ) : null}
                       </span>
                       {d.analyse_statut === "en_attente" ? (
                         <span className="flex shrink-0 items-center gap-1 text-sm text-muted-foreground">
                           <Loader2 className="size-3.5 animate-spin" aria-hidden /> Analyse…
                         </span>
                       ) : d.analyse_statut === "erreur" ? (
-                        <span className="flex shrink-0 items-center gap-1 text-sm text-retard" title={d.analyse_message ?? undefined}>
+                        <span
+                          className="flex shrink-0 items-center gap-1 text-sm text-retard"
+                          title={d.analyse_message ?? undefined}
+                        >
                           <AlertCircle className="size-3.5" aria-hidden /> Non analysé
                         </span>
                       ) : d.categorie ? (
@@ -212,9 +246,19 @@ export default function PageDocuments() {
                           {d.categorie}
                         </Badge>
                       ) : null}
-                      {dom ? <PastilleDomaine nom={dom.nom} couleur={dom.couleur} className="hidden w-28 shrink-0 lg:inline-flex" /> : null}
-                      <span className="hidden w-16 shrink-0 text-right text-sm tabular text-muted-foreground md:inline">{taille(d.taille)}</span>
-                      <span className="w-16 shrink-0 text-right text-sm tabular text-muted-foreground">{dateCourte(d.created_at)}</span>
+                      {dom ? (
+                        <PastilleDomaine
+                          nom={dom.nom}
+                          couleur={dom.couleur}
+                          className="hidden w-28 shrink-0 lg:inline-flex"
+                        />
+                      ) : null}
+                      <span className="hidden w-16 shrink-0 text-right text-sm tabular text-muted-foreground md:inline">
+                        {taille(d.taille)}
+                      </span>
+                      <span className="w-16 shrink-0 text-right text-sm tabular text-muted-foreground">
+                        {dateCourte(d.created_at)}
+                      </span>
                     </button>
                   </li>
                 );

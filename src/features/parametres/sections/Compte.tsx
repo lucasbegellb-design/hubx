@@ -47,8 +47,24 @@ export function SectionCompte() {
       <div className="space-y-1.5 border-t pt-5">
         <Label>Changer de mot de passe</Label>
         <div className="flex max-w-lg flex-wrap gap-2">
-          <Input type="password" autoComplete="new-password" placeholder="Nouveau mot de passe" value={mdp} onChange={(e) => setMdp(e.target.value)} className="w-52" aria-label="Nouveau mot de passe" />
-          <Input type="password" autoComplete="new-password" placeholder="Confirmation" value={mdp2} onChange={(e) => setMdp2(e.target.value)} className="w-40" aria-label="Confirmation" />
+          <Input
+            type="password"
+            autoComplete="new-password"
+            placeholder="Nouveau mot de passe"
+            value={mdp}
+            onChange={(e) => setMdp(e.target.value)}
+            className="w-52"
+            aria-label="Nouveau mot de passe"
+          />
+          <Input
+            type="password"
+            autoComplete="new-password"
+            placeholder="Confirmation"
+            value={mdp2}
+            onChange={(e) => setMdp2(e.target.value)}
+            className="w-40"
+            aria-label="Confirmation"
+          />
           <Button variant="outline" onClick={changerMdp} disabled={!mdp}>
             Changer
           </Button>

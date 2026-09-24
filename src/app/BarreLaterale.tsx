@@ -46,14 +46,26 @@ function useCompteurRetard() {
   });
 }
 
-function Lien({ to, libelle, icone: Icone, badge }: { to: string; libelle: string; icone: LucideIcon; badge?: number }) {
+function Lien({
+  to,
+  libelle,
+  icone: Icone,
+  badge,
+}: {
+  to: string;
+  libelle: string;
+  icone: LucideIcon;
+  badge?: number;
+}) {
   return (
     <NavLink
       to={to}
       className={({ isActive }) =>
         cn(
           "flex h-8 items-center gap-2.5 rounded-md px-2.5 text-base transition-colors",
-          isActive ? "bg-accent font-medium text-foreground" : "text-muted-foreground hover:bg-accent/60 hover:text-foreground",
+          isActive
+            ? "bg-accent font-medium text-foreground"
+            : "text-muted-foreground hover:bg-accent/60 hover:text-foreground",
         )
       }
     >

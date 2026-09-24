@@ -27,7 +27,10 @@ async function jeton(id: IdentifiantsAzure): Promise<string> {
     }),
   });
   if (!r.ok) {
-    throw new HttpError(502, "Connexion Microsoft refusée : vérifie AZURE_TENANT_ID, AZURE_CLIENT_ID et AZURE_CLIENT_SECRET (secret expiré ?).");
+    throw new HttpError(
+      502,
+      "Connexion Microsoft refusée : vérifie AZURE_TENANT_ID, AZURE_CLIENT_ID et AZURE_CLIENT_SECRET (secret expiré ?).",
+    );
   }
   return (await r.json()).access_token as string;
 }
@@ -40,10 +43,18 @@ export function encoderLienPartage(url: string): string {
 
 function erreurGraph(status: number): HttpError {
   if (status === 401 || status === 403) {
-    return new HttpError(502, "Accès refusé par Microsoft : la permission Files.Read.All (application) et le consentement administrateur sont nécessaires (SETUP.md, étape 4).");
+    return new HttpError(
+      502,
+      "Accès refusé par Microsoft : la permission Files.Read.All (application) et le consentement administrateur sont nécessaires (SETUP.md, étape 4).",
+    );
   }
-  if (status === 404) return new HttpError(502, "Fichier introuvable : le lien de partage a peut-être été supprimé ou remplacé. Colle le nouveau lien dans Paramètres › Suivi Chine.");
-  if (status === 429) return new HttpError(503, "Microsoft limite temporairement les accès. Nouvel essai au prochain passage.");
+  if (status === 404)
+    return new HttpError(
+      502,
+      "Fichier introuvable : le lien de partage a peut-être été supprimé ou remplacé. Colle le nouveau lien dans Paramètres › Suivi Chine.",
+    );
+  if (status === 429)
+    return new HttpError(503, "Microsoft limite temporairement les accès. Nouvel essai au prochain passage.");
   return new HttpError(502, `Microsoft Graph indisponible (code ${status}). Nouvel essai au prochain passage.`);
 }
 
@@ -54,7 +65,11 @@ export interface FichierOneDrive {
   octets?: Uint8Array;
 }
 
-export async function lireFichierPartage(id: IdentifiantsAzure, lien: string, telecharger: boolean): Promise<FichierOneDrive> {
+export async function lireFichierPartage(
+  id: IdentifiantsAzure,
+  lien: string,
+  telecharger: boolean,
+): Promise<FichierOneDrive> {
   const t = await jeton(id);
   const enTetes = { Authorization: `Bearer ${t}` };
   const base = `https://graph.microsoft.com/v1.0/shares/${encoderLienPartage(lien)}/driveItem`;

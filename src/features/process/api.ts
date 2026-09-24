@@ -4,6 +4,7 @@ import { appelerFonction } from "@/lib/fonctions";
 import { supabase } from "@/lib/supabase";
 import type { MiseAJour } from "@/lib/types";
 import { verifierEcriture } from "@/hooks/useEcriture";
+import { schemaProcess, valider } from "@/lib/schemas";
 import { modeleVide, texteBrut, type SectionsStructurees } from "./modele";
 
 /** Liste légère des process (sans contenu). */
@@ -78,7 +79,12 @@ export function useCreerProcess() {
       const contenu = modeleVide();
       const { data, error } = await supabase
         .from("process")
-        .insert({ titre: champs.titre ?? "Nouveau process", domaine_id: champs.domaine_id ?? null, contenu, contenu_texte: "" })
+        .insert({
+          titre: champs.titre ?? "Nouveau process",
+          domaine_id: champs.domaine_id ?? null,
+          contenu,
+          contenu_texte: "",
+        })
         .select("id")
         .single();
       if (error) throw error;
@@ -98,7 +104,12 @@ export function useEnregistrerProcess() {
         maj.contenu = contenu as MiseAJour<"process">["contenu"];
         maj.contenu_texte = texteBrut(contenu);
       }
-      const { data, error } = await supabase.from("process").update(maj).eq("id", id).select().single();
+      const { data, error } = await supabase
+        .from("process")
+        .update(valider(schemaProcess, maj))
+        .eq("id", id)
+        .select()
+        .single();
       if (error) throw error;
       return data;
     },

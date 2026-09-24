@@ -46,14 +46,20 @@ servir(async (req) => {
         await db.auth.admin.updateUserById(existant.id, { password: c.mot_de_passe, ban_duration: "none" });
         userId = existant.id;
       }
-      const { error: e2 } = await db.from("membres").upsert({ user_id: userId!, nom, email, role }, { onConflict: "user_id" });
+      const { error: e2 } = await db
+        .from("membres")
+        .upsert({ user_id: userId!, nom, email, role }, { onConflict: "user_id" });
       if (e2) throw new HttpError(500, "Compte créé mais ajout aux membres impossible.");
       return json({ ok: true, user_id: userId });
     }
     case "role": {
       if (!c.user_id || (c.role !== "admin" && c.role !== "membre")) throw new HttpError(400, "Paramètres invalides.");
       if (c.role === "membre") {
-        const { count } = await db.from("membres").select("id", { count: "exact", head: true }).eq("role", "admin").neq("user_id", c.user_id);
+        const { count } = await db
+          .from("membres")
+          .select("id", { count: "exact", head: true })
+          .eq("role", "admin")
+          .neq("user_id", c.user_id);
         if (!count) throw new HttpError(400, "Il doit rester au moins un administrateur.");
       }
       const { error } = await db.from("membres").update({ role: c.role }).eq("user_id", c.user_id);
@@ -68,7 +74,8 @@ servir(async (req) => {
     }
     case "retirer": {
       if (!c.user_id) throw new HttpError(400, "Compte manquant.");
-      if (c.user_id === appelant.userId) throw new HttpError(400, "Tu ne peux pas retirer ton propre accès. Nomme d'abord un autre administrateur.");
+      if (c.user_id === appelant.userId)
+        throw new HttpError(400, "Tu ne peux pas retirer ton propre accès. Nomme d'abord un autre administrateur.");
       // Bloque la connexion (les données restent attribuées pour l'historique)
       await db.auth.admin.updateUserById(c.user_id, { ban_duration: "876000h" });
       const { error } = await db.from("membres").delete().eq("user_id", c.user_id);

@@ -2,7 +2,14 @@ import type { JSONContent } from "@tiptap/core";
 import { X } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useReferentiels } from "@/features/referentiels/api";
 import { useRaccourci } from "@/hooks/useRaccourci";
@@ -26,7 +33,10 @@ export function PanneauVersions({
   useRaccourci("Escape", onFermer, { actif: !apercu });
 
   return (
-    <aside aria-label="Historique des versions" className="flex w-80 shrink-0 animate-slide-in-right flex-col border-l bg-card">
+    <aside
+      aria-label="Historique des versions"
+      className="flex w-80 shrink-0 animate-slide-in-right flex-col border-l bg-card"
+    >
       <div className="flex h-12 items-center border-b px-3">
         <p className="flex-1 text-sm font-medium">Historique</p>
         <Button variant="ghost" size="icon" aria-label="Fermer l'historique" onClick={onFermer}>
@@ -44,7 +54,11 @@ export function PanneauVersions({
           <ul className="space-y-0.5">
             {versions.data?.map((v, i) => (
               <li key={v.id}>
-                <button type="button" onClick={() => setApercu(v)} className="w-full rounded-md px-2 py-2 text-left hover:bg-accent/60">
+                <button
+                  type="button"
+                  onClick={() => setApercu(v)}
+                  className="w-full rounded-md px-2 py-2 text-left hover:bg-accent/60"
+                >
                   <p className="text-sm">
                     {dateHeure(v.created_at)}
                     {i === 0 ? <span className="ml-1.5 text-xs text-fait">actuelle</span> : null}

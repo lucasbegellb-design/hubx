@@ -29,8 +29,15 @@ export function AlertesChineResume() {
               <span className="min-w-0 flex-1 truncate">
                 Paiement {l.fournisseur ?? ""} {l.po ? `(${l.po})` : ""}
               </span>
-              {l.montant !== null ? <span className="shrink-0 text-sm tabular">{montant(l.montant, l.devise)}</span> : null}
-              <span className={cn("w-24 shrink-0 text-right text-sm tabular", l.enRetard ? "font-medium text-retard" : "text-muted-foreground")}>
+              {l.montant !== null ? (
+                <span className="shrink-0 text-sm tabular">{montant(l.montant, l.devise)}</span>
+              ) : null}
+              <span
+                className={cn(
+                  "w-24 shrink-0 text-right text-sm tabular",
+                  l.enRetard ? "font-medium text-retard" : "text-muted-foreground",
+                )}
+              >
                 {l.enRetard ? "en retard" : dateCourte(l.date_echeance)}
               </span>
             </li>
@@ -40,7 +47,9 @@ export function AlertesChineResume() {
               <span className="min-w-0 flex-1 truncate">
                 Livraison {l.po ?? ""} {l.fournisseur ? `· ${l.fournisseur}` : ""}
               </span>
-              <span className="w-24 shrink-0 text-right text-sm font-medium tabular text-retard">{l.joursRetard} j de retard</span>
+              <span className="w-24 shrink-0 text-right text-sm font-medium tabular text-retard">
+                {l.joursRetard} j de retard
+              </span>
             </li>
           ))}
         </ul>

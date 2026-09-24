@@ -20,7 +20,10 @@ import {
 function lireFixture(): DonneesChine {
   const wb = XLSX.read(readFileSync("fixtures/suivi_chine_exemple.xlsx"), { type: "buffer", cellDates: true });
   return normaliserClasseur(
-    wb.SheetNames.map((nom) => ({ nom, lignes: XLSX.utils.sheet_to_json<unknown[]>(wb.Sheets[nom], { header: 1, raw: true, defval: null }) })),
+    wb.SheetNames.map((nom) => ({
+      nom,
+      lignes: XLSX.utils.sheet_to_json<unknown[]>(wb.Sheets[nom], { header: 1, raw: true, defval: null }),
+    })),
   );
 }
 
@@ -28,9 +31,25 @@ const MAPPING: MappingChine = {
   onglets: [
     {
       onglet: "PO & paiements",
-      colonnes: { fournisseur: "Fournisseur", po: "N° PO", montant: "Montant", devise: "Devise", date_echeance: "Échéance", date_paiement: "Payé le", statut: "Statut" },
+      colonnes: {
+        fournisseur: "Fournisseur",
+        po: "N° PO",
+        montant: "Montant",
+        devise: "Devise",
+        date_echeance: "Échéance",
+        date_paiement: "Payé le",
+        statut: "Statut",
+      },
     },
-    { onglet: "Livraisons", colonnes: { po: "N° PO", livraison_prevue: "Livraison prévue", livraison_reelle: "Livraison réelle", statut: "Statut" } },
+    {
+      onglet: "Livraisons",
+      colonnes: {
+        po: "N° PO",
+        livraison_prevue: "Livraison prévue",
+        livraison_reelle: "Livraison réelle",
+        statut: "Statut",
+      },
+    },
   ],
 };
 
@@ -50,7 +69,15 @@ describe("normalisation du classeur", () => {
   });
 
   it("nomme les colonnes sans en-tête et dédoublonne", () => {
-    const r = normaliserClasseur([{ nom: "X", lignes: [["A", "A", null, "B"], [1, 2, 3, 4]] }]);
+    const r = normaliserClasseur([
+      {
+        nom: "X",
+        lignes: [
+          ["A", "A", null, "B"],
+          [1, 2, 3, 4],
+        ],
+      },
+    ]);
     expect(r.onglets[0].entetes).toEqual(["A", "A (2)", "Colonne 3", "B"]);
   });
 
@@ -92,12 +119,21 @@ describe("application du mapping", () => {
   it("type chaque ligne des onglets mappés", () => {
     const pai = lignes.filter((l) => l.onglet === "PO & paiements");
     expect(pai).toHaveLength(9);
-    expect(pai[0]).toMatchObject({ fournisseur: "Shenzhen Wingtech Co.", po: "PO-2026-031", montant: 9600, devise: "USD", paye: true });
+    expect(pai[0]).toMatchObject({
+      fournisseur: "Shenzhen Wingtech Co.",
+      po: "PO-2026-031",
+      montant: 9600,
+      devise: "USD",
+      paye: true,
+    });
     expect(pai[1]).toMatchObject({ date_echeance: "2026-09-28", paye: false });
   });
 
   it("calcule les KPI par devise", () => {
-    const kpi = calculerKpi(lignes.filter((l) => l.onglet === "PO & paiements"), "2026-09-24");
+    const kpi = calculerKpi(
+      lignes.filter((l) => l.onglet === "PO & paiements"),
+      "2026-09-24",
+    );
     const usd = kpi.parDevise.find((k) => k.devise === "USD")!;
     expect(usd.engage).toBe(9600 + 22400 + 5850 + 13650 + 3200 + 3200 + 9600);
     expect(usd.paye).toBe(9600 + 5850 + 3200);
@@ -108,7 +144,12 @@ describe("application du mapping", () => {
 
   it("lève les alertes paiements dus et livraisons en retard", () => {
     const a = calculerAlertes(lignes, "2026-09-24");
-    expect(a.paiementsDus.map((l) => l.date_echeance)).toEqual(["2026-09-22", "2026-09-28", "2026-09-30", "2026-10-01"]);
+    expect(a.paiementsDus.map((l) => l.date_echeance)).toEqual([
+      "2026-09-22",
+      "2026-09-28",
+      "2026-09-30",
+      "2026-10-01",
+    ]);
     expect(a.paiementsDus[0].enRetard).toBe(true);
     // PO-2026-029 est livré, PO-2026-034/038 pas encore dus
     expect(a.livraisonsEnRetard.map((l) => l.po)).toEqual(["PO-2026-036", "PO-2026-031"]);
@@ -184,7 +225,18 @@ describe("détection automatique des colonnes", () => {
   it("reconnaît les libellés courants (français et anglais)", async () => {
     const { devinerColonnes } = await import("@shared/chine.ts");
     expect(
-      devinerColonnes(["Réf.", "Fournisseur", "N° PO", "Désignation", "Type", "Montant", "Devise", "Échéance", "Payé le", "Statut"]),
+      devinerColonnes([
+        "Réf.",
+        "Fournisseur",
+        "N° PO",
+        "Désignation",
+        "Type",
+        "Montant",
+        "Devise",
+        "Échéance",
+        "Payé le",
+        "Statut",
+      ]),
     ).toEqual({
       fournisseur: "Fournisseur",
       po: "N° PO",
@@ -194,7 +246,9 @@ describe("détection automatique des colonnes", () => {
       date_paiement: "Payé le",
       statut: "Statut",
     });
-    expect(devinerColonnes(["Supplier", "PO", "Amount", "Currency", "Due date", "ETA", "Delivered on", "Status"])).toMatchObject({
+    expect(
+      devinerColonnes(["Supplier", "PO", "Amount", "Currency", "Due date", "ETA", "Delivered on", "Status"]),
+    ).toMatchObject({
       fournisseur: "Supplier",
       po: "PO",
       montant: "Amount",

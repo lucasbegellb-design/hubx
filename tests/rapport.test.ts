@@ -79,7 +79,11 @@ describe("agrégation des rapports", () => {
       ["Compta", 1],
       ["Production", 1],
     ]);
-    expect(r.realise_par_domaine[0].taches[0]).toMatchObject({ titre: "Lundi tôt", done_le: "2026-09-21", qui: "Lucas" });
+    expect(r.realise_par_domaine[0].taches[0]).toMatchObject({
+      titre: "Lundi tôt",
+      done_le: "2026-09-21",
+      qui: "Lucas",
+    });
   });
 
   it("liste en cours, en attente (avec « en attente de »), en retard et à venir", () => {
@@ -147,7 +151,12 @@ describe("agrégation des rapports", () => {
     });
     const avant: DonneesChine = { onglets: [onglet([["A1", "Wingtech", 1000, "USD", "2026-09-30", "À payer"]])] };
     const apres: DonneesChine = {
-      onglets: [onglet([["A1", "Wingtech", 1000, "USD", "2026-09-30", "Payé"], ["A2", "Ningbo", 500, "EUR", "2026-10-05", "À payer"]])],
+      onglets: [
+        onglet([
+          ["A1", "Wingtech", 1000, "USD", "2026-09-30", "Payé"],
+          ["A2", "Ningbo", 500, "EUR", "2026-10-05", "À payer"],
+        ]),
+      ],
     };
     const r = construireRapport(
       entree([], {
@@ -156,14 +165,29 @@ describe("agrégation des rapports", () => {
           apres,
           avantLe: "2026-09-20T10:00:00Z",
           apresLe: "2026-09-25T10:00:00Z",
-          mapping: { onglets: [{ onglet: "Paiements", colonnes: { fournisseur: "Fournisseur", montant: "Montant", devise: "Devise", date_echeance: "Échéance", statut: "Statut" } }] },
+          mapping: {
+            onglets: [
+              {
+                onglet: "Paiements",
+                colonnes: {
+                  fournisseur: "Fournisseur",
+                  montant: "Montant",
+                  devise: "Devise",
+                  date_echeance: "Échéance",
+                  statut: "Statut",
+                },
+              },
+            ],
+          },
         },
       }),
     );
     expect(r.chine.disponible).toBe(true);
     expect(r.chine.evolutions).toMatchObject({ ajoutees: 1, modifiees: 1, supprimees: 0 });
     expect(r.chine.evolutions!.details[0].exemples).toEqual(["+ A2", "~ A1 (Statut)"]);
-    expect(r.chine.echeances).toEqual([{ fournisseur: "Ningbo", po: null, montant: 500, devise: "EUR", date: "2026-10-05", en_retard: false }]);
+    expect(r.chine.echeances).toEqual([
+      { fournisseur: "Ningbo", po: null, montant: 500, devise: "EUR", date: "2026-10-05", en_retard: false },
+    ]);
     expect(r.chine.kpi.find((k) => k.devise === "USD")).toMatchObject({ engage: 1000, paye: 1000, reste: 0 });
   });
 
@@ -174,9 +198,20 @@ describe("agrégation des rapports", () => {
   });
 
   it("rend un Markdown complet même sans synthèse IA", () => {
-    const r = construireRapport(entree([tache({ statut: "fait", done_at: "2026-09-22T10:00:00Z", titre: "Facture salon" })]));
+    const r = construireRapport(
+      entree([tache({ statut: "fait", done_at: "2026-09-22T10:00:00Z", titre: "Facture salon" })]),
+    );
     const md = rendreMarkdown(r, null);
-    for (const titre of ["## Synthèse", "## Réalisé par domaine", "## En cours et en attente", "## En retard", "## Chine", "## Process créés ou modifiés", "## Documents ajoutés", "## À venir"]) {
+    for (const titre of [
+      "## Synthèse",
+      "## Réalisé par domaine",
+      "## En cours et en attente",
+      "## En retard",
+      "## Chine",
+      "## Process créés ou modifiés",
+      "## Documents ajoutés",
+      "## À venir",
+    ]) {
       expect(md).toContain(titre);
     }
     expect(md).toContain("Facture salon");

@@ -48,3 +48,7 @@ Une ligne par arbitrage non bloquant.
 - Icône : mouette stylisée blanche sur fond bleu ardoise (évocation Bionic Bird), générée depuis `assets/icone.svg` (`npx tauri icon`).
 - Mémoire mesurée sous Linux/WebKitGTK sans GPU : ≈ 240 Mo PSS au repos (rendu logiciel, non représentatif de WebView2) ; à mesurer sur le PC de Lucas.
 - Les Edge Functions acceptent la clé serveur historique (`SUPABASE_SERVICE_ROLE_KEY`) ou le nouveau format (`SUPABASE_SECRET_KEYS`).
+- Validation zod de toutes les écritures (`src/lib/schemas.ts`), en plus des contraintes SQL ; validation partielle pour les mises à jour.
+- Mutations TanStack en `networkMode: "always"` : hors ligne, refus immédiat et explicite plutôt qu'une file d'attente invisible ; la saisie reste possible (brouillon).
+- Texte secondaire des post-its en `text-foreground/75` (contraste AA sur les quatre teintes, vérifié avec axe-core).
+- Workflow manuel « Build Windows » : installeur en artefact, sans publication, pour tester avant une release.

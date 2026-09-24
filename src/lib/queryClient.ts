@@ -22,6 +22,7 @@ export const queryClient = new QueryClient({
       retry: (n, e) => !estErreurReseau(e) && n < 2,
       refetchOnWindowFocus: false,
     },
-    mutations: { retry: false },
+    // Les mutations s'exécutent toujours : hors ligne, la garde verifierEcriture() les refuse aussitôt (pas de file d'attente invisible).
+    mutations: { retry: false, networkMode: "always" },
   },
 });

@@ -42,7 +42,12 @@ function CarteOnglet({
       <div className="flex items-end gap-2">
         <div className="flex-1 space-y-1.5">
           <Label>Onglet</Label>
-          <Select value={mo.onglet} onValueChange={(v) => onChange({ onglet: v, colonnes: devinerColonnes(onglets.find((o) => o.nom === v)?.entetes ?? []) })}>
+          <Select
+            value={mo.onglet}
+            onValueChange={(v) =>
+              onChange({ onglet: v, colonnes: devinerColonnes(onglets.find((o) => o.nom === v)?.entetes ?? []) })
+            }
+          >
             <SelectTrigger aria-label="Onglet du classeur">
               <SelectValue placeholder="Choisir un onglet" />
             </SelectTrigger>
@@ -56,7 +61,11 @@ function CarteOnglet({
             </SelectContent>
           </Select>
         </div>
-        <Button variant="outline" onClick={() => onglet && onChange({ ...mo, colonnes: devinerColonnes(onglet.entetes) })} disabled={!onglet}>
+        <Button
+          variant="outline"
+          onClick={() => onglet && onChange({ ...mo, colonnes: devinerColonnes(onglet.entetes) })}
+          disabled={!onglet}
+        >
           <Wand2 aria-hidden /> Détecter
         </Button>
         <Button variant="ghost" size="icon" aria-label="Retirer cet onglet du mapping" onClick={onRetirer}>
@@ -70,7 +79,9 @@ function CarteOnglet({
               <Label className="text-sm font-normal text-muted-foreground">{LIBELLES_ROLES[r]}</Label>
               <Select
                 value={mo.colonnes[r] ?? AUCUNE}
-                onValueChange={(v) => onChange({ ...mo, colonnes: { ...mo.colonnes, [r]: v === AUCUNE ? undefined : v } })}
+                onValueChange={(v) =>
+                  onChange({ ...mo, colonnes: { ...mo.colonnes, [r]: v === AUCUNE ? undefined : v } })
+                }
               >
                 <SelectTrigger className="h-8" aria-label={LIBELLES_ROLES[r]}>
                   <SelectValue />
@@ -112,7 +123,11 @@ export function ParametresChine() {
   const onglets = a.donnees.onglets;
   const apercu = useMemo(() => {
     const lignes = appliquerMapping(a.donnees, mapping);
-    return { lignes: lignes.length, devises: calculerKpi(lignes, aujourdhuiParis()).parDevise.length, problemes: validerMapping(a.donnees, mapping).problemes };
+    return {
+      lignes: lignes.length,
+      devises: calculerKpi(lignes, aujourdhuiParis()).parDevise.length,
+      problemes: validerMapping(a.donnees, mapping).problemes,
+    };
   }, [a.donnees, mapping]);
 
   async function tester() {
@@ -120,7 +135,10 @@ export function ParametresChine() {
     setTest(null);
     try {
       const r = await testerConnexionChine();
-      setTest({ ok: true, message: `Connexion réussie : « ${r.nom} »${r.modifie_le ? `, modifié le ${dateHeure(r.modifie_le)}` : ""}.` });
+      setTest({
+        ok: true,
+        message: `Connexion réussie : « ${r.nom} »${r.modifie_le ? `, modifié le ${dateHeure(r.modifie_le)}` : ""}.`,
+      });
     } catch (e) {
       setTest({ ok: false, message: (e as Error).message });
     } finally {
@@ -130,7 +148,8 @@ export function ParametresChine() {
 
   async function enregistrerLien() {
     const v = lien.trim();
-    if (v && !/^https:\/\//i.test(v)) return toast.error("Le lien doit commencer par https:// (copie « Copier le lien » dans OneDrive).");
+    if (v && !/^https:\/\//i.test(v))
+      return toast.error("Le lien doit commencer par https:// (copie « Copier le lien » dans OneDrive).");
     try {
       await majSource.mutateAsync({ share_url: v || null });
       toast.success("Lien enregistré");
@@ -143,7 +162,10 @@ export function ParametresChine() {
     const propre: MappingChine = {
       onglets: mapping.onglets
         .filter((o) => o.onglet)
-        .map((o) => ({ onglet: o.onglet, colonnes: Object.fromEntries(Object.entries(o.colonnes).filter(([, v]) => v)) })),
+        .map((o) => ({
+          onglet: o.onglet,
+          colonnes: Object.fromEntries(Object.entries(o.colonnes).filter(([, v]) => v)),
+        })),
     };
     try {
       await majSource.mutateAsync({ mapping: propre });
@@ -154,7 +176,11 @@ export function ParametresChine() {
   }
 
   if (!estAdmin) {
-    return <p className="text-sm text-muted-foreground">La source et le mapping du Suivi Chine sont réservés à l'administrateur.</p>;
+    return (
+      <p className="text-sm text-muted-foreground">
+        La source et le mapping du Suivi Chine sont réservés à l'administrateur.
+      </p>
+    );
   }
 
   const ongletsLibres = onglets.filter((o) => !mapping.onglets.some((m) => m.onglet === o.nom));
@@ -164,14 +190,24 @@ export function ParametresChine() {
       <div className="space-y-2">
         <Label htmlFor="lien">Lien de partage du fichier Excel (OneDrive d'Edwin)</Label>
         <div className="flex gap-2">
-          <Input id="lien" value={lien} onChange={(e) => setLien(e.target.value)} placeholder="https://xtim-my.sharepoint.com/:x:/g/personal/…" className="flex-1" />
-          <Button onClick={enregistrerLien} disabled={lien.trim() === (a.source?.share_url ?? "") || majSource.isPending}>
+          <Input
+            id="lien"
+            value={lien}
+            onChange={(e) => setLien(e.target.value)}
+            placeholder="https://xtim-my.sharepoint.com/:x:/g/personal/…"
+            className="flex-1"
+          />
+          <Button
+            onClick={enregistrerLien}
+            disabled={lien.trim() === (a.source?.share_url ?? "") || majSource.isPending}
+          >
             Enregistrer
           </Button>
         </div>
         <p className="text-sm text-muted-foreground">
-          Le fichier est lu, jamais modifié. Source actuelle : {a.source?.derniere_source === "onedrive" ? "OneDrive" : "mode démo (identifiants Azure absents)"} ·
-          dernière synchro {ilYa(a.source?.last_sync_at)}.
+          Le fichier est lu, jamais modifié. Source actuelle :{" "}
+          {a.source?.derniere_source === "onedrive" ? "OneDrive" : "mode démo (identifiants Azure absents)"} · dernière
+          synchro {ilYa(a.source?.last_sync_at)}.
         </p>
         <div className="flex flex-wrap gap-2">
           <Button variant="outline" onClick={tester} disabled={testEnCours}>
@@ -187,7 +223,8 @@ export function ParametresChine() {
             }
             disabled={actualiser.isPending}
           >
-            <RefreshCw aria-hidden className={actualiser.isPending ? "animate-spin" : undefined} /> Actualiser maintenant
+            <RefreshCw aria-hidden className={actualiser.isPending ? "animate-spin" : undefined} /> Actualiser
+            maintenant
           </Button>
         </div>
         {test ? (
@@ -197,19 +234,24 @@ export function ParametresChine() {
             <MessageErreur>{test.message}</MessageErreur>
           )
         ) : null}
-        {a.source?.last_error ? <MessageErreur>Dernière synchronisation échouée : {a.source.last_error}</MessageErreur> : null}
+        {a.source?.last_error ? (
+          <MessageErreur>Dernière synchronisation échouée : {a.source.last_error}</MessageErreur>
+        ) : null}
       </div>
 
       <div className="space-y-3 border-t pt-5">
         <div>
           <p className="font-medium">Mapping des colonnes (optionnel)</p>
           <p className="text-sm text-muted-foreground">
-            Associe les colonnes du fichier à des rôles pour débloquer les montants (engagé, payé, reste à payer), les prochaines
-            échéances et les alertes. Si Edwin renomme une colonne, un message clair s'affiche au lieu d'une erreur.
+            Associe les colonnes du fichier à des rôles pour débloquer les montants (engagé, payé, reste à payer), les
+            prochaines échéances et les alertes. Si Edwin renomme une colonne, un message clair s'affiche au lieu d'une
+            erreur.
           </p>
         </div>
         {!onglets.length ? (
-          <p className="text-sm text-muted-foreground">Lance d'abord une synchronisation pour connaître les onglets du fichier.</p>
+          <p className="text-sm text-muted-foreground">
+            Lance d'abord une synchronisation pour connaître les onglets du fichier.
+          </p>
         ) : (
           <>
             {mapping.onglets.map((mo, i) => (
@@ -225,7 +267,12 @@ export function ParametresChine() {
               <Button
                 variant="outline"
                 onClick={() =>
-                  setMapping((x) => ({ onglets: [...x.onglets, { onglet: ongletsLibres[0].nom, colonnes: devinerColonnes(ongletsLibres[0].entetes) }] }))
+                  setMapping((x) => ({
+                    onglets: [
+                      ...x.onglets,
+                      { onglet: ongletsLibres[0].nom, colonnes: devinerColonnes(ongletsLibres[0].entetes) },
+                    ],
+                  }))
                 }
               >
                 <Plus aria-hidden /> Ajouter un onglet
@@ -236,7 +283,8 @@ export function ParametresChine() {
                 Enregistrer le mapping
               </Button>
               <p className="text-sm text-muted-foreground">
-                Aperçu : {pluriel(apercu.lignes, "ligne reconnue", "lignes reconnues")}, {pluriel(apercu.devises, "devise")}.
+                Aperçu : {pluriel(apercu.lignes, "ligne reconnue", "lignes reconnues")},{" "}
+                {pluriel(apercu.devises, "devise")}.
               </p>
             </div>
             {apercu.problemes.map((p) => (

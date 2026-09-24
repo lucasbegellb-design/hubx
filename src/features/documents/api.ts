@@ -4,6 +4,7 @@ import { appelerFonction } from "@/lib/fonctions";
 import { supabase } from "@/lib/supabase";
 import type { DocumentXtim, MiseAJour } from "@/lib/types";
 import { verifierEcriture } from "@/hooks/useEcriture";
+import { schemaDocument, valider } from "@/lib/schemas";
 
 export const TAILLE_MAX = 50 * 1024 * 1024;
 
@@ -60,7 +61,15 @@ export async function lancerAnalyse(id: string) {
 export function useDeposerDocuments() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ fichiers, domaine_id, projet_id }: { fichiers: File[]; domaine_id: string | null; projet_id: string | null }) => {
+    mutationFn: async ({
+      fichiers,
+      domaine_id,
+      projet_id,
+    }: {
+      fichiers: File[];
+      domaine_id: string | null;
+      projet_id: string | null;
+    }) => {
       if (!verifierEcriture()) throw new Error("hors-ligne");
       const crees: DocumentXtim[] = [];
       for (const f of fichiers) {
@@ -69,7 +78,9 @@ export function useDeposerDocuments() {
           continue;
         }
         const chemin = cheminStockage(f.name);
-        const up = await supabase.storage.from("documents").upload(chemin, f, { contentType: f.type || undefined, upsert: false });
+        const up = await supabase.storage
+          .from("documents")
+          .upload(chemin, f, { contentType: f.type || undefined, upsert: false });
         if (up.error) throw up.error;
         const { data, error } = await supabase
           .from("documents")
@@ -95,7 +106,12 @@ export function useMajDocument() {
   return useMutation({
     mutationFn: async ({ id, ...maj }: MiseAJour<"documents"> & { id: string }) => {
       if (!verifierEcriture()) throw new Error("hors-ligne");
-      const { data, error } = await supabase.from("documents").update(maj).eq("id", id).select().single();
+      const { data, error } = await supabase
+        .from("documents")
+        .update(valider(schemaDocument, maj))
+        .eq("id", id)
+        .select()
+        .single();
       if (error) throw error;
       return data;
     },
@@ -103,7 +119,9 @@ export function useMajDocument() {
       const cle = ["documents", "liste"];
       await qc.cancelQueries({ queryKey: cle });
       const avant = qc.getQueryData<DocumentXtim[]>(cle);
-      qc.setQueryData<DocumentXtim[]>(cle, (l) => l?.map((d) => (d.id === id ? { ...d, ...maj } as DocumentXtim : d)));
+      qc.setQueryData<DocumentXtim[]>(cle, (l) =>
+        l?.map((d) => (d.id === id ? ({ ...d, ...maj } as DocumentXtim) : d)),
+      );
       return { avant };
     },
     onError: (_e, _v, ctx) => ctx?.avant && qc.setQueryData(["documents", "liste"], ctx.avant),

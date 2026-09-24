@@ -4,8 +4,19 @@ import { ajouterJours, bornesInstant, dernierJourOuvre, finSemaine, periode } fr
 
 const AUJ = "2026-09-24"; // jeudi
 
-function t(id: string, champs: Partial<{ statut: string; echeance: string | null; priorite: string; done_at: string | null }>) {
-  return { id, statut: "a_faire", echeance: null, priorite: "normale", done_at: null, created_at: "2026-09-01T10:00:00Z", ...champs };
+function t(
+  id: string,
+  champs: Partial<{ statut: string; echeance: string | null; priorite: string; done_at: string | null }>,
+) {
+  return {
+    id,
+    statut: "a_faire",
+    echeance: null,
+    priorite: "normale",
+    done_at: null,
+    created_at: "2026-09-01T10:00:00Z",
+    ...champs,
+  };
 }
 
 describe("regroupement par échéance", () => {
@@ -15,7 +26,9 @@ describe("regroupement par échéance", () => {
     expect(groupeDe(t("c", { echeance: "2026-09-27" }), AUJ)).toBe("cette_semaine"); // dimanche
     expect(groupeDe(t("d", { echeance: "2026-09-28" }), AUJ)).toBe("plus_tard"); // lundi suivant
     expect(groupeDe(t("e", {}), AUJ)).toBe("sans_date");
-    expect(groupeDe(t("f", { statut: "fait", done_at: "2026-09-20T10:00:00Z", echeance: "2026-09-01" }), AUJ)).toBe("faites");
+    expect(groupeDe(t("f", { statut: "fait", done_at: "2026-09-20T10:00:00Z", echeance: "2026-09-01" }), AUJ)).toBe(
+      "faites",
+    );
   });
 
   it("exclut les tâches faites depuis plus de 7 jours", () => {
@@ -23,7 +36,10 @@ describe("regroupement par échéance", () => {
   });
 
   it("une tâche faite en retard n'apparaît pas en retard", () => {
-    const g = grouperParEcheance([t("h", { statut: "fait", echeance: "2026-09-01", done_at: "2026-09-24T08:00:00Z" })], AUJ);
+    const g = grouperParEcheance(
+      [t("h", { statut: "fait", echeance: "2026-09-01", done_at: "2026-09-24T08:00:00Z" })],
+      AUJ,
+    );
     expect(g.find((x) => x.cle === "en_retard")!.taches).toHaveLength(0);
     expect(g.find((x) => x.cle === "faites")!.taches).toHaveLength(1);
   });

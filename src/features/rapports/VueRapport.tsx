@@ -48,7 +48,15 @@ export function titreRapport(d: { type: string }) {
 }
 
 /** Rendu à l'écran d'un rapport, à partir du JSON déterministe `donnees`. */
-export function VueRapport({ d, synthese, erreurIa }: { d: DonneesRapport; synthese: string | null; erreurIa: string | null }) {
+export function VueRapport({
+  d,
+  synthese,
+  erreurIa,
+}: {
+  d: DonneesRapport;
+  synthese: string | null;
+  erreurIa: string | null;
+}) {
   const c = d.compteurs;
   return (
     <div className="max-w-4xl space-y-7">
@@ -57,7 +65,8 @@ export function VueRapport({ d, synthese, erreurIa }: { d: DonneesRapport; synth
           <p className="whitespace-pre-line leading-6">{synthese}</p>
         ) : (
           <p className="text-sm text-muted-foreground">
-            Synthèse rédigée indisponible{erreurIa ? ` : ${erreurIa}` : " (IA non configurée)"}. Les chiffres ci-dessous sont complets.
+            Synthèse rédigée indisponible{erreurIa ? ` : ${erreurIa}` : " (IA non configurée)"}. Les chiffres ci-dessous
+            sont complets.
           </p>
         )}
         <div className="flex flex-wrap gap-2 pt-1">
@@ -83,19 +92,33 @@ export function VueRapport({ d, synthese, erreurIa }: { d: DonneesRapport; synth
             ))}
           </div>
         ) : (
-          <p className="text-sm text-muted-foreground">Aucune tâche terminée sur la période. Pense au bouton « Fait » pour le travail réalisé hors to-do.</p>
+          <p className="text-sm text-muted-foreground">
+            Aucune tâche terminée sur la période. Pense au bouton « Fait » pour le travail réalisé hors to-do.
+          </p>
         )}
       </Section>
 
       <Section titre="En cours et en attente" compteur={c.en_cours + c.en_attente}>
         <div className="space-y-3">
-          <Liste items={d.en_cours} vide="Rien en cours." rendu={(t) => (t.echeance ? `échéance ${dateFr(t.echeance)}` : "")} />
-          <Liste items={d.en_attente} vide="Rien en attente." rendu={(t) => (t.en_attente_de ? `attend : ${t.en_attente_de}` : "en attente")} />
+          <Liste
+            items={d.en_cours}
+            vide="Rien en cours."
+            rendu={(t) => (t.echeance ? `échéance ${dateFr(t.echeance)}` : "")}
+          />
+          <Liste
+            items={d.en_attente}
+            vide="Rien en attente."
+            rendu={(t) => (t.en_attente_de ? `attend : ${t.en_attente_de}` : "en attente")}
+          />
         </div>
       </Section>
 
       <Section titre="En retard" compteur={c.en_retard}>
-        <Liste items={d.en_retard} vide="Aucune tâche en retard." rendu={(t) => <span className="text-retard">{`${dateFr(t.echeance)} · ${t.jours_retard} j`}</span>} />
+        <Liste
+          items={d.en_retard}
+          vide="Aucune tâche en retard."
+          rendu={(t) => <span className="text-retard">{`${dateFr(t.echeance)} · ${t.jours_retard} j`}</span>}
+        />
       </Section>
 
       <Section titre="Chine">
@@ -126,7 +149,8 @@ export function VueRapport({ d, synthese, erreurIa }: { d: DonneesRapport; synth
               <p className="text-sm">
                 {d.chine.kpi.map((k) => (
                   <span key={k.devise} className="mr-4 inline-block tabular">
-                    {k.devise} : reste à payer <strong>{montantFr(k.reste, k.devise)}</strong> sur {montantFr(k.engage, k.devise)}
+                    {k.devise} : reste à payer <strong>{montantFr(k.reste, k.devise)}</strong> sur{" "}
+                    {montantFr(k.engage, k.devise)}
                   </span>
                 ))}
               </p>
@@ -135,7 +159,9 @@ export function VueRapport({ d, synthese, erreurIa }: { d: DonneesRapport; synth
               <ul className="divide-y rounded-lg border bg-card text-sm">
                 {d.chine.echeances.map((e, i) => (
                   <li key={i} className="flex gap-3 px-3 py-2">
-                    <span className={cn("w-28 shrink-0 tabular", e.en_retard && "font-medium text-retard")}>{dateFr(e.date)}</span>
+                    <span className={cn("w-28 shrink-0 tabular", e.en_retard && "font-medium text-retard")}>
+                      {dateFr(e.date)}
+                    </span>
                     <span className="min-w-0 flex-1 truncate">
                       {e.fournisseur ?? "?"} {e.po ? <span className="text-muted-foreground">· {e.po}</span> : null}
                     </span>
@@ -146,7 +172,8 @@ export function VueRapport({ d, synthese, erreurIa }: { d: DonneesRapport; synth
             ) : null}
             {d.chine.livraisons_en_retard.length ? (
               <p className="text-sm text-retard">
-                Livraisons en retard : {d.chine.livraisons_en_retard.map((l) => `${l.po ?? "?"} (${l.jours} j)`).join(", ")}
+                Livraisons en retard :{" "}
+                {d.chine.livraisons_en_retard.map((l) => `${l.po ?? "?"} (${l.jours} j)`).join(", ")}
               </p>
             ) : null}
           </div>

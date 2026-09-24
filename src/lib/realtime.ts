@@ -39,7 +39,10 @@ export function demarrerRealtime() {
     c = c.on("postgres_changes", { event: "*", schema: "public", table }, (payload) => {
       queryClient.invalidateQueries({ queryKey: [table] });
       if (table === "journal_activite") queryClient.invalidateQueries({ queryKey: ["aujourdhui"] });
-      const ligne = (payload.new && Object.keys(payload.new).length ? payload.new : payload.old) as Record<string, unknown>;
+      const ligne = (payload.new && Object.keys(payload.new).length ? payload.new : payload.old) as Record<
+        string,
+        unknown
+      >;
       ecouteurs.forEach((fn) => fn(table, payload.eventType, ligne));
     });
   }

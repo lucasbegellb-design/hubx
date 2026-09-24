@@ -40,12 +40,17 @@ export function PageConfigServeur() {
     location.reload();
   });
   return (
-    <Cadre titre="Connexion au serveur" sousTitre="Renseigne une fois l'adresse du projet Supabase (voir SETUP.md, étape 1).">
+    <Cadre
+      titre="Connexion au serveur"
+      sousTitre="Renseigne une fois l'adresse du projet Supabase (voir SETUP.md, étape 1)."
+    >
       <form onSubmit={onSubmit} className="space-y-4" noValidate>
         <div className="space-y-1.5">
           <Label htmlFor="url">Adresse du projet</Label>
           <Input id="url" placeholder="https://xxxx.supabase.co" autoFocus {...form.register("url")} />
-          {form.formState.errors.url ? <p className="text-sm text-urgent">{form.formState.errors.url.message}</p> : null}
+          {form.formState.errors.url ? (
+            <p className="text-sm text-urgent">{form.formState.errors.url.message}</p>
+          ) : null}
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="anon">Clé publique (anon)</Label>
@@ -87,7 +92,9 @@ export function PageConnexion() {
         <div className="space-y-1.5">
           <Label htmlFor="email">E-mail</Label>
           <Input id="email" type="email" autoComplete="username" autoFocus {...form.register("email")} />
-          {form.formState.errors.email ? <p className="text-sm text-urgent">{form.formState.errors.email.message}</p> : null}
+          {form.formState.errors.email ? (
+            <p className="text-sm text-urgent">{form.formState.errors.email.message}</p>
+          ) : null}
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="mdp">Mot de passe</Label>
@@ -130,7 +137,10 @@ export function PageAccesRefuse() {
   }
 
   return (
-    <Cadre titre="Accès non autorisé" sousTitre={`Le compte ${session?.user.email ?? ""} n'est pas encore membre du Hub.`}>
+    <Cadre
+      titre="Accès non autorisé"
+      sousTitre={`Le compte ${session?.user.email ?? ""} n'est pas encore membre du Hub.`}
+    >
       {premierAdmin.data ? (
         <div className="space-y-3">
           <p className="text-sm">
@@ -147,7 +157,9 @@ export function PageAccesRefuse() {
           </Button>
         </div>
       ) : (
-        <p className="text-sm text-muted-foreground">Demande à l'administrateur de t'ajouter dans Paramètres › Comptes.</p>
+        <p className="text-sm text-muted-foreground">
+          Demande à l'administrateur de t'ajouter dans Paramètres › Comptes.
+        </p>
       )}
       <Button variant="outline" className="w-full" onClick={() => supabase.auth.signOut()}>
         Se déconnecter

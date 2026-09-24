@@ -60,7 +60,11 @@ export function PaletteCommandes() {
     fermer();
   };
 
-  const saisie = analyserSaisie(q, { domaines: r.listeDomaines, projets: r.projetsActifs, aujourdhui: aujourdhuiParis() });
+  const saisie = analyserSaisie(q, {
+    domaines: r.listeDomaines,
+    projets: r.projetsActifs,
+    aujourdhui: aujourdhuiParis(),
+  });
   const texte = saisie.titre.trim();
 
   async function creer(type: "tache" | "fait" | "postit") {
@@ -162,7 +166,11 @@ export function PaletteCommandes() {
             <CommandSeparator />
             <ResultatGroupe
               titre="Tâches"
-              items={tachesActives.map((t) => ({ id: t.id, libelle: t.titre, detail: t.statut === "fait" ? "faite" : "" }))}
+              items={tachesActives.map((t) => ({
+                id: t.id,
+                libelle: t.titre,
+                detail: t.statut === "fait" ? "faite" : "",
+              }))}
               icone={<ListTodo aria-hidden />}
               onSelect={(id) => aller(`/taches?t=${id}`)()}
             />
@@ -215,4 +223,3 @@ function ResultatGroupe({
     </CommandGroup>
   );
 }
-

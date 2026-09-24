@@ -31,7 +31,8 @@ export default function PageChine() {
 
   function lancer() {
     actualiser.mutate(undefined, {
-      onSuccess: (r) => toast.success(r.change ? "Actualisé : nouvelle version du fichier" : "Actualisé : aucun changement"),
+      onSuccess: (r) =>
+        toast.success(r.change ? "Actualisé : nouvelle version du fichier" : "Actualisé : aucun changement"),
       onError: (e) => toast.error((e as Error).message),
     });
   }
@@ -62,7 +63,9 @@ export default function PageChine() {
       />
       {source?.last_error || a.problemes.length ? (
         <div className="space-y-2 border-b bg-card px-6 py-3">
-          {source?.last_error ? <MessageErreur>Dernière synchronisation échouée : {source.last_error}</MessageErreur> : null}
+          {source?.last_error ? (
+            <MessageErreur>Dernière synchronisation échouée : {source.last_error}</MessageErreur>
+          ) : null}
           {a.problemes.map((p) => (
             <MessageErreur key={p}>{p}</MessageErreur>
           ))}
@@ -84,22 +87,33 @@ export default function PageChine() {
               </Button>
             }
           >
-            La synchronisation automatique a lieu toutes les 15 minutes. Sans identifiants Azure, le fichier d'exemple est utilisé.
+            La synchronisation automatique a lieu toutes les 15 minutes. Sans identifiants Azure, le fichier d'exemple
+            est utilisé.
           </EtatVide>
         </div>
       ) : (
         <Tabs value={onglet} onValueChange={setOnglet} className="flex min-h-0 flex-1 flex-col">
           <div className="overflow-x-auto border-b bg-card px-6 scrollbar-thin">
             <TabsList className="h-11 gap-1 rounded-none bg-transparent p-0">
-              <TabsTrigger value="ensemble" className="rounded-none border-b-2 border-transparent px-3 data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none">
+              <TabsTrigger
+                value="ensemble"
+                className="rounded-none border-b-2 border-transparent px-3 data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none"
+              >
                 Vue d'ensemble
               </TabsTrigger>
               {a.donnees.onglets.map((o) => (
-                <TabsTrigger key={o.nom} value={`o:${o.nom}`} className="rounded-none border-b-2 border-transparent px-3 data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none">
+                <TabsTrigger
+                  key={o.nom}
+                  value={`o:${o.nom}`}
+                  className="rounded-none border-b-2 border-transparent px-3 data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none"
+                >
                   {o.nom}
                 </TabsTrigger>
               ))}
-              <TabsTrigger value="historique" className="rounded-none border-b-2 border-transparent px-3 data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none">
+              <TabsTrigger
+                value="historique"
+                className="rounded-none border-b-2 border-transparent px-3 data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none"
+              >
                 Historique
               </TabsTrigger>
             </TabsList>

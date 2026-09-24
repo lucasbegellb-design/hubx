@@ -42,7 +42,12 @@ function NouveauPostit() {
   }
 
   return (
-    <div className={cn("flex flex-col gap-2 rounded-lg border border-black/5 p-3 dark:border-white/5", classeCouleur(couleur))}>
+    <div
+      className={cn(
+        "flex flex-col gap-2 rounded-lg border border-black/5 p-3 dark:border-white/5",
+        classeCouleur(couleur),
+      )}
+    >
       <Textarea
         ref={ref}
         value={contenu}
@@ -60,7 +65,11 @@ function NouveauPostit() {
             aria-label={`Couleur ${c.libelle}`}
             aria-pressed={couleur === c.valeur}
             onClick={() => setCouleur(c.valeur)}
-            className={cn("size-5 rounded border border-black/10", c.classe, couleur === c.valeur && "ring-2 ring-primary ring-offset-1")}
+            className={cn(
+              "size-5 rounded border border-black/10",
+              c.classe,
+              couleur === c.valeur && "ring-2 ring-primary ring-offset-1",
+            )}
           />
         ))}
         <div className="flex-1" />
@@ -113,7 +122,12 @@ export default function PagePostits() {
       <EnteteePage
         titre="Post-its"
         actions={
-          <ToggleGroup type="single" value={vue} onValueChange={(v) => v && setVue(v as Vue)} className="rounded-md border p-0.5">
+          <ToggleGroup
+            type="single"
+            value={vue}
+            onValueChange={(v) => v && setVue(v as Vue)}
+            className="rounded-md border p-0.5"
+          >
             {(
               [
                 ["tous", "Tous"],

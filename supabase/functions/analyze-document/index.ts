@@ -97,7 +97,10 @@ servir(async (req) => {
   let extrait = false;
   if (mime === "application/pdf" || doc.nom.toLowerCase().endsWith(".pdf")) {
     if (octets.length > MAX_PDF) return echec("PDF trop volumineux pour l'analyse (20 Mo maximum).");
-    contenu.push({ type: "document", source: { type: "base64", media_type: "application/pdf", data: encodeBase64(octets) } });
+    contenu.push({
+      type: "document",
+      source: { type: "base64", media_type: "application/pdf", data: encodeBase64(octets) },
+    });
   } else if (IMAGES.includes(mime)) {
     if (octets.length > MAX_IMAGE) return echec("Image trop lourde pour l'analyse (5 Mo maximum).");
     contenu.push({
@@ -111,7 +114,8 @@ servir(async (req) => {
     } catch {
       return echec("Fichier illisible (corrompu ou protégé par mot de passe).");
     }
-    if (texte === null) return echec("Format non pris en charge pour l'analyse (PDF, images, Word, Excel, PowerPoint, texte).");
+    if (texte === null)
+      return echec("Format non pris en charge pour l'analyse (PDF, images, Word, Excel, PowerPoint, texte).");
     if (!texte.trim()) return echec("Aucun texte exploitable dans ce fichier.");
     if (texte.length > MAX_TEXTE) {
       texte = texte.slice(0, MAX_TEXTE);
@@ -146,7 +150,10 @@ servir(async (req) => {
     return echec(e instanceof HttpError ? e.message : "Analyse IA impossible pour le moment. Relance-la plus tard.");
   }
 
-  const domaineId = !doc.domaine_id && analyse.domaine_suggere ? (domaines ?? []).find((d) => d.nom === analyse.domaine_suggere)?.id : null;
+  const domaineId =
+    !doc.domaine_id && analyse.domaine_suggere
+      ? (domaines ?? []).find((d) => d.nom === analyse.domaine_suggere)?.id
+      : null;
 
   await db
     .from("documents")

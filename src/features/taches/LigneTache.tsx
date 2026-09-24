@@ -76,7 +76,12 @@ export const LigneTache = forwardRef<HTMLButtonElement, Props>(function LigneTac
         {t.priorite === "urgente" && !fait ? (
           <span className="shrink-0 text-xs font-semibold text-urgent">Urgent</span>
         ) : null}
-        <span className={cn("min-w-0 truncate", fait && "text-muted-foreground line-through decoration-muted-foreground/50")}>
+        <span
+          className={cn(
+            "min-w-0 truncate",
+            fait && "text-muted-foreground line-through decoration-muted-foreground/50",
+          )}
+        >
           {t.titre}
         </span>
         {t.statut === "en_attente" ? (
@@ -87,8 +92,12 @@ export const LigneTache = forwardRef<HTMLButtonElement, Props>(function LigneTac
           <span className="shrink-0 text-sm text-muted-foreground">· en cours</span>
         ) : null}
       </button>
-      {!compacte && projet ? <span className="hidden shrink-0 text-sm text-muted-foreground lg:inline">{projet.nom}</span> : null}
-      {domaine ? <PastilleDomaine nom={domaine.nom} couleur={domaine.couleur} className="hidden w-28 shrink-0 md:inline-flex" /> : null}
+      {!compacte && projet ? (
+        <span className="hidden shrink-0 text-sm text-muted-foreground lg:inline">{projet.nom}</span>
+      ) : null}
+      {domaine ? (
+        <PastilleDomaine nom={domaine.nom} couleur={domaine.couleur} className="hidden w-28 shrink-0 md:inline-flex" />
+      ) : null}
       {!compacte ? (
         <span className="hidden w-16 shrink-0 truncate text-sm text-muted-foreground xl:inline" title={assigne}>
           {assigne}

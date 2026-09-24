@@ -13,15 +13,29 @@ export default function FenetreCapture() {
         <p className="flex-1 text-sm font-medium" data-tauri-drag-region>
           Capture rapide
         </p>
-        <Button variant="ghost" size="icon" className="size-7" aria-label="Ouvrir Hub XTIM" onClick={() => montrerFenetrePrincipale()}>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="size-7"
+          aria-label="Ouvrir Hub XTIM"
+          onClick={() => montrerFenetrePrincipale()}
+        >
           <Maximize2 />
         </Button>
-        <Button variant="ghost" size="icon" className="size-7" aria-label="Fermer (Échap)" onClick={() => fermerFenetreCourante()}>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="size-7"
+          aria-label="Fermer (Échap)"
+          onClick={() => fermerFenetreCourante()}
+        >
           <X />
         </Button>
       </div>
       <SaisieRapide autoFocus cleBrouillon="saisie-capture" onTermine={() => setTimeout(fermerFenetreCourante, 600)} />
-      <p className="text-xs text-muted-foreground">Entrée pour ajouter · Tab pour changer de type · Échap pour fermer</p>
+      <p className="text-xs text-muted-foreground">
+        Entrée pour ajouter · Tab pour changer de type · Échap pour fermer
+      </p>
     </div>
   );
 }

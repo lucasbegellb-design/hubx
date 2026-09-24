@@ -50,8 +50,22 @@ export interface EntreeRapport {
   taches: TacheRapport[];
   journal: JournalRapport[];
   process: { id: string; titre: string; domaine_id: string | null; statut: string; deleted_at: string | null }[];
-  documents: { id: string; nom: string; categorie: string | null; domaine_id: string | null; projet_id: string | null; created_at: string; deleted_at: string | null }[];
-  chine: { avant: DonneesChine | null; apres: DonneesChine | null; avantLe: string | null; apresLe: string | null; mapping: MappingChine } | null;
+  documents: {
+    id: string;
+    nom: string;
+    categorie: string | null;
+    domaine_id: string | null;
+    projet_id: string | null;
+    created_at: string;
+    deleted_at: string | null;
+  }[];
+  chine: {
+    avant: DonneesChine | null;
+    apres: DonneesChine | null;
+    avantLe: string | null;
+    apresLe: string | null;
+    mapping: MappingChine;
+  } | null;
 }
 
 export interface TacheResumee {
@@ -93,9 +107,21 @@ export interface DonneesRapport {
     disponible: boolean;
     message: string | null;
     versions: { du: string | null; au: string | null };
-    evolutions: { ajoutees: number; modifiees: number; supprimees: number; details: { onglet: string; ajoutees: number; modifiees: number; supprimees: number; exemples: string[] }[] } | null;
+    evolutions: {
+      ajoutees: number;
+      modifiees: number;
+      supprimees: number;
+      details: { onglet: string; ajoutees: number; modifiees: number; supprimees: number; exemples: string[] }[];
+    } | null;
     kpi: KpiDevise[];
-    echeances: { fournisseur: string | null; po: string | null; montant: number | null; devise: string; date: string; en_retard: boolean }[];
+    echeances: {
+      fournisseur: string | null;
+      po: string | null;
+      montant: number | null;
+      devise: string;
+      date: string;
+      en_retard: boolean;
+    }[];
     livraisons_en_retard: { fournisseur: string | null; po: string | null; prevue: string; jours: number }[];
   };
   process: { titre: string; domaine: string; action: "créé" | "modifié"; statut: string }[];
@@ -115,7 +141,8 @@ export function construireRapport(e: EntreeRapport): DonneesRapport {
   const filtreProjets = e.filtres.projets?.length ? new Set(e.filtres.projets) : null;
 
   const garde = (domaineId: string | null, projetId: string | null) =>
-    (!filtreDomaines || (domaineId !== null && filtreDomaines.has(domaineId))) && (!filtreProjets || (projetId !== null && filtreProjets.has(projetId)));
+    (!filtreDomaines || (domaineId !== null && filtreDomaines.has(domaineId))) &&
+    (!filtreProjets || (projetId !== null && filtreProjets.has(projetId)));
 
   const nomDomaine = (id: string | null) => (id && domaines.get(id)?.nom) || SANS_DOMAINE;
   const resumer = (t: TacheRapport): TacheResumee => ({
@@ -127,10 +154,14 @@ export function construireRapport(e: EntreeRapport): DonneesRapport {
 
   const taches = e.taches.filter((t) => !t.deleted_at && garde(t.domaine_id, t.projet_id));
   // Les projets archivés sortent des vues « en cours » et des alertes, mais le travail réalisé reste compté.
-  const actives = taches.filter((t) => t.statut !== "fait" && !(t.projet_id && projets.get(t.projet_id)?.statut === "archive"));
+  const actives = taches.filter(
+    (t) => t.statut !== "fait" && !(t.projet_id && projets.get(t.projet_id)?.statut === "archive"),
+  );
 
   // Réalisé par domaine (ordre des domaines, « Sans domaine » à la fin)
-  const faites = taches.filter((t) => t.statut === "fait" && dans(t.done_at)).sort((a, b) => (a.done_at! < b.done_at! ? -1 : 1));
+  const faites = taches
+    .filter((t) => t.statut === "fait" && dans(t.done_at))
+    .sort((a, b) => (a.done_at! < b.done_at! ? -1 : 1));
   const groupes = new Map<string, TacheResumee[]>();
   for (const t of faites) {
     const k = t.domaine_id ?? "";
@@ -138,10 +169,17 @@ export function construireRapport(e: EntreeRapport): DonneesRapport {
   }
   const realise_par_domaine = [...groupes.entries()]
     .sort(([a], [b]) => (domaines.get(a)?.ordre ?? 999) - (domaines.get(b)?.ordre ?? 999))
-    .map(([id, ts]) => ({ domaine: nomDomaine(id || null), couleur: domaines.get(id)?.couleur ?? "#5E6B78", taches: ts }));
+    .map(([id, ts]) => ({
+      domaine: nomDomaine(id || null),
+      couleur: domaines.get(id)?.couleur ?? "#5E6B78",
+      taches: ts,
+    }));
 
-  const parEcheance = (a: TacheRapport, b: TacheRapport) => (a.echeance ?? "9999") < (b.echeance ?? "9999") ? -1 : 1;
-  const en_cours = actives.filter((t) => t.statut === "en_cours").sort(parEcheance).map((t) => ({ ...resumer(t), echeance: t.echeance }));
+  const parEcheance = (a: TacheRapport, b: TacheRapport) => ((a.echeance ?? "9999") < (b.echeance ?? "9999") ? -1 : 1);
+  const en_cours = actives
+    .filter((t) => t.statut === "en_cours")
+    .sort(parEcheance)
+    .map((t) => ({ ...resumer(t), echeance: t.echeance }));
   const en_attente = actives
     .filter((t) => t.statut === "en_attente")
     .sort(parEcheance)
@@ -149,7 +187,13 @@ export function construireRapport(e: EntreeRapport): DonneesRapport {
   const en_retard = actives
     .filter((t) => t.echeance && t.echeance < e.aujourdhui)
     .sort(parEcheance)
-    .map((t) => ({ ...resumer(t), statut: t.statut, echeance: t.echeance, jours_retard: joursDeRetard(t.echeance!, e.aujourdhui), urgente: t.priorite === "urgente" }));
+    .map((t) => ({
+      ...resumer(t),
+      statut: t.statut,
+      echeance: t.echeance,
+      jours_retard: joursDeRetard(t.echeance!, e.aujourdhui),
+      urgente: t.priorite === "urgente",
+    }));
 
   const j7 = ajouterJours(e.aujourdhui, 7);
   const j30 = ajouterJours(e.aujourdhui, 30);
@@ -168,14 +212,22 @@ export function construireRapport(e: EntreeRapport): DonneesRapport {
   }
   const process = [...processActions.entries()]
     .map(([id, action]) => ({ p: processInfos.get(id), action }))
-    .filter((x) => x.p && !x.p.deleted_at && (!filtreDomaines || (x.p.domaine_id !== null && filtreDomaines.has(x.p.domaine_id))))
+    .filter(
+      (x) =>
+        x.p && !x.p.deleted_at && (!filtreDomaines || (x.p.domaine_id !== null && filtreDomaines.has(x.p.domaine_id))),
+    )
     .map((x) => ({ titre: x.p!.titre, domaine: nomDomaine(x.p!.domaine_id), action: x.action, statut: x.p!.statut }))
     .sort((a, b) => a.titre.localeCompare(b.titre, "fr"));
 
   const documents = e.documents
     .filter((d) => !d.deleted_at && dans(d.created_at) && garde(d.domaine_id, d.projet_id))
     .sort((a, b) => (a.created_at < b.created_at ? -1 : 1))
-    .map((d) => ({ nom: d.nom, categorie: d.categorie, domaine: nomDomaine(d.domaine_id), ajoute_le: dateParis(d.created_at) }));
+    .map((d) => ({
+      nom: d.nom,
+      categorie: d.categorie,
+      domaine: nomDomaine(d.domaine_id),
+      ajoute_le: dateParis(d.created_at),
+    }));
 
   const chine = rapportChine(e);
   const a7 = aVenir(e.aujourdhui, j7, true);
@@ -215,7 +267,8 @@ export function construireRapport(e: EntreeRapport): DonneesRapport {
 
 function rapportChine(e: EntreeRapport): DonneesRapport["chine"] {
   const vide = { versions: { du: null, au: null }, evolutions: null, kpi: [], echeances: [], livraisons_en_retard: [] };
-  if (!e.chine || !e.chine.apres) return { disponible: false, message: "Aucune donnée du suivi Chine sur la période.", ...vide };
+  if (!e.chine || !e.chine.apres)
+    return { disponible: false, message: "Aucune donnée du suivi Chine sur la période.", ...vide };
   const { avant, apres, mapping } = e.chine;
   let evolutions: DonneesRapport["chine"]["evolutions"] = null;
   if (avant) {
@@ -243,12 +296,26 @@ function rapportChine(e: EntreeRapport): DonneesRapport["chine"] {
   const alertes = calculerAlertes(lignes, e.aujourdhui, 30);
   return {
     disponible: true,
-    message: mapping.onglets.length ? null : "Mapping des colonnes non configuré : échéances et montants indisponibles.",
+    message: mapping.onglets.length
+      ? null
+      : "Mapping des colonnes non configuré : échéances et montants indisponibles.",
     versions: { du: e.chine.avantLe, au: e.chine.apresLe },
     evolutions,
     kpi: calculerKpi(lignes, e.aujourdhui).parDevise,
-    echeances: alertes.paiementsDus.map((l) => ({ fournisseur: l.fournisseur, po: l.po, montant: l.montant, devise: l.devise, date: l.date_echeance!, en_retard: l.enRetard })),
-    livraisons_en_retard: alertes.livraisonsEnRetard.map((l) => ({ fournisseur: l.fournisseur, po: l.po, prevue: l.livraison_prevue!, jours: l.joursRetard })),
+    echeances: alertes.paiementsDus.map((l) => ({
+      fournisseur: l.fournisseur,
+      po: l.po,
+      montant: l.montant,
+      devise: l.devise,
+      date: l.date_echeance!,
+      en_retard: l.enRetard,
+    })),
+    livraisons_en_retard: alertes.livraisonsEnRetard.map((l) => ({
+      fournisseur: l.fournisseur,
+      po: l.po,
+      prevue: l.livraison_prevue!,
+      jours: l.joursRetard,
+    })),
   };
 }
 
@@ -265,7 +332,9 @@ export function dateFr(iso: string | null | undefined): string {
 
 export function montantFr(v: number | null, devise: string): string {
   if (v === null) return "";
-  const n = v.toLocaleString("fr-FR", { minimumFractionDigits: 0, maximumFractionDigits: 2 }).replace(/\u202f|\u00a0/g, " ");
+  const n = v
+    .toLocaleString("fr-FR", { minimumFractionDigits: 0, maximumFractionDigits: 2 })
+    .replace(/\u202f|\u00a0/g, " ");
   return `${n} ${devise}`.trim();
 }
 
@@ -287,7 +356,9 @@ export function rendreMarkdown(d: DonneesRapport, synthese: string | null): stri
   }
 
   s.push("## Synthèse");
-  s.push(synthese?.trim() || "_Synthèse rédigée indisponible (IA non configurée). Les chiffres ci-dessous sont complets._");
+  s.push(
+    synthese?.trim() || "_Synthèse rédigée indisponible (IA non configurée). Les chiffres ci-dessous sont complets._",
+  );
   const c = d.compteurs;
   s.push(
     `**${c.realisees}** tâche(s) réalisée(s) · **${c.creees}** créée(s) · **${c.en_cours}** en cours · **${c.en_attente}** en attente · **${c.en_retard}** en retard`,
@@ -302,30 +373,62 @@ export function rendreMarkdown(d: DonneesRapport, synthese: string | null): stri
 
   s.push("## En cours et en attente");
   if (!d.en_cours.length && !d.en_attente.length) s.push("_Rien en cours ni en attente._");
-  if (d.en_cours.length) s.push("**En cours**\n" + d.en_cours.map((t) => ligneTache(t, t.echeance ? ` · échéance ${dateFr(t.echeance)}` : "")).join("\n"));
+  if (d.en_cours.length)
+    s.push(
+      "**En cours**\n" +
+        d.en_cours.map((t) => ligneTache(t, t.echeance ? ` · échéance ${dateFr(t.echeance)}` : "")).join("\n"),
+    );
   if (d.en_attente.length)
-    s.push("**En attente**\n" + d.en_attente.map((t) => ligneTache(t, t.en_attente_de ? ` · en attente de ${t.en_attente_de}` : "")).join("\n"));
+    s.push(
+      "**En attente**\n" +
+        d.en_attente.map((t) => ligneTache(t, t.en_attente_de ? ` · en attente de ${t.en_attente_de}` : "")).join("\n"),
+    );
 
   s.push("## En retard");
-  s.push(d.en_retard.length ? d.en_retard.map((t) => ligneTache(t, ` · échéance ${dateFr(t.echeance)} (${t.jours_retard} j)`)).join("\n") : "_Aucune tâche en retard._");
+  s.push(
+    d.en_retard.length
+      ? d.en_retard.map((t) => ligneTache(t, ` · échéance ${dateFr(t.echeance)} (${t.jours_retard} j)`)).join("\n")
+      : "_Aucune tâche en retard._",
+  );
 
   s.push("## Chine");
   if (!d.chine.disponible) s.push(`_${d.chine.message}_`);
   else {
     if (d.chine.evolutions) {
       const ev = d.chine.evolutions;
-      s.push(`Évolutions du fichier : ${ev.ajoutees} ligne(s) ajoutée(s), ${ev.modifiees} modifiée(s), ${ev.supprimees} supprimée(s).`);
+      s.push(
+        `Évolutions du fichier : ${ev.ajoutees} ligne(s) ajoutée(s), ${ev.modifiees} modifiée(s), ${ev.supprimees} supprimée(s).`,
+      );
       for (const o of ev.details) s.push(`- **${o.onglet}** : ${o.exemples.join(" ; ")}`);
     } else s.push("_Pas de version antérieure pour mesurer les évolutions._");
     if (d.chine.message) s.push(`_${d.chine.message}_`);
-    if (d.chine.kpi.length) s.push(d.chine.kpi.map((k) => `- ${k.devise} : engagé ${montantFr(k.engage, k.devise)}, payé ${montantFr(k.paye, k.devise)}, reste ${montantFr(k.reste, k.devise)}`).join("\n"));
+    if (d.chine.kpi.length)
+      s.push(
+        d.chine.kpi
+          .map(
+            (k) =>
+              `- ${k.devise} : engagé ${montantFr(k.engage, k.devise)}, payé ${montantFr(k.paye, k.devise)}, reste ${montantFr(k.reste, k.devise)}`,
+          )
+          .join("\n"),
+      );
     if (d.chine.echeances.length) {
       s.push("**Échéances de paiement (30 jours)**");
-      s.push(d.chine.echeances.map((x) => `- ${dateFr(x.date)}${x.en_retard ? " (en retard)" : ""} — ${x.fournisseur ?? "?"}${x.po ? ` ${x.po}` : ""} : ${montantFr(x.montant, x.devise)}`).join("\n"));
+      s.push(
+        d.chine.echeances
+          .map(
+            (x) =>
+              `- ${dateFr(x.date)}${x.en_retard ? " (en retard)" : ""} — ${x.fournisseur ?? "?"}${x.po ? ` ${x.po}` : ""} : ${montantFr(x.montant, x.devise)}`,
+          )
+          .join("\n"),
+      );
     }
     if (d.chine.livraisons_en_retard.length) {
       s.push("**Livraisons en retard**");
-      s.push(d.chine.livraisons_en_retard.map((x) => `- ${x.po ?? "?"} ${x.fournisseur ?? ""} : prévue le ${dateFr(x.prevue)} (${x.jours} j)`).join("\n"));
+      s.push(
+        d.chine.livraisons_en_retard
+          .map((x) => `- ${x.po ?? "?"} ${x.fournisseur ?? ""} : prévue le ${dateFr(x.prevue)} (${x.jours} j)`)
+          .join("\n"),
+      );
     }
   }
 
@@ -333,11 +436,27 @@ export function rendreMarkdown(d: DonneesRapport, synthese: string | null): stri
   s.push(d.process.length ? d.process.map((p) => `- ${p.titre} (${p.domaine}) — ${p.action}`).join("\n") : "_Aucun._");
 
   s.push("## Documents ajoutés");
-  s.push(d.documents.length ? d.documents.map((x) => `- ${x.nom}${x.categorie ? ` — ${x.categorie}` : ""} (${x.domaine}, ${dateFr(x.ajoute_le)})`).join("\n") : "_Aucun._");
+  s.push(
+    d.documents.length
+      ? d.documents
+          .map((x) => `- ${x.nom}${x.categorie ? ` — ${x.categorie}` : ""} (${x.domaine}, ${dateFr(x.ajoute_le)})`)
+          .join("\n")
+      : "_Aucun._",
+  );
 
   s.push("## À venir");
-  s.push("**7 prochains jours**\n" + (d.a_venir.j7.length ? d.a_venir.j7.map((t) => ligneTache(t, ` · ${dateFr(t.echeance)}`)).join("\n") : "_Rien de prévu._"));
-  s.push("**Jusqu'à 30 jours**\n" + (d.a_venir.j30.length ? d.a_venir.j30.map((t) => ligneTache(t, ` · ${dateFr(t.echeance)}`)).join("\n") : "_Rien de prévu._"));
+  s.push(
+    "**7 prochains jours**\n" +
+      (d.a_venir.j7.length
+        ? d.a_venir.j7.map((t) => ligneTache(t, ` · ${dateFr(t.echeance)}`)).join("\n")
+        : "_Rien de prévu._"),
+  );
+  s.push(
+    "**Jusqu'à 30 jours**\n" +
+      (d.a_venir.j30.length
+        ? d.a_venir.j30.map((t) => ligneTache(t, ` · ${dateFr(t.echeance)}`)).join("\n")
+        : "_Rien de prévu._"),
+  );
   return s.join("\n\n") + "\n";
 }
 

@@ -17,7 +17,14 @@ function LigneAlerte({ l, detail, alerte }: { l: LigneChine; detail: string; ale
         {l.po ? <span className="text-muted-foreground"> · {l.po}</span> : null}
       </span>
       {l.montant !== null ? <span className="shrink-0 tabular">{montant(l.montant, l.devise)}</span> : null}
-      <span className={cn("w-40 shrink-0 text-right text-sm tabular", alerte ? "font-medium text-retard" : "text-muted-foreground")}>{detail}</span>
+      <span
+        className={cn(
+          "w-40 shrink-0 text-right text-sm tabular",
+          alerte ? "font-medium text-retard" : "text-muted-foreground",
+        )}
+      >
+        {detail}
+      </span>
     </li>
   );
 }
@@ -37,8 +44,9 @@ export function VueEnsemble({ a }: { a: Analyse }) {
             ) : undefined
           }
         >
-          Le mapping des colonnes débloque les montants engagés, payés, restant à payer et les alertes (paiements dus sous 7 jours,
-          livraisons en retard). {estAdmin ? "" : "Demande à l'administrateur de le configurer."} Les onglets restent consultables tels quels.
+          Le mapping des colonnes débloque les montants engagés, payés, restant à payer et les alertes (paiements dus
+          sous 7 jours, livraisons en retard). {estAdmin ? "" : "Demande à l'administrateur de le configurer."} Les
+          onglets restent consultables tels quels.
         </EtatVide>
       </div>
     );
@@ -66,11 +74,19 @@ export function VueEnsemble({ a }: { a: Analyse }) {
                     <tr key={k.devise} className="border-b last:border-b-0">
                       <td className="px-3 py-2.5 font-medium">{k.devise}</td>
                       <td className="px-3 py-2.5 text-right text-base tabular">{montant(k.engage, k.devise)}</td>
-                      <td className="px-3 py-2.5 text-right text-base tabular text-fait">{montant(k.paye, k.devise)}</td>
-                      <td className="px-3 py-2.5 text-right text-base font-semibold tabular">{montant(k.reste, k.devise)}</td>
+                      <td className="px-3 py-2.5 text-right text-base tabular text-fait">
+                        {montant(k.paye, k.devise)}
+                      </td>
+                      <td className="px-3 py-2.5 text-right text-base font-semibold tabular">
+                        {montant(k.reste, k.devise)}
+                      </td>
                       <td className="px-3 py-2.5">
                         <div className="flex items-center gap-2">
-                          <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted" role="img" aria-label={`${part} % payé`}>
+                          <div
+                            className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted"
+                            role="img"
+                            aria-label={`${part} % payé`}
+                          >
                             <div className="h-full rounded-full bg-fait" style={{ width: `${part}%` }} />
                           </div>
                           <span className="w-10 text-right text-xs tabular text-muted-foreground">{part} %</span>
@@ -91,7 +107,14 @@ export function VueEnsemble({ a }: { a: Analyse }) {
         {alertes.paiementsDus.length ? (
           <ul className="divide-y rounded-lg border bg-card">
             {alertes.paiementsDus.map((l) => (
-              <LigneAlerte key={`${l.onglet}-${l.index}`} l={l} alerte={l.enRetard} detail={l.enRetard ? `en retard · ${dateCourte(l.date_echeance)}` : `dû le ${dateCourte(l.date_echeance)}`} />
+              <LigneAlerte
+                key={`${l.onglet}-${l.index}`}
+                l={l}
+                alerte={l.enRetard}
+                detail={
+                  l.enRetard ? `en retard · ${dateCourte(l.date_echeance)}` : `dû le ${dateCourte(l.date_echeance)}`
+                }
+              />
             ))}
           </ul>
         ) : (
@@ -103,7 +126,12 @@ export function VueEnsemble({ a }: { a: Analyse }) {
         {alertes.livraisonsEnRetard.length ? (
           <ul className="divide-y rounded-lg border bg-card">
             {alertes.livraisonsEnRetard.map((l) => (
-              <LigneAlerte key={`${l.onglet}-${l.index}`} l={l} alerte detail={`prévue ${dateCourte(l.livraison_prevue)} · ${l.joursRetard} j`} />
+              <LigneAlerte
+                key={`${l.onglet}-${l.index}`}
+                l={l}
+                alerte
+                detail={`prévue ${dateCourte(l.livraison_prevue)} · ${l.joursRetard} j`}
+              />
             ))}
           </ul>
         ) : (

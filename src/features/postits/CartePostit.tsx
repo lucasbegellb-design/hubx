@@ -61,11 +61,28 @@ export function ChoixRappel({ valeur, onChange }: { valeur: string | null; onCha
   );
 }
 
-function Action({ libelle, onClick, children, disabled }: { libelle: string; onClick?: () => void; children: ReactNode; disabled?: boolean }) {
+function Action({
+  libelle,
+  onClick,
+  children,
+  disabled,
+}: {
+  libelle: string;
+  onClick?: () => void;
+  children: ReactNode;
+  disabled?: boolean;
+}) {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Button variant="ghost" size="icon" className="size-7 hover:bg-black/5 dark:hover:bg-white/10" aria-label={libelle} onClick={onClick} disabled={disabled}>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="size-7 hover:bg-black/5 dark:hover:bg-white/10"
+          aria-label={libelle}
+          onClick={onClick}
+          disabled={disabled}
+        >
           {children}
         </Button>
       </TooltipTrigger>
@@ -145,13 +162,15 @@ export function CartePostit({ postit: p, miseEnAvant }: { postit: Postit; miseEn
             className="w-full whitespace-pre-wrap break-words rounded text-left leading-6"
             aria-label="Modifier le post-it"
           >
-            {p.epingle ? <Pin className="float-right ml-2 size-3.5 text-muted-foreground" aria-label="Épinglé" /> : null}
+            {p.epingle ? (
+              <Pin className="float-right ml-2 size-3.5 text-foreground/75" aria-label="Épinglé" />
+            ) : null}
             {p.contenu}
           </button>
         )}
       </div>
 
-      <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+      <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-foreground/75">
         {p.rappel_at ? (
           <span className={cn("inline-flex items-center gap-1", rappelPasse && !p.rappel_envoye && "text-retard")}>
             <Bell className="size-3" aria-hidden />
@@ -168,19 +187,35 @@ export function CartePostit({ postit: p, miseEnAvant }: { postit: Postit; miseEn
 
       <div className="-mb-1 mt-1 flex items-center gap-0.5 opacity-0 transition-opacity focus-within:opacity-100 group-hover:opacity-100">
         {archive ? (
-          <Action libelle="Désarchiver" onClick={() => maj.mutate({ id: p.id, archived_at: null }, { onSuccess: () => toast.success("Désarchivé") })} disabled={!peutEcrire}>
+          <Action
+            libelle="Désarchiver"
+            onClick={() =>
+              maj.mutate({ id: p.id, archived_at: null }, { onSuccess: () => toast.success("Désarchivé") })
+            }
+            disabled={!peutEcrire}
+          >
             <ArchiveRestore />
           </Action>
         ) : (
           <>
-            <Action libelle={p.epingle ? "Désépingler" : "Épingler"} onClick={() => maj.mutate({ id: p.id, epingle: !p.epingle })} disabled={!peutEcrire}>
+            <Action
+              libelle={p.epingle ? "Désépingler" : "Épingler"}
+              onClick={() => maj.mutate({ id: p.id, epingle: !p.epingle })}
+              disabled={!peutEcrire}
+            >
               {p.epingle ? <PinOff /> : <Pin />}
             </Action>
             <Popover>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <PopoverTrigger asChild>
-                    <Button variant="ghost" size="icon" className="size-7 hover:bg-black/5 dark:hover:bg-white/10" aria-label="Rappel" disabled={!peutEcrire}>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="size-7 hover:bg-black/5 dark:hover:bg-white/10"
+                      aria-label="Rappel"
+                      disabled={!peutEcrire}
+                    >
                       {p.rappel_at ? <BellOff /> : <Bell />}
                     </Button>
                   </PopoverTrigger>
@@ -192,14 +227,23 @@ export function CartePostit({ postit: p, miseEnAvant }: { postit: Postit; miseEn
                 <ChoixRappel
                   valeur={p.rappel_at}
                   onChange={(iso) =>
-                    maj.mutate({ id: p.id, rappel_at: iso }, { onSuccess: () => toast.success(iso ? "Rappel programmé" : "Rappel retiré") })
+                    maj.mutate(
+                      { id: p.id, rappel_at: iso },
+                      { onSuccess: () => toast.success(iso ? "Rappel programmé" : "Rappel retiré") },
+                    )
                   }
                 />
               </PopoverContent>
             </Popover>
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="ghost" size="icon" className="size-7 hover:bg-black/5 dark:hover:bg-white/10" aria-label="Couleur" disabled={!peutEcrire}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="size-7 hover:bg-black/5 dark:hover:bg-white/10"
+                  aria-label="Couleur"
+                  disabled={!peutEcrire}
+                >
                   <Palette />
                 </Button>
               </PopoverTrigger>
@@ -210,7 +254,11 @@ export function CartePostit({ postit: p, miseEnAvant }: { postit: Postit; miseEn
                     type="button"
                     aria-label={c.libelle}
                     onClick={() => maj.mutate({ id: p.id, couleur: c.valeur })}
-                    className={cn("size-7 rounded-md border", c.classe, p.couleur === c.valeur && "ring-2 ring-primary")}
+                    className={cn(
+                      "size-7 rounded-md border",
+                      c.classe,
+                      p.couleur === c.valeur && "ring-2 ring-primary",
+                    )}
                   />
                 ))}
               </PopoverContent>
@@ -218,7 +266,12 @@ export function CartePostit({ postit: p, miseEnAvant }: { postit: Postit; miseEn
             {proprio ? (
               <Action
                 libelle={p.partage ? "Rendre privé" : "Partager avec l'équipe"}
-                onClick={() => maj.mutate({ id: p.id, partage: !p.partage }, { onSuccess: () => toast.success(p.partage ? "Rendu privé" : "Partagé") })}
+                onClick={() =>
+                  maj.mutate(
+                    { id: p.id, partage: !p.partage },
+                    { onSuccess: () => toast.success(p.partage ? "Rendu privé" : "Partagé") },
+                  )
+                }
                 disabled={!peutEcrire}
               >
                 <Users />
@@ -234,7 +287,9 @@ export function CartePostit({ postit: p, miseEnAvant }: { postit: Postit; miseEn
                   { id: p.id, archived_at: new Date().toISOString() },
                   {
                     onSuccess: () =>
-                      toast.success("Archivé", { action: { label: "Annuler", onClick: () => maj.mutate({ id: p.id, archived_at: null }) } }),
+                      toast.success("Archivé", {
+                        action: { label: "Annuler", onClick: () => maj.mutate({ id: p.id, archived_at: null }) },
+                      }),
                   },
                 )
               }

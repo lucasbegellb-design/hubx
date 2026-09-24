@@ -46,7 +46,8 @@ export function SectionSysteme() {
       <div className="space-y-2">
         <Label>Mises à jour</Label>
         <p className="text-sm text-muted-foreground">
-          Version installée : <span className="tabular">{version}</span>. Les nouvelles versions sont proposées automatiquement au démarrage.
+          Version installée : <span className="tabular">{version}</span>. Les nouvelles versions sont proposées
+          automatiquement au démarrage.
         </p>
         <Button variant="outline" onClick={verifier} disabled={verif || !estTauri()}>
           <RefreshCw aria-hidden className={verif ? "animate-spin" : undefined} /> Rechercher une mise à jour
@@ -67,8 +68,8 @@ export function SectionSysteme() {
       <div className="space-y-2 border-t pt-5">
         <Label>Export complet</Label>
         <p className="text-sm text-muted-foreground">
-          Toutes les données (JSON et CSV pour Excel) et tous les fichiers déposés, dans une archive zip. À faire avant une passation ou
-          régulièrement comme sauvegarde.
+          Toutes les données (JSON et CSV pour Excel) et tous les fichiers déposés, dans une archive zip. À faire avant
+          une passation ou régulièrement comme sauvegarde.
         </p>
         <Button variant="outline" onClick={exporter} disabled={Boolean(progression)}>
           <Download aria-hidden /> {progression ?? "Exporter toutes les données"}
@@ -78,7 +79,10 @@ export function SectionSysteme() {
       <div className="space-y-2 border-t pt-5">
         <Label>Pack de passation</Label>
         <p className="text-sm text-muted-foreground">Tous les process actifs dans un seul PDF, avec sommaire.</p>
-        <Button variant="outline" onClick={() => exporterPackPassation(r.domaines, membre?.nom ?? "").catch((e) => toast.error(e.message))}>
+        <Button
+          variant="outline"
+          onClick={() => exporterPackPassation(r.domaines, membre?.nom ?? "").catch((e) => toast.error(e.message))}
+        >
           <FileDown aria-hidden /> Générer le pack de passation
         </Button>
       </div>

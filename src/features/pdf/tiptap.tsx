@@ -31,7 +31,11 @@ function Bloc({ n, niveau = 0 }: { n: JSONContent; niveau?: number }): ReactNode
   switch (n.type) {
     case "heading": {
       const st = (n.attrs?.level as number) <= 2 ? s.h2 : s.h3;
-      return <Text style={st} minPresenceAhead={40}>{(n.content ?? []).map(enLigne)}</Text>;
+      return (
+        <Text style={st} minPresenceAhead={40}>
+          {(n.content ?? []).map(enLigne)}
+        </Text>
+      );
     }
     case "paragraph":
       return n.content?.length ? <Text style={s.p}>{n.content.map(enLigne)}</Text> : null;

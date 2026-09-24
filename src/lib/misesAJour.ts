@@ -1,7 +1,11 @@
 import { toast } from "sonner";
 import { estTauri } from "./tauri";
 
-export type EtatMaj = { type: "a_jour" } | { type: "disponible"; version: string; notes?: string } | { type: "erreur"; message: string } | { type: "indisponible" };
+export type EtatMaj =
+  | { type: "a_jour" }
+  | { type: "disponible"; version: string; notes?: string }
+  | { type: "erreur"; message: string }
+  | { type: "indisponible" };
 
 /** Vérifie la présence d'une nouvelle version (GitHub Releases, signée). */
 export async function verifierMiseAJour(): Promise<EtatMaj> {

@@ -189,7 +189,13 @@ export function PanneauTache({ tache, onFermer }: { tache: Tache; onFermer: () =
               className="flex-1 tabular"
               disabled={!peutEcrire}
             />
-            <Button variant="outline" size="sm" className="h-9" onClick={() => set({ echeance: aujourdhui })} disabled={!peutEcrire}>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-9"
+              onClick={() => set({ echeance: aujourdhui })}
+              disabled={!peutEcrire}
+            >
               Aujourd'hui
             </Button>
             <Button
@@ -207,7 +213,11 @@ export function PanneauTache({ tache, onFermer }: { tache: Tache; onFermer: () =
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
             <Label>Domaine</Label>
-            <Select value={tache.domaine_id ?? AUCUN} onValueChange={(v) => set({ domaine_id: v === AUCUN ? null : v })} disabled={!peutEcrire}>
+            <Select
+              value={tache.domaine_id ?? AUCUN}
+              onValueChange={(v) => set({ domaine_id: v === AUCUN ? null : v })}
+              disabled={!peutEcrire}
+            >
               <SelectTrigger aria-label="Domaine">
                 <SelectValue />
               </SelectTrigger>
@@ -223,7 +233,11 @@ export function PanneauTache({ tache, onFermer }: { tache: Tache; onFermer: () =
           </div>
           <div className="space-y-1.5">
             <Label>Projet</Label>
-            <Select value={tache.projet_id ?? AUCUN} onValueChange={(v) => set({ projet_id: v === AUCUN ? null : v })} disabled={!peutEcrire}>
+            <Select
+              value={tache.projet_id ?? AUCUN}
+              onValueChange={(v) => set({ projet_id: v === AUCUN ? null : v })}
+              disabled={!peutEcrire}
+            >
               <SelectTrigger aria-label="Projet">
                 <SelectValue />
               </SelectTrigger>
@@ -244,7 +258,11 @@ export function PanneauTache({ tache, onFermer }: { tache: Tache; onFermer: () =
 
         <div className="space-y-1.5">
           <Label>Assignée à</Label>
-          <Select value={tache.assigne_a ?? AUCUN} onValueChange={(v) => set({ assigne_a: v === AUCUN ? null : v })} disabled={!peutEcrire}>
+          <Select
+            value={tache.assigne_a ?? AUCUN}
+            onValueChange={(v) => set({ assigne_a: v === AUCUN ? null : v })}
+            disabled={!peutEcrire}
+          >
             <SelectTrigger aria-label="Assignée à">
               <SelectValue />
             </SelectTrigger>
@@ -274,7 +292,8 @@ export function PanneauTache({ tache, onFermer }: { tache: Tache; onFermer: () =
       </div>
 
       <div className="border-t px-4 py-2.5 text-xs text-muted-foreground">
-        Créée par {r.nomMembre(tache.cree_par) || "—"} le {dateHeure(tache.created_at)} · modifiée {ilYa(tache.updated_at)}
+        Créée par {r.nomMembre(tache.cree_par) || "—"} le {dateHeure(tache.created_at)} · modifiée{" "}
+        {ilYa(tache.updated_at)}
         {tache.done_at ? ` · faite le ${dateHeure(tache.done_at)}` : ""}
       </div>
     </aside>

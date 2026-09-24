@@ -10,7 +10,10 @@ const SCHEMA = {
   additionalProperties: false,
   required: ["titre_suggere", "objectif", "declencheur", "responsable", "outils", "etapes", "points_attention"],
   properties: {
-    titre_suggere: { type: "string", description: "Titre court du process (verbe à l'infinitif), vide si impossible à déduire" },
+    titre_suggere: {
+      type: "string",
+      description: "Titre court du process (verbe à l'infinitif), vide si impossible à déduire",
+    },
     objectif: { type: "string", description: "À quoi sert ce process, en une ou deux phrases" },
     declencheur: { type: "string", description: "Événement ou moment qui déclenche le process" },
     responsable: { type: "string", description: "Personne ou rôle responsable" },
@@ -34,7 +37,10 @@ servir(async (req) => {
   const propre = (texte ?? "").trim();
   if (propre.length < 20) throw new HttpError(400, "Texte trop court : colle au moins quelques lignes.");
   if (propre.length > MAX_CARACTERES) {
-    throw new HttpError(413, `Texte trop long (${propre.length} caractères, maximum ${MAX_CARACTERES}). Découpe-le en plusieurs process.`);
+    throw new HttpError(
+      413,
+      `Texte trop long (${propre.length} caractères, maximum ${MAX_CARACTERES}). Découpe-le en plusieurs process.`,
+    );
   }
   const resultat = await demanderJson<Record<string, unknown>>({
     system: SYSTEM,

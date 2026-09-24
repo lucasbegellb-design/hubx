@@ -34,7 +34,11 @@ export function useRapport(id: string | null) {
 export function useGenererRapport() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (p: { periode_debut: string; periode_fin: string; filtres: { domaines: string[]; projets: string[] } }) => {
+    mutationFn: async (p: {
+      periode_debut: string;
+      periode_fin: string;
+      filtres: { domaines: string[]; projets: string[] };
+    }) => {
       if (!verifierEcriture()) throw new Error("hors-ligne");
       return appelerFonction<{ ok: boolean; id: string }>("generate-report", { type: "demande", ...p });
     },

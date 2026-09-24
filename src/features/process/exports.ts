@@ -41,7 +41,12 @@ export async function exporterMarkdown(p: Process, domaines: Map<string, Domaine
   const e = versExport(p, domaines, contenu);
   const md = versMarkdown(e.contenu, {
     titre: p.titre,
-    meta: [`Domaine : ${e.domaine}`, `Statut : ${e.statut}`, ...(p.responsable ? [`Responsable : ${p.responsable}`] : []), `Mis à jour le ${e.majLe}`],
+    meta: [
+      `Domaine : ${e.domaine}`,
+      `Statut : ${e.statut}`,
+      ...(p.responsable ? [`Responsable : ${p.responsable}`] : []),
+      `Mis à jour le ${e.majLe}`,
+    ],
   });
   const chemin = await enregistrerFichier(`${nomFichier(p.titre)}.md`, new TextEncoder().encode(md), {
     nom: "Markdown",
@@ -58,7 +63,9 @@ export async function exporterPackPassation(domaines: Map<string, Domaine>, par:
   }
   const ordre = new Map([...domaines.values()].map((d) => [d.id, d.ordre]));
   liste.sort(
-    (a, b) => (ordre.get(a.domaine_id ?? "") ?? 99) - (ordre.get(b.domaine_id ?? "") ?? 99) || a.titre.localeCompare(b.titre, "fr"),
+    (a, b) =>
+      (ordre.get(a.domaine_id ?? "") ?? 99) - (ordre.get(b.domaine_id ?? "") ?? 99) ||
+      a.titre.localeCompare(b.titre, "fr"),
   );
   const { pdfPackPassation } = await import("@/features/pdf/process");
   const blob = await pdfPackPassation(

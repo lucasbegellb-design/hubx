@@ -13,7 +13,12 @@ export function GraphiqueRealise({ d }: { d: DonneesRapport }) {
     <figure className="max-w-xl" aria-label="Tâches réalisées par domaine">
       <div style={{ height: hauteur }}>
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={donnees} layout="vertical" margin={{ top: 4, right: 36, bottom: 4, left: 0 }} barCategoryGap={8}>
+          <BarChart
+            data={donnees}
+            layout="vertical"
+            margin={{ top: 4, right: 36, bottom: 4, left: 0 }}
+            barCategoryGap={8}
+          >
             <XAxis type="number" hide allowDecimals={false} domain={[0, "dataMax"]} />
             <YAxis
               type="category"
@@ -36,7 +41,11 @@ export function GraphiqueRealise({ d }: { d: DonneesRapport }) {
               labelStyle={{ color: "hsl(var(--foreground))", fontWeight: 500 }}
             />
             <Bar dataKey="n" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]} maxBarSize={16} isAnimationActive={false}>
-              <LabelList dataKey="n" position="right" style={{ fill: "hsl(var(--foreground))", fontSize: 13, fontVariantNumeric: "tabular-nums" }} />
+              <LabelList
+                dataKey="n"
+                position="right"
+                style={{ fill: "hsl(var(--foreground))", fontSize: 13, fontVariantNumeric: "tabular-nums" }}
+              />
             </Bar>
           </BarChart>
         </ResponsiveContainer>

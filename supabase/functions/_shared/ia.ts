@@ -41,11 +41,16 @@ export async function demanderJson<T>(options: {
       output_config: { format: { type: "json_schema", schema: options.schema } },
     } as Anthropic.MessageCreateParamsNonStreaming);
   } catch (e) {
-    if (e instanceof Anthropic.AuthenticationError) throw new HttpError(502, "Clé API Anthropic refusée. Vérifie le secret ANTHROPIC_API_KEY.");
-    if (e instanceof Anthropic.NotFoundError) throw new HttpError(502, `Modèle IA « ${modele} » introuvable. Corrige-le dans Paramètres > IA.`);
-    if (e instanceof Anthropic.RateLimitError) throw new HttpError(503, "Limite d'utilisation de l'IA atteinte. Réessaie dans quelques minutes.");
-    if (e instanceof Anthropic.BadRequestError) throw new HttpError(502, "Requête IA refusée (fichier trop volumineux ou format non pris en charge).");
-    if (e instanceof Anthropic.APIError) throw new HttpError(502, `Service IA indisponible (code ${e.status ?? "?"}). Réessaie plus tard.`);
+    if (e instanceof Anthropic.AuthenticationError)
+      throw new HttpError(502, "Clé API Anthropic refusée. Vérifie le secret ANTHROPIC_API_KEY.");
+    if (e instanceof Anthropic.NotFoundError)
+      throw new HttpError(502, `Modèle IA « ${modele} » introuvable. Corrige-le dans Paramètres > IA.`);
+    if (e instanceof Anthropic.RateLimitError)
+      throw new HttpError(503, "Limite d'utilisation de l'IA atteinte. Réessaie dans quelques minutes.");
+    if (e instanceof Anthropic.BadRequestError)
+      throw new HttpError(502, "Requête IA refusée (fichier trop volumineux ou format non pris en charge).");
+    if (e instanceof Anthropic.APIError)
+      throw new HttpError(502, `Service IA indisponible (code ${e.status ?? "?"}). Réessaie plus tard.`);
     throw new HttpError(502, "Service IA injoignable. Réessaie plus tard.");
   }
 

@@ -153,11 +153,10 @@ export const SaisieRapide = forwardRef<HTMLInputElement, ProprietesSaisie>(funct
             autoFocus={autoFocus}
             aria-label="Saisie rapide (Entrée pour ajouter)"
             className="h-9 pr-20"
-            disabled={!peutEcrire && !texte}
           />
           {analyse.titre.trim() ? (
             <span className="pointer-events-none absolute right-2.5 top-2.5 text-xs text-muted-foreground">
-              {enCours ? "Ajout…" : "Entrée ↵"}
+              {enCours ? "Ajout…" : peutEcrire ? "Entrée ↵" : "hors ligne"}
             </span>
           ) : null}
         </div>

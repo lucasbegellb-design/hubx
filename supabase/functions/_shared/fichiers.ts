@@ -41,8 +41,9 @@ function texteZip(octets: Uint8Array, ext: string): string {
 
 function texteTableur(octets: Uint8Array): string {
   const classeur = XLSX.read(octets, { type: "array", cellDates: true });
-  return classeur.SheetNames.map((nom) => `--- Onglet « ${nom} » ---\n` + XLSX.utils.sheet_to_csv(classeur.Sheets[nom], { blankrows: false }))
-    .join("\n\n");
+  return classeur.SheetNames.map(
+    (nom) => `--- Onglet « ${nom} » ---\n` + XLSX.utils.sheet_to_csv(classeur.Sheets[nom], { blankrows: false }),
+  ).join("\n\n");
 }
 
 /** Renvoie le texte d'un fichier bureautique, ou null si le format n'est pas pris en charge. */

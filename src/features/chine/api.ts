@@ -14,6 +14,7 @@ import {
 import { appelerFonction } from "@/lib/fonctions";
 import { supabase } from "@/lib/supabase";
 import type { Json } from "@/lib/database.types";
+import { schemaLienPartage, schemaMapping } from "@/lib/schemas";
 
 export function useChineSource() {
   return useQuery({
@@ -67,7 +68,11 @@ export function useSnapshot(id: string | null) {
     enabled: Boolean(id),
     staleTime: Infinity,
     queryFn: async () => {
-      const { data, error } = await supabase.from("chine_snapshots").select("id, taken_at, data").eq("id", id!).single();
+      const { data, error } = await supabase
+        .from("chine_snapshots")
+        .select("id, taken_at, data")
+        .eq("id", id!)
+        .single();
       if (error) throw error;
       return { ...data, donnees: lireDonnees(data.data) };
     },
@@ -112,13 +117,23 @@ export function useActualiserChine() {
 }
 
 export function testerConnexionChine() {
-  return appelerFonction<{ ok: boolean; mode: string; nom: string; modifie_le: string | null }>("sync-chine", { test: true });
+  return appelerFonction<{ ok: boolean; mode: string; nom: string; modifie_le: string | null }>("sync-chine", {
+    test: true,
+  });
 }
 
 export function useMajSourceChine() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (maj: { share_url?: string | null; mapping?: MappingChine }) => {
+      if (maj.share_url) {
+        const r = schemaLienPartage.safeParse(maj.share_url);
+        if (!r.success) throw new Error(r.error.issues[0].message);
+      }
+      if (maj.mapping) {
+        const r = schemaMapping.safeParse(maj.mapping);
+        if (!r.success) throw new Error(r.error.issues[0].message);
+      }
       const { data: s } = await supabase.from("chine_source").select("id").limit(1).single();
       const { error } = await supabase
         .from("chine_source")

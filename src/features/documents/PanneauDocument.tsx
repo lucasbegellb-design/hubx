@@ -19,7 +19,17 @@ import { lancerAnalyse, telecharger, urlSignee, useMajDocument, type InfoCle, ty
 
 const AUCUN = "__aucun__";
 
-function Action({ libelle, onClick, children, disabled }: { libelle: string; onClick: () => void; children: React.ReactNode; disabled?: boolean }) {
+function Action({
+  libelle,
+  onClick,
+  children,
+  disabled,
+}: {
+  libelle: string;
+  onClick: () => void;
+  children: React.ReactNode;
+  disabled?: boolean;
+}) {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
@@ -98,7 +108,10 @@ export function PanneauDocument({ doc, onFermer }: { doc: DocumentXtim; onFermer
   }
 
   return (
-    <aside aria-label="Détail du document" className="flex w-[420px] shrink-0 animate-slide-in-right flex-col border-l bg-card">
+    <aside
+      aria-label="Détail du document"
+      className="flex w-[420px] shrink-0 animate-slide-in-right flex-col border-l bg-card"
+    >
       <div className="flex h-12 items-center gap-0.5 border-b px-3">
         <p className="flex-1 text-sm text-muted-foreground">Document</p>
         <Action libelle="Ouvrir" onClick={ouvrir}>
@@ -107,7 +120,11 @@ export function PanneauDocument({ doc, onFermer }: { doc: DocumentXtim; onFermer
         <Action libelle="Télécharger" onClick={sauvegarder}>
           <Download />
         </Action>
-        <Action libelle={doc.epingle ? "Désépingler" : "Épingler"} onClick={() => maj.mutate({ id: doc.id, epingle: !doc.epingle })} disabled={!peutEcrire}>
+        <Action
+          libelle={doc.epingle ? "Désépingler" : "Épingler"}
+          onClick={() => maj.mutate({ id: doc.id, epingle: !doc.epingle })}
+          disabled={!peutEcrire}
+        >
           {doc.epingle ? <PinOff /> : <Pin />}
         </Action>
         <Action
@@ -116,7 +133,12 @@ export function PanneauDocument({ doc, onFermer }: { doc: DocumentXtim; onFermer
           onClick={() => {
             maj.mutate(
               { id: doc.id, deleted_at: new Date().toISOString() },
-              { onSuccess: () => toast.success("Supprimé", { action: { label: "Annuler", onClick: () => maj.mutate({ id: doc.id, deleted_at: null }) } }) },
+              {
+                onSuccess: () =>
+                  toast.success("Supprimé", {
+                    action: { label: "Annuler", onClick: () => maj.mutate({ id: doc.id, deleted_at: null }) },
+                  }),
+              },
             );
             onFermer();
           }}
@@ -144,7 +166,11 @@ export function PanneauDocument({ doc, onFermer }: { doc: DocumentXtim; onFermer
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
             <Label>Domaine</Label>
-            <Select value={doc.domaine_id ?? AUCUN} onValueChange={(v) => maj.mutate({ id: doc.id, domaine_id: v === AUCUN ? null : v })} disabled={!peutEcrire}>
+            <Select
+              value={doc.domaine_id ?? AUCUN}
+              onValueChange={(v) => maj.mutate({ id: doc.id, domaine_id: v === AUCUN ? null : v })}
+              disabled={!peutEcrire}
+            >
               <SelectTrigger aria-label="Domaine">
                 <SelectValue />
               </SelectTrigger>
@@ -160,7 +186,11 @@ export function PanneauDocument({ doc, onFermer }: { doc: DocumentXtim; onFermer
           </div>
           <div className="space-y-1.5">
             <Label>Projet</Label>
-            <Select value={doc.projet_id ?? AUCUN} onValueChange={(v) => maj.mutate({ id: doc.id, projet_id: v === AUCUN ? null : v })} disabled={!peutEcrire}>
+            <Select
+              value={doc.projet_id ?? AUCUN}
+              onValueChange={(v) => maj.mutate({ id: doc.id, projet_id: v === AUCUN ? null : v })}
+              disabled={!peutEcrire}
+            >
               <SelectTrigger aria-label="Projet">
                 <SelectValue />
               </SelectTrigger>
@@ -181,7 +211,10 @@ export function PanneauDocument({ doc, onFermer }: { doc: DocumentXtim; onFermer
             id="categorie"
             value={categorie}
             onChange={(e) => setCategorie(e.target.value)}
-            onBlur={() => categorie.trim() !== (doc.categorie ?? "") && maj.mutate({ id: doc.id, categorie: categorie.trim() || null })}
+            onBlur={() =>
+              categorie.trim() !== (doc.categorie ?? "") &&
+              maj.mutate({ id: doc.id, categorie: categorie.trim() || null })
+            }
             placeholder="Facture, contrat, fiche technique…"
             disabled={!peutEcrire}
           />
@@ -190,7 +223,12 @@ export function PanneauDocument({ doc, onFermer }: { doc: DocumentXtim; onFermer
         <div className="space-y-2 border-t pt-4">
           <div className="flex items-center gap-2">
             <p className="flex-1 text-sm font-semibold text-muted-foreground">Analyse IA</p>
-            <Button variant="ghost" size="sm" onClick={relancer} disabled={relance || !peutEcrire || doc.analyse_statut === "en_attente"}>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={relancer}
+              disabled={relance || !peutEcrire || doc.analyse_statut === "en_attente"}
+            >
               <RefreshCw aria-hidden className={relance ? "animate-spin" : undefined} />
               Relancer l'analyse
             </Button>
@@ -226,7 +264,9 @@ export function PanneauDocument({ doc, onFermer }: { doc: DocumentXtim; onFermer
                 <li key={i} className="flex items-center gap-2 rounded-md px-1 py-1">
                   <span className="min-w-0 flex-1">
                     {s.titre}
-                    {s.echeance ? <span className="ml-1.5 text-sm text-muted-foreground">· {dateCourte(s.echeance)}</span> : null}
+                    {s.echeance ? (
+                      <span className="ml-1.5 text-sm text-muted-foreground">· {dateCourte(s.echeance)}</span>
+                    ) : null}
                   </span>
                   {s.ajoutee ? (
                     <span className="text-sm text-fait">Ajoutée</span>

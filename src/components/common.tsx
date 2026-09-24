@@ -105,7 +105,10 @@ export function EcranChargement({ message = "Chargement…" }: { message?: strin
 
 export function MessageErreur({ children, action }: { children: ReactNode; action?: ReactNode }) {
   return (
-    <div role="alert" className="flex items-start gap-3 rounded-md border border-urgent/30 bg-urgent/5 px-3 py-2 text-sm">
+    <div
+      role="alert"
+      className="flex items-start gap-3 rounded-md border border-urgent/30 bg-urgent/5 px-3 py-2 text-sm"
+    >
       <div className="flex-1 text-foreground">{children}</div>
       {action}
     </div>

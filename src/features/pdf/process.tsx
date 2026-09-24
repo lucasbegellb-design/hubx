@@ -50,7 +50,9 @@ export async function pdfPackPassation(liste: ProcessExport[], genereLe: string,
         <EntetePdf gauche="Pack de passation" droite={genereLe} />
         <View style={{ marginTop: 120 }}>
           <Text style={{ fontSize: 26, fontWeight: 600, lineHeight: 1.25 }}>Pack de passation</Text>
-          <Text style={{ fontSize: 13, color: C.secondaire, marginTop: 6, lineHeight: 1.4 }}>XTIM SAS · Bionic Bird</Text>
+          <Text style={{ fontSize: 13, color: C.secondaire, marginTop: 6, lineHeight: 1.4 }}>
+            XTIM SAS · Bionic Bird
+          </Text>
           <Text style={{ marginTop: 28 }}>
             Ce document rassemble les {liste.length} process actifs de l'entreprise, classés par domaine. Chaque process
             suit le modèle XTIM : objectif, déclencheur, responsable, outils et fichiers, étapes, points d'attention,

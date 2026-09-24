@@ -3,7 +3,14 @@ import { Sparkles } from "lucide-react";
 import { useState } from "react";
 import { MessageErreur } from "@/components/common";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { useBrouillon } from "@/stores/ui";
 import { structurerBrouillon } from "./api";

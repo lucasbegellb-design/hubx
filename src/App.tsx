@@ -12,7 +12,6 @@ import { useApplyTheme } from "@/stores/ui";
 import { estFenetreCapture } from "./app/fenetre";
 import { router } from "./app/router";
 
-
 function PorteAuth({ children }: { children: ReactNode }) {
   const { sessionChargee, session, membreCharge, membre } = useAuth();
   if (!sessionChargee) return <EcranChargement />;

@@ -74,7 +74,8 @@ export default function PageProcess() {
       if (domaine !== TOUS && p.domaine_id !== domaine) return false;
       if (statut === "courants" && p.statut === "obsolete") return false;
       if (statut !== "courants" && statut !== TOUS && p.statut !== statut) return false;
-      if (terme && !normaliser(`${p.titre} ${p.responsable ?? ""}`).includes(terme) && !plein.data?.has(p.id)) return false;
+      if (terme && !normaliser(`${p.titre} ${p.responsable ?? ""}`).includes(terme) && !plein.data?.has(p.id))
+        return false;
       return true;
     });
     const map = new Map<string, typeof filtres>();
@@ -160,7 +161,9 @@ export default function PageProcess() {
             ))}
           </div>
         ) : groupes.length === 0 ? (
-          <EtatVide titre={q || domaine !== TOUS ? "Aucun process ne correspond." : "Aucun process documenté pour l'instant."}>
+          <EtatVide
+            titre={q || domaine !== TOUS ? "Aucun process ne correspond." : "Aucun process documenté pour l'instant."}
+          >
             {q || domaine !== TOUS
               ? "Essaie d'autres mots : la recherche porte aussi sur le contenu."
               : "Crée le premier avec N : le modèle XTIM (objectif, déclencheur, étapes…) est pré-rempli."}
@@ -174,7 +177,9 @@ export default function PageProcess() {
                     <li key={p.id}>
                       <Link to={`/process/${p.id}`} className="flex items-center gap-3 px-3 py-2.5 hover:bg-accent/50">
                         <span className="min-w-0 flex-1 truncate font-medium">{p.titre}</span>
-                        {p.responsable ? <span className="hidden text-sm text-muted-foreground md:inline">{p.responsable}</span> : null}
+                        {p.responsable ? (
+                          <span className="hidden text-sm text-muted-foreground md:inline">{p.responsable}</span>
+                        ) : null}
                         <BadgeStatutProcess statut={p.statut} />
                         <span className="w-40 shrink-0 text-right text-sm text-muted-foreground">
                           modifié {ilYa(p.updated_at)}
@@ -191,4 +196,3 @@ export default function PageProcess() {
     </div>
   );
 }
-

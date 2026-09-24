@@ -31,7 +31,10 @@ describe("saisie rapide", () => {
 
   it("gère les préfixes de type", () => {
     expect(analyserSaisie("p: idée #truc", ctx)).toMatchObject({ type: "postit", titre: "idée #truc" });
-    expect(analyserSaisie("f: Envoyé les factures #compta", ctx)).toMatchObject({ type: "fait", domaineId: "d-compta" });
+    expect(analyserSaisie("f: Envoyé les factures #compta", ctx)).toMatchObject({
+      type: "fait",
+      domaineId: "d-compta",
+    });
     expect(analyserSaisie("T: appeler", ctx).type).toBe("tache");
   });
 

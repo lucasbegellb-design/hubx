@@ -12,7 +12,14 @@ export const LIBELLES_GROUPES: Record<CleGroupe, string> = {
   faites: "Faites récemment",
 };
 
-export const ORDRE_GROUPES: CleGroupe[] = ["en_retard", "aujourdhui", "cette_semaine", "plus_tard", "sans_date", "faites"];
+export const ORDRE_GROUPES: CleGroupe[] = [
+  "en_retard",
+  "aujourdhui",
+  "cette_semaine",
+  "plus_tard",
+  "sans_date",
+  "faites",
+];
 
 export interface TacheEcheance {
   id: string;

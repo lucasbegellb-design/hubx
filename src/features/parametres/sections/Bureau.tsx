@@ -24,7 +24,12 @@ const RACCOURCIS: [string, string][] = [
 ];
 
 function versAffichage(r: string) {
-  return r.replace("CommandOrControl", "Ctrl").replace("Shift", "Maj").replace("Space", "Espace").split("+").join(" + ");
+  return r
+    .replace("CommandOrControl", "Ctrl")
+    .replace("Shift", "Maj")
+    .replace("Space", "Espace")
+    .split("+")
+    .join(" + ");
 }
 
 export function SectionBureau() {
@@ -38,7 +43,9 @@ export function SectionBureau() {
 
   useEffect(() => {
     if (!desktop) return;
-    import("@tauri-apps/plugin-autostart").then((a) => a.isEnabled().then(setAutostart)).catch(() => setAutostart(false));
+    import("@tauri-apps/plugin-autostart")
+      .then((a) => a.isEnabled().then(setAutostart))
+      .catch(() => setAutostart(false));
   }, [desktop]);
 
   async function basculerAutostart(v: boolean) {
@@ -55,7 +62,11 @@ export function SectionBureau() {
 
   function enregistrerRaccourci() {
     const v = saisie.trim();
-    if (!/^((CommandOrControl|Ctrl|Alt|Shift|Super)\+)+[A-Za-z0-9]+$|^((CommandOrControl|Ctrl|Alt|Shift|Super)\+)+(Space|F\d{1,2})$/.test(v)) {
+    if (
+      !/^((CommandOrControl|Ctrl|Alt|Shift|Super)\+)+[A-Za-z0-9]+$|^((CommandOrControl|Ctrl|Alt|Shift|Super)\+)+(Space|F\d{1,2})$/.test(
+        v,
+      )
+    ) {
       return toast.error("Format attendu : CommandOrControl+Shift+Space (au moins un modificateur + une touche).");
     }
     setRaccourci(v);
@@ -66,7 +77,12 @@ export function SectionBureau() {
     <div className="space-y-6">
       <div className="space-y-2">
         <Label>Thème</Label>
-        <ToggleGroup type="single" value={theme} onValueChange={(v) => v && setTheme(v as Theme)} className="w-fit rounded-md border p-0.5">
+        <ToggleGroup
+          type="single"
+          value={theme}
+          onValueChange={(v) => v && setTheme(v as Theme)}
+          className="w-fit rounded-md border p-0.5"
+        >
           {(
             [
               ["clair", "Clair"],
@@ -84,22 +100,39 @@ export function SectionBureau() {
       <div className="flex items-center justify-between gap-4 border-t pt-5">
         <div>
           <Label htmlFor="autostart">Démarrer avec Windows</Label>
-          <p className="text-sm text-muted-foreground">L'application se lance réduite dans la zone de notification, prête pour les rappels.</p>
+          <p className="text-sm text-muted-foreground">
+            L'application se lance réduite dans la zone de notification, prête pour les rappels.
+          </p>
         </div>
-        <Switch id="autostart" checked={Boolean(autostart)} onCheckedChange={basculerAutostart} disabled={!desktop || autostart === null} />
+        <Switch
+          id="autostart"
+          checked={Boolean(autostart)}
+          onCheckedChange={basculerAutostart}
+          disabled={!desktop || autostart === null}
+        />
       </div>
 
       <div className="space-y-1.5 border-t pt-5">
         <Label htmlFor="raccourci">Raccourci global de capture rapide</Label>
         <p className="text-sm text-muted-foreground">
-          Actuel : <Kbd>{versAffichage(raccourci)}</Kbd> — ouvre une petite fenêtre tâche / post-it / fait, même quand l'app est en arrière-plan.
+          Actuel : <Kbd>{versAffichage(raccourci)}</Kbd> — ouvre une petite fenêtre tâche / post-it / fait, même quand
+          l'app est en arrière-plan.
         </p>
         <div className="flex gap-2">
-          <Input id="raccourci" value={saisie} onChange={(e) => setSaisie(e.target.value)} className="max-w-xs font-mono text-sm" />
+          <Input
+            id="raccourci"
+            value={saisie}
+            onChange={(e) => setSaisie(e.target.value)}
+            className="max-w-xs font-mono text-sm"
+          />
           <Button variant="outline" onClick={enregistrerRaccourci} disabled={saisie === raccourci || !desktop}>
             Enregistrer
           </Button>
-          <Button variant="ghost" onClick={() => (setSaisie(RACCOURCI_CAPTURE_DEFAUT), setRaccourci(RACCOURCI_CAPTURE_DEFAUT))} disabled={raccourci === RACCOURCI_CAPTURE_DEFAUT}>
+          <Button
+            variant="ghost"
+            onClick={() => (setSaisie(RACCOURCI_CAPTURE_DEFAUT), setRaccourci(RACCOURCI_CAPTURE_DEFAUT))}
+            disabled={raccourci === RACCOURCI_CAPTURE_DEFAUT}
+          >
             Par défaut
           </Button>
         </div>

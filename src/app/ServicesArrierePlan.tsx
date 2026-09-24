@@ -64,7 +64,8 @@ function useNotificationsRapports() {
       ecouterRealtime((table, evt, ligne) => {
         if (table !== "rapports" || ligne.statut !== "pret") return;
         if (evt !== "INSERT" && evt !== "UPDATE") return;
-        const libelle = ligne.type === "hebdo" ? "Rapport hebdomadaire" : ligne.type === "mensuel" ? "Rapport mensuel" : "Rapport";
+        const libelle =
+          ligne.type === "hebdo" ? "Rapport hebdomadaire" : ligne.type === "mensuel" ? "Rapport mensuel" : "Rapport";
         toast.success(`${libelle} prêt`, {
           description: `Période du ${dateCourte(ligne.periode_debut as string)} au ${dateCourte(ligne.periode_fin as string)}`,
           action: { label: "Ouvrir", onClick: () => naviguer(`/rapports?r=${ligne.id}`) },
@@ -91,7 +92,9 @@ function useRaccourciGlobal() {
           if (e.state === "Pressed") invoke("ouvrir_capture");
         });
       } catch {
-        toast.warning(`Raccourci global « ${raccourci} » indisponible (déjà utilisé par une autre application ?). Change-le dans Paramètres.`);
+        toast.warning(
+          `Raccourci global « ${raccourci} » indisponible (déjà utilisé par une autre application ?). Change-le dans Paramètres.`,
+        );
       }
     })();
     return () => {

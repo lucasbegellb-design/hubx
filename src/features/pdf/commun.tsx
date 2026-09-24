@@ -34,7 +34,15 @@ export const C = {
 };
 
 export const s = StyleSheet.create({
-  page: { fontFamily: "Plex", fontSize: 10, color: C.texte, paddingTop: 56, paddingBottom: 48, paddingHorizontal: 48, lineHeight: 1.45 },
+  page: {
+    fontFamily: "Plex",
+    fontSize: 10,
+    color: C.texte,
+    paddingTop: 56,
+    paddingBottom: 48,
+    paddingHorizontal: 48,
+    lineHeight: 1.45,
+  },
   entete: {
     position: "absolute",
     top: 22,

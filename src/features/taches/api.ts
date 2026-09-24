@@ -4,6 +4,7 @@ import { ajouterJours, aujourdhuiParis } from "@shared/dates.ts";
 import { supabase } from "@/lib/supabase";
 import type { Insertion, MiseAJour, Tache } from "@/lib/types";
 import { verifierEcriture } from "@/hooks/useEcriture";
+import { schemaTache, valider } from "@/lib/schemas";
 
 const CLE_LISTE = ["taches", "liste"] as const;
 
@@ -55,7 +56,7 @@ export function useCreerTache() {
   return useMutation({
     mutationFn: async (t: Insertion<"taches">) => {
       if (!verifierEcriture()) throw new Error("hors-ligne");
-      const { data, error } = await supabase.from("taches").insert(t).select().single();
+      const { data, error } = await supabase.from("taches").insert(valider(schemaTache, t)).select().single();
       if (error) throw error;
       return data;
     },
@@ -72,7 +73,12 @@ export function useMajTache() {
   return useMutation({
     mutationFn: async ({ id, ...maj }: MiseAJour<"taches"> & { id: string }) => {
       if (!verifierEcriture()) throw new Error("hors-ligne");
-      const { data, error } = await supabase.from("taches").update(nettoyer(maj)).eq("id", id).select().single();
+      const { data, error } = await supabase
+        .from("taches")
+        .update(valider(schemaTache, nettoyer(maj)))
+        .eq("id", id)
+        .select()
+        .single();
       if (error) throw error;
       return data;
     },

@@ -4,7 +4,13 @@ import { clientAdmin, verifierAppelant } from "../_shared/auth.ts";
 import { HttpError, json, lireCorps, servir } from "../_shared/http.ts";
 import { demanderJson, iaDisponible } from "../_shared/ia.ts";
 import { lireDonnees, lireMapping } from "../_shared/logic/chine.ts";
-import { aujourdhuiParis, bornesInstant, joursEntre, periode as periodeDe, type Periode } from "../_shared/logic/dates.ts";
+import {
+  aujourdhuiParis,
+  bornesInstant,
+  joursEntre,
+  periode as periodeDe,
+  type Periode,
+} from "../_shared/logic/dates.ts";
 import { consigneSynthese, construireRapport, rendreMarkdown, type TypeRapport } from "../_shared/logic/rapport.ts";
 
 interface Corps {
@@ -16,7 +22,9 @@ interface Corps {
 
 const RE_DATE = /^\d{4}-\d{2}-\d{2}$/;
 
-async function toutesLesLignes<T>(requete: (de: number, a: number) => PromiseLike<{ data: T[] | null; error: unknown }>): Promise<T[]> {
+async function toutesLesLignes<T>(
+  requete: (de: number, a: number) => PromiseLike<{ data: T[] | null; error: unknown }>,
+): Promise<T[]> {
   const res: T[] = [];
   for (let de = 0; ; de += 1000) {
     const { data, error } = await requete(de, de + 999);
@@ -36,12 +44,14 @@ servir(async (req) => {
   if (type === "hebdo") p = periodeDe("cette_semaine", aujourdhui);
   else if (type === "mensuel") p = periodeDe("ce_mois", aujourdhui);
   else {
-    if (!RE_DATE.test(corps.periode_debut ?? "") || !RE_DATE.test(corps.periode_fin ?? "")) throw new HttpError(400, "Période invalide.");
+    if (!RE_DATE.test(corps.periode_debut ?? "") || !RE_DATE.test(corps.periode_fin ?? ""))
+      throw new HttpError(400, "Période invalide.");
     p = { debut: corps.periode_debut!, fin: corps.periode_fin! };
     if (p.fin < p.debut) throw new HttpError(400, "La fin de période précède le début.");
     if (joursEntre(p.debut, p.fin) > 400) throw new HttpError(400, "Période trop longue (400 jours maximum).");
   }
-  const filtres = type === "demande" ? { domaines: corps.filtres?.domaines ?? [], projets: corps.filtres?.projets ?? [] } : {};
+  const filtres =
+    type === "demande" ? { domaines: corps.filtres?.domaines ?? [], projets: corps.filtres?.projets ?? [] } : {};
 
   const db = clientAdmin();
   const { data: rapport, error: errInsert } = await db
@@ -71,28 +81,59 @@ servir(async (req) => {
       toutesLesLignes((de, a) =>
         db
           .from("taches")
-          .select("id, titre, statut, domaine_id, projet_id, echeance, priorite, en_attente_de, assigne_a, cree_par, done_at, created_at, deleted_at")
+          .select(
+            "id, titre, statut, domaine_id, projet_id, echeance, priorite, en_attente_de, assigne_a, cree_par, done_at, created_at, deleted_at",
+          )
           .is("deleted_at", null)
           .order("id")
           .range(de, a),
       ),
       toutesLesLignes((de, a) =>
-        db.from("journal_activite").select("entite, entite_id, action, at, user_id").gte("at", depuis).lt("at", jusqua).order("at").range(de, a),
+        db
+          .from("journal_activite")
+          .select("entite, entite_id, action, at, user_id")
+          .gte("at", depuis)
+          .lt("at", jusqua)
+          .order("at")
+          .range(de, a),
       ),
       db.from("process").select("id, titre, domaine_id, statut, deleted_at"),
-      db.from("documents").select("id, nom, categorie, domaine_id, projet_id, created_at, deleted_at").gte("created_at", depuis).lt("created_at", jusqua),
+      db
+        .from("documents")
+        .select("id, nom, categorie, domaine_id, projet_id, created_at, deleted_at")
+        .gte("created_at", depuis)
+        .lt("created_at", jusqua),
       db.from("chine_source").select("mapping").limit(1).maybeSingle(),
     ]);
 
     // Suivi Chine : version en vigueur au début de la période et à la fin
     const [snapAvant, snapApres] = await Promise.all([
-      db.from("chine_snapshots").select("taken_at, data").lte("taken_at", depuis).order("taken_at", { ascending: false }).limit(1).maybeSingle(),
-      db.from("chine_snapshots").select("taken_at, data").lt("taken_at", jusqua).order("taken_at", { ascending: false }).limit(1).maybeSingle(),
+      db
+        .from("chine_snapshots")
+        .select("taken_at, data")
+        .lte("taken_at", depuis)
+        .order("taken_at", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+      db
+        .from("chine_snapshots")
+        .select("taken_at, data")
+        .lt("taken_at", jusqua)
+        .order("taken_at", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
     ]);
     let avant = snapAvant.data;
     if (!avant) {
       // Pas de version antérieure : la première version de la période sert de référence
-      const { data } = await db.from("chine_snapshots").select("taken_at, data").gte("taken_at", depuis).lt("taken_at", jusqua).order("taken_at").limit(1).maybeSingle();
+      const { data } = await db
+        .from("chine_snapshots")
+        .select("taken_at, data")
+        .gte("taken_at", depuis)
+        .lt("taken_at", jusqua)
+        .order("taken_at")
+        .limit(1)
+        .maybeSingle();
       avant = data && snapApres.data && data.taken_at !== snapApres.data.taken_at ? data : null;
     }
 

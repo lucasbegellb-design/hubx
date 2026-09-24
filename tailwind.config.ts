@@ -52,8 +52,15 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       keyframes: {
-        "slide-in-right": { from: { transform: "translateX(16px)", opacity: "0" }, to: { transform: "none", opacity: "1" } },
-        "check-pop": { "0%": { transform: "scale(1)" }, "50%": { transform: "scale(1.15)" }, "100%": { transform: "scale(1)" } },
+        "slide-in-right": {
+          from: { transform: "translateX(16px)", opacity: "0" },
+          to: { transform: "none", opacity: "1" },
+        },
+        "check-pop": {
+          "0%": { transform: "scale(1)" },
+          "50%": { transform: "scale(1.15)" },
+          "100%": { transform: "scale(1)" },
+        },
       },
       animation: {
         "slide-in-right": "slide-in-right 160ms ease-out",

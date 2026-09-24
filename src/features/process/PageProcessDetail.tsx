@@ -55,7 +55,10 @@ function Editeur({ process: p }: { process: Process }) {
   const minuteur = useRef<number>();
 
   const brouillon = useRef(lireBrouillon(p.id));
-  const initial = brouillon.current && JSON.stringify(brouillon.current) !== JSON.stringify(p.contenu) ? brouillon.current : (p.contenu as JSONContent);
+  const initial =
+    brouillon.current && JSON.stringify(brouillon.current) !== JSON.stringify(p.contenu)
+      ? brouillon.current
+      : (p.contenu as JSONContent);
 
   const editor = useEditeurProcess(
     initial,
@@ -91,7 +94,8 @@ function Editeur({ process: p }: { process: Process }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [p.updated_at]);
 
-  const revision = () => `${new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })} — ${membre?.nom ?? ""}`;
+  const revision = () =>
+    `${new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })} — ${membre?.nom ?? ""}`;
 
   async function sauver() {
     if (!editor || !peutEcrire) return;
@@ -157,10 +161,14 @@ function Editeur({ process: p }: { process: Process }) {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onSelect={() => exporterPdf(p, r.domaines, contenuCourant()).catch((e) => toast.error(e.message))}>
+              <DropdownMenuItem
+                onSelect={() => exporterPdf(p, r.domaines, contenuCourant()).catch((e) => toast.error(e.message))}
+              >
                 <FileDown aria-hidden /> Exporter en PDF
               </DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => exporterMarkdown(p, r.domaines, contenuCourant()).catch((e) => toast.error(e.message))}>
+              <DropdownMenuItem
+                onSelect={() => exporterMarkdown(p, r.domaines, contenuCourant()).catch((e) => toast.error(e.message))}
+              >
                 <FileText aria-hidden /> Exporter en Markdown
               </DropdownMenuItem>
               <DropdownMenuSeparator />
@@ -173,7 +181,10 @@ function Editeur({ process: p }: { process: Process }) {
                     {
                       onSuccess: () => {
                         toast.success("Supprimé", {
-                          action: { label: "Annuler", onClick: () => enregistrer.mutate({ id: p.id, deleted_at: null }) },
+                          action: {
+                            label: "Annuler",
+                            onClick: () => enregistrer.mutate({ id: p.id, deleted_at: null }),
+                          },
                         });
                         naviguer("/process");
                       },
@@ -192,7 +203,11 @@ function Editeur({ process: p }: { process: Process }) {
         </header>
 
         <div className="flex flex-wrap items-center gap-3 border-b bg-card px-6 py-2">
-          <Select value={p.statut} onValueChange={(v) => champ({ statut: v }, `Statut : ${LIBELLE_STATUT_PROCESS[v as StatutProcess]}`)} disabled={!peutEcrire}>
+          <Select
+            value={p.statut}
+            onValueChange={(v) => champ({ statut: v }, `Statut : ${LIBELLE_STATUT_PROCESS[v as StatutProcess]}`)}
+            disabled={!peutEcrire}
+          >
             <SelectTrigger className="h-8 w-36" aria-label="Statut">
               <SelectValue />
             </SelectTrigger>
@@ -204,7 +219,11 @@ function Editeur({ process: p }: { process: Process }) {
               ))}
             </SelectContent>
           </Select>
-          <Select value={p.domaine_id ?? AUCUN} onValueChange={(v) => champ({ domaine_id: v === AUCUN ? null : v })} disabled={!peutEcrire}>
+          <Select
+            value={p.domaine_id ?? AUCUN}
+            onValueChange={(v) => champ({ domaine_id: v === AUCUN ? null : v })}
+            disabled={!peutEcrire}
+          >
             <SelectTrigger className="h-8 w-40" aria-label="Domaine">
               <SelectValue />
             </SelectTrigger>
@@ -221,7 +240,9 @@ function Editeur({ process: p }: { process: Process }) {
             id="responsable"
             value={responsable}
             onChange={(e) => setResponsable(e.target.value)}
-            onBlur={() => responsable.trim() !== (p.responsable ?? "") && champ({ responsable: responsable.trim() || null })}
+            onBlur={() =>
+              responsable.trim() !== (p.responsable ?? "") && champ({ responsable: responsable.trim() || null })
+            }
             placeholder="Responsable"
             aria-label="Responsable"
             disabled={!peutEcrire}
@@ -290,11 +311,23 @@ export default function PageProcessDetail() {
         <Skeleton className="h-64 w-full max-w-3xl" />
       </div>
     );
-  if (q.error) return <div className="p-6"><MessageErreur>Impossible de charger ce process. Vérifie ta connexion.</MessageErreur></div>;
+  if (q.error)
+    return (
+      <div className="p-6">
+        <MessageErreur>Impossible de charger ce process. Vérifie ta connexion.</MessageErreur>
+      </div>
+    );
   if (!q.data || q.data.deleted_at)
     return (
       <div className="p-6">
-        <EtatVide titre="Ce process n'existe plus." action={<Button asChild variant="outline"><Link to="/process">Retour aux process</Link></Button>} />
+        <EtatVide
+          titre="Ce process n'existe plus."
+          action={
+            <Button asChild variant="outline">
+              <Link to="/process">Retour aux process</Link>
+            </Button>
+          }
+        />
       </div>
     );
   return <Editeur key={q.data.id} process={q.data} />;

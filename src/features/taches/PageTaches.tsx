@@ -72,7 +72,9 @@ export default function PageTaches() {
   }, [visibles, aujourdhui, filtres.statut]);
 
   const ordre = useMemo(() => groupes.flatMap((g) => g.taches), [groupes]);
-  const tacheOuverte = ouverte ? (liste.data?.find((t) => t.id === ouverte) ?? faites.data?.find((t) => t.id === ouverte)) : undefined;
+  const tacheOuverte = ouverte
+    ? (liste.data?.find((t) => t.id === ouverte) ?? faites.data?.find((t) => t.id === ouverte))
+    : undefined;
   const tacheSelection = ordre.find((t) => t.id === selection);
 
   function ouvrir(id: string | null) {
@@ -145,7 +147,10 @@ export default function PageTaches() {
           <SaisieRapide ref={refCreation} types={["tache"]} cleBrouillon="saisie-taches" />
           <div className="flex flex-wrap items-center gap-2">
             <div className="relative w-64">
-              <Search className="pointer-events-none absolute left-2.5 top-2.5 size-4 text-muted-foreground" aria-hidden />
+              <Search
+                className="pointer-events-none absolute left-2.5 top-2.5 size-4 text-muted-foreground"
+                aria-hidden
+              />
               <Input
                 ref={refRecherche}
                 value={recherche}

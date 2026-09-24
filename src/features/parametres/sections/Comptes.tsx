@@ -52,7 +52,8 @@ export function SectionComptes() {
           <li key={m.id} className="flex items-center gap-3 px-3 py-2.5">
             <div className="min-w-0 flex-1">
               <p className="font-medium">
-                {m.nom} {m.user_id === userId ? <span className="text-sm font-normal text-muted-foreground">(toi)</span> : null}
+                {m.nom}{" "}
+                {m.user_id === userId ? <span className="text-sm font-normal text-muted-foreground">(toi)</span> : null}
               </p>
               <p className="truncate text-sm text-muted-foreground">
                 {m.email} · dernière ouverture {ilYa(m.derniere_ouverture_at)}
@@ -60,7 +61,11 @@ export function SectionComptes() {
             </div>
             {estAdmin ? (
               <>
-                <Select value={m.role} onValueChange={(v) => action({ action: "role", user_id: m.user_id, role: v }, "Rôle modifié")} disabled={!peutEcrire || enCours}>
+                <Select
+                  value={m.role}
+                  onValueChange={(v) => action({ action: "role", user_id: m.user_id, role: v }, "Rôle modifié")}
+                  disabled={!peutEcrire || enCours}
+                >
                   <SelectTrigger className="h-8 w-36" aria-label={`Rôle de ${m.nom}`}>
                     <SelectValue />
                   </SelectTrigger>
@@ -71,15 +76,35 @@ export function SectionComptes() {
                 </Select>
                 <Popover onOpenChange={(o) => o && setNouveauMdp(genererMotDePasse())}>
                   <PopoverTrigger asChild>
-                    <Button variant="ghost" size="icon" aria-label={`Réinitialiser le mot de passe de ${m.nom}`} disabled={!peutEcrire}>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      aria-label={`Réinitialiser le mot de passe de ${m.nom}`}
+                      disabled={!peutEcrire}
+                    >
                       <KeyRound />
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-80 space-y-2">
                     <p className="text-sm font-medium">Nouveau mot de passe pour {m.nom}</p>
-                    <Input value={nouveauMdp} onChange={(e) => setNouveauMdp(e.target.value)} className="font-mono text-sm" aria-label="Nouveau mot de passe" />
-                    <p className="text-xs text-muted-foreground">Transmets-le de vive voix ; la personne pourra le changer dans Paramètres › Mon compte.</p>
-                    <Button size="sm" onClick={() => action({ action: "mot_de_passe", user_id: m.user_id, mot_de_passe: nouveauMdp }, "Mot de passe réinitialisé")}>
+                    <Input
+                      value={nouveauMdp}
+                      onChange={(e) => setNouveauMdp(e.target.value)}
+                      className="font-mono text-sm"
+                      aria-label="Nouveau mot de passe"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Transmets-le de vive voix ; la personne pourra le changer dans Paramètres › Mon compte.
+                    </p>
+                    <Button
+                      size="sm"
+                      onClick={() =>
+                        action(
+                          { action: "mot_de_passe", user_id: m.user_id, mot_de_passe: nouveauMdp },
+                          "Mot de passe réinitialisé",
+                        )
+                      }
+                    >
                       Réinitialiser
                     </Button>
                   </PopoverContent>
@@ -87,15 +112,25 @@ export function SectionComptes() {
                 {m.user_id !== userId ? (
                   <Popover>
                     <PopoverTrigger asChild>
-                      <Button variant="ghost" size="icon" aria-label={`Retirer l'accès de ${m.nom}`} disabled={!peutEcrire}>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        aria-label={`Retirer l'accès de ${m.nom}`}
+                        disabled={!peutEcrire}
+                      >
                         <UserMinus />
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-80 space-y-2">
                       <p className="text-sm">
-                        Retirer l'accès de <strong>{m.nom}</strong> ? Son compte est bloqué ; ses tâches, process et documents restent en place.
+                        Retirer l'accès de <strong>{m.nom}</strong> ? Son compte est bloqué ; ses tâches, process et
+                        documents restent en place.
                       </p>
-                      <Button size="sm" variant="destructive" onClick={() => action({ action: "retirer", user_id: m.user_id }, "Accès retiré")}>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => action({ action: "retirer", user_id: m.user_id }, "Accès retiré")}
+                      >
                         Retirer l'accès
                       </Button>
                     </PopoverContent>
@@ -115,15 +150,31 @@ export function SectionComptes() {
           <div className="grid max-w-2xl grid-cols-2 gap-3">
             <div className="space-y-1">
               <Label htmlFor="c-nom">Nom</Label>
-              <Input id="c-nom" value={form.nom} onChange={(e) => setForm({ ...form, nom: e.target.value })} placeholder="Edwin" />
+              <Input
+                id="c-nom"
+                value={form.nom}
+                onChange={(e) => setForm({ ...form, nom: e.target.value })}
+                placeholder="Edwin"
+              />
             </div>
             <div className="space-y-1">
               <Label htmlFor="c-email">E-mail</Label>
-              <Input id="c-email" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="edwin@xtim.fr" />
+              <Input
+                id="c-email"
+                type="email"
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                placeholder="edwin@xtim.fr"
+              />
             </div>
             <div className="space-y-1">
               <Label htmlFor="c-mdp">Mot de passe provisoire</Label>
-              <Input id="c-mdp" value={form.mot_de_passe} onChange={(e) => setForm({ ...form, mot_de_passe: e.target.value })} className="font-mono text-sm" />
+              <Input
+                id="c-mdp"
+                value={form.mot_de_passe}
+                onChange={(e) => setForm({ ...form, mot_de_passe: e.target.value })}
+                className="font-mono text-sm"
+              />
             </div>
             <div className="space-y-1">
               <Label>Rôle</Label>
@@ -140,13 +191,16 @@ export function SectionComptes() {
           </div>
           <Button
             onClick={async () => {
-              if (await action({ action: "creer", ...form }, "Compte créé")) setForm({ email: "", nom: "", role: "membre", mot_de_passe: genererMotDePasse() });
+              if (await action({ action: "creer", ...form }, "Compte créé"))
+                setForm({ email: "", nom: "", role: "membre", mot_de_passe: genererMotDePasse() });
             }}
             disabled={!form.email || !form.nom || enCours || !peutEcrire}
           >
             <UserPlus aria-hidden /> Créer le compte
           </Button>
-          <p className="text-sm text-muted-foreground">Communique l'e-mail et le mot de passe provisoire à la personne ; elle le changera à sa première connexion.</p>
+          <p className="text-sm text-muted-foreground">
+            Communique l'e-mail et le mot de passe provisoire à la personne ; elle le changera à sa première connexion.
+          </p>
         </div>
       ) : null}
       {erreur ? <MessageErreur>{erreur}</MessageErreur> : null}

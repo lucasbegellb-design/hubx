@@ -55,8 +55,7 @@ export function useReferentiels() {
       listeProjets: p.data ?? [],
       projetsActifs: (p.data ?? []).filter((x) => x.statut === "actif"),
       listeMembres: m.data ?? [],
-      nomMembre: (userId: string | null | undefined) =>
-        userId ? (membres.get(userId)?.nom ?? "Ancien membre") : "",
+      nomMembre: (userId: string | null | undefined) => (userId ? (membres.get(userId)?.nom ?? "Ancien membre") : ""),
       charge: d.isSuccess && p.isSuccess && m.isSuccess,
     };
   }, [d.data, p.data, m.data, d.isSuccess, p.isSuccess, m.isSuccess]);

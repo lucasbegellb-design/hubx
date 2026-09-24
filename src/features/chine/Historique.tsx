@@ -61,7 +61,8 @@ export function Historique({ mapping }: { mapping: MappingChine }) {
     return (
       <div className="p-6">
         <EtatVide titre="Pas encore d'historique.">
-          Un snapshot est enregistré à chaque modification du fichier (et au moins une fois par jour). Les évolutions apparaîtront ici.
+          Un snapshot est enregistré à chaque modification du fichier (et au moins une fois par jour). Les évolutions
+          apparaîtront ici.
         </EtatVide>
       </div>
     );
@@ -127,14 +128,18 @@ export function Historique({ mapping }: { mapping: MappingChine }) {
                 ))}
                 {o.modifiees.map((m, i) => (
                   <li key={`m${i}`} className="px-3 py-2">
-                    <p className="font-medium">{o.colonneCle ? `${o.colonneCle} ${m.cle}` : resumeLigne(o.entetes, m.apres)}</p>
+                    <p className="font-medium">
+                      {o.colonneCle ? `${o.colonneCle} ${m.cle}` : resumeLigne(o.entetes, m.apres)}
+                    </p>
                     <ul className="mt-0.5 space-y-0.5">
                       {m.colonnes.map((c) => {
                         const i2 = o.entetes.indexOf(c);
                         return (
                           <li key={c} className="text-muted-foreground">
                             {c} : <span className="line-through">{afficherCellule(m.avant[i2]) || "vide"}</span> →{" "}
-                            <span className="font-medium text-foreground">{afficherCellule(m.apres[i2]) || "vide"}</span>
+                            <span className="font-medium text-foreground">
+                              {afficherCellule(m.apres[i2]) || "vide"}
+                            </span>
                           </li>
                         );
                       })}

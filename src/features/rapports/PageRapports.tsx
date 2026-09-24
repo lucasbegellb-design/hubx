@@ -41,13 +41,18 @@ function Generateur({ onGenere }: { onGenere: (id: string) => void }) {
     if (params.get("nouveau")) refDebut.current?.focus();
   }, [params]);
 
-  const bascule = (liste: string[], set: (l: string[]) => void, id: string) => set(liste.includes(id) ? liste.filter((x) => x !== id) : [...liste, id]);
+  const bascule = (liste: string[], set: (l: string[]) => void, id: string) =>
+    set(liste.includes(id) ? liste.filter((x) => x !== id) : [...liste, id]);
   const nbFiltres = domaines.length + projets.length;
 
   async function lancer() {
     setErreur(null);
     try {
-      const res = await generer.mutateAsync({ periode_debut: p.debut, periode_fin: p.fin, filtres: { domaines, projets } });
+      const res = await generer.mutateAsync({
+        periode_debut: p.debut,
+        periode_fin: p.fin,
+        filtres: { domaines, projets },
+      });
       toast.success("Rapport généré");
       onGenere(res.id);
     } catch (e) {
@@ -67,7 +72,10 @@ function Generateur({ onGenere }: { onGenere: (id: string) => void }) {
               setCode(c);
               setP(periodeDe(c, aujourdhui));
             }}
-            className={cn("rounded-md border px-2 py-1 text-sm", code === c ? "border-primary bg-accent font-medium" : "text-muted-foreground hover:bg-accent/60")}
+            className={cn(
+              "rounded-md border px-2 py-1 text-sm",
+              code === c ? "border-primary bg-accent font-medium" : "text-muted-foreground hover:bg-accent/60",
+            )}
           >
             {LIBELLES_PERIODES[c]}
           </button>
@@ -78,13 +86,28 @@ function Generateur({ onGenere }: { onGenere: (id: string) => void }) {
           <Label htmlFor="debut" className="text-sm font-normal text-muted-foreground">
             Du
           </Label>
-          <Input ref={refDebut} id="debut" type="date" value={p.debut} max={p.fin} onChange={(e) => (setCode(null), setP({ ...p, debut: e.target.value }))} className="h-8 tabular" />
+          <Input
+            ref={refDebut}
+            id="debut"
+            type="date"
+            value={p.debut}
+            max={p.fin}
+            onChange={(e) => (setCode(null), setP({ ...p, debut: e.target.value }))}
+            className="h-8 tabular"
+          />
         </div>
         <div className="space-y-1">
           <Label htmlFor="fin" className="text-sm font-normal text-muted-foreground">
             Au
           </Label>
-          <Input id="fin" type="date" value={p.fin} min={p.debut} onChange={(e) => (setCode(null), setP({ ...p, fin: e.target.value }))} className="h-8 tabular" />
+          <Input
+            id="fin"
+            type="date"
+            value={p.fin}
+            min={p.debut}
+            onChange={(e) => (setCode(null), setP({ ...p, fin: e.target.value }))}
+            className="h-8 tabular"
+          />
         </div>
       </div>
       <div className="flex gap-2">
@@ -100,7 +123,10 @@ function Generateur({ onGenere }: { onGenere: (id: string) => void }) {
               <p className="text-sm font-medium">Domaines</p>
               {r.listeDomaines.map((d) => (
                 <label key={d.id} className="flex items-center gap-2 text-sm">
-                  <Checkbox checked={domaines.includes(d.id)} onCheckedChange={() => bascule(domaines, setDomaines, d.id)} />
+                  <Checkbox
+                    checked={domaines.includes(d.id)}
+                    onCheckedChange={() => bascule(domaines, setDomaines, d.id)}
+                  />
                   {d.nom}
                 </label>
               ))}
@@ -109,7 +135,10 @@ function Generateur({ onGenere }: { onGenere: (id: string) => void }) {
               <p className="text-sm font-medium">Projets</p>
               {r.listeProjets.map((pr) => (
                 <label key={pr.id} className="flex items-center gap-2 text-sm">
-                  <Checkbox checked={projets.includes(pr.id)} onCheckedChange={() => bascule(projets, setProjets, pr.id)} />
+                  <Checkbox
+                    checked={projets.includes(pr.id)}
+                    onCheckedChange={() => bascule(projets, setProjets, pr.id)}
+                  />
                   {pr.nom}
                 </label>
               ))}
@@ -121,7 +150,12 @@ function Generateur({ onGenere }: { onGenere: (id: string) => void }) {
             ) : null}
           </PopoverContent>
         </Popover>
-        <Button size="sm" className="h-8" onClick={lancer} disabled={generer.isPending || !peutEcrire || !p.debut || !p.fin || p.fin < p.debut}>
+        <Button
+          size="sm"
+          className="h-8"
+          onClick={lancer}
+          disabled={generer.isPending || !peutEcrire || !p.debut || !p.fin || p.fin < p.debut}
+        >
           {generer.isPending ? <Loader2 className="animate-spin" aria-hidden /> : null}
           {generer.isPending ? "Génération…" : "Générer"}
         </Button>
@@ -160,7 +194,11 @@ export default function PageRapports() {
     try {
       const { pdfRapport } = await import("@/features/pdf/rapport");
       const blob = await pdfRapport(d, r?.synthese ?? null, auteur);
-      const chemin = await enregistrerFichier(`${nomFichier(`rapport-xtim-${d.periode.debut}-${d.periode.fin}`)}.pdf`, blob, { nom: "PDF", extensions: ["pdf"] });
+      const chemin = await enregistrerFichier(
+        `${nomFichier(`rapport-xtim-${d.periode.debut}-${d.periode.fin}`)}.pdf`,
+        blob,
+        { nom: "PDF", extensions: ["pdf"] },
+      );
       if (chemin) toast.success("Exporté en PDF");
     } catch (e) {
       toast.error(`Export impossible : ${(e as Error).message}`);
@@ -171,16 +209,23 @@ export default function PageRapports() {
 
   async function exporterMd() {
     if (!r?.contenu_md || !d) return;
-    const chemin = await enregistrerFichier(`${nomFichier(`rapport-xtim-${d.periode.debut}-${d.periode.fin}`)}.md`, new TextEncoder().encode(r.contenu_md), {
-      nom: "Markdown",
-      extensions: ["md"],
-    });
+    const chemin = await enregistrerFichier(
+      `${nomFichier(`rapport-xtim-${d.periode.debut}-${d.periode.fin}`)}.md`,
+      new TextEncoder().encode(r.contenu_md),
+      {
+        nom: "Markdown",
+        extensions: ["md"],
+      },
+    );
     if (chemin) toast.success("Exporté en Markdown");
   }
 
   return (
     <div className="flex h-full flex-col">
-      <EnteteePage titre="Rapports" sousTitre="Hebdomadaire le vendredi à 17 h, mensuel le dernier jour ouvré à 17 h, ou à la demande" />
+      <EnteteePage
+        titre="Rapports"
+        sousTitre="Hebdomadaire le vendredi à 17 h, mensuel le dernier jour ouvré à 17 h, ou à la demande"
+      />
       <div className="flex min-h-0 flex-1">
         <aside className="flex w-80 shrink-0 flex-col border-r bg-card">
           <Generateur onGenere={choisir} />
@@ -201,13 +246,21 @@ export default function PageRapports() {
                         <button
                           type="button"
                           onClick={() => choisir(x.id)}
-                          className={cn("w-full rounded-md px-2 py-1.5 text-left", x.id === selection ? "bg-accent" : "hover:bg-accent/60")}
+                          className={cn(
+                            "w-full rounded-md px-2 py-1.5 text-left",
+                            x.id === selection ? "bg-accent" : "hover:bg-accent/60",
+                          )}
                         >
                           <p className="text-sm">
                             {dateFr(x.periode_debut)} – {dateFr(x.periode_fin)}
                           </p>
                           <p className={cn("text-xs text-muted-foreground", x.statut === "erreur" && "text-urgent")}>
-                            {TYPES[x.type]} · {x.statut === "en_cours" ? "génération…" : x.statut === "erreur" ? "échec" : ilYa(x.created_at)}
+                            {TYPES[x.type]} ·{" "}
+                            {x.statut === "en_cours"
+                              ? "génération…"
+                              : x.statut === "erreur"
+                                ? "échec"
+                                : ilYa(x.created_at)}
                           </p>
                         </button>
                       </li>
@@ -223,7 +276,8 @@ export default function PageRapports() {
           {!selection ? (
             <div className="p-6">
               <EtatVide titre="Aucun rapport pour l'instant.">
-                Choisis une période à gauche puis « Générer ». Les rapports hebdomadaires et mensuels apparaîtront ici automatiquement.
+                Choisis une période à gauche puis « Générer ». Les rapports hebdomadaires et mensuels apparaîtront ici
+                automatiquement.
               </EtatVide>
             </div>
           ) : rapport.isPending ? (
@@ -241,8 +295,11 @@ export default function PageRapports() {
                 <div className="min-w-0 flex-1">
                   <h2 className="text-xl font-semibold">{titreRapport(r)}</h2>
                   <p className="text-sm text-muted-foreground">
-                    Du {dateFr(r.periode_debut)} au {dateFr(r.periode_fin)} · généré {ilYa(r.created_at)} {auteur ? `par ${auteur}` : "automatiquement"}
-                    {d && (d.filtres.domaines.length || d.filtres.projets.length) ? ` · filtres : ${[...d.filtres.domaines, ...d.filtres.projets].join(", ")}` : ""}
+                    Du {dateFr(r.periode_debut)} au {dateFr(r.periode_fin)} · généré {ilYa(r.created_at)}{" "}
+                    {auteur ? `par ${auteur}` : "automatiquement"}
+                    {d && (d.filtres.domaines.length || d.filtres.projets.length)
+                      ? ` · filtres : ${[...d.filtres.domaines, ...d.filtres.projets].join(", ")}`
+                      : ""}
                   </p>
                 </div>
                 <Button variant="outline" onClick={exporterPdf} disabled={!d || export_}>
@@ -275,7 +332,9 @@ export default function PageRapports() {
                   <Loader2 className="size-4 animate-spin" aria-hidden /> Génération en cours…
                 </p>
               ) : r.statut === "erreur" ? (
-                <MessageErreur>{r.erreur ?? "La génération a échoué."} Relance la génération depuis le panneau de gauche.</MessageErreur>
+                <MessageErreur>
+                  {r.erreur ?? "La génération a échoué."} Relance la génération depuis le panneau de gauche.
+                </MessageErreur>
               ) : d ? (
                 <VueRapport d={d} synthese={r.synthese} erreurIa={r.erreur} />
               ) : null}

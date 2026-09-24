@@ -22,7 +22,11 @@ const TABLES = [
 async function lireTable(table: (typeof TABLES)[number]): Promise<Record<string, unknown>[]> {
   const lignes: Record<string, unknown>[] = [];
   for (let de = 0; ; de += 1000) {
-    const { data, error } = await supabase.from(table).select("*").order("created_at").range(de, de + 999);
+    const { data, error } = await supabase
+      .from(table)
+      .select("*")
+      .order("created_at")
+      .range(de, de + 999);
     if (error) throw new Error(`Lecture de « ${table} » impossible : ${error.message}`);
     lignes.push(...(data as Record<string, unknown>[]));
     if (data.length < 1000) return lignes;
@@ -81,5 +85,8 @@ export async function exporterTout(progression: (m: string) => void): Promise<st
 
   progression("Compression…");
   const octets = zipSync(zip, { level: 6 });
-  return enregistrerFichier(`export-hub-xtim-${new Date().toISOString().slice(0, 10)}.zip`, octets, { nom: "Archive zip", extensions: ["zip"] });
+  return enregistrerFichier(`export-hub-xtim-${new Date().toISOString().slice(0, 10)}.zip`, octets, {
+    nom: "Archive zip",
+    extensions: ["zip"],
+  });
 }

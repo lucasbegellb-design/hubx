@@ -80,7 +80,11 @@ export function normaliserClasseur(feuilles: { nom: string; lignes: unknown[][] 
     const donnees = lignes.slice(iEntete + 1).filter((l) => l.some((c) => !estVide(c)));
     let largeur = Math.max(lignes[iEntete]?.length ?? 0, ...donnees.map((l) => l.length));
     // Retire les colonnes vides en fin de tableau
-    while (largeur > 0 && estVide(lignes[iEntete]?.[largeur - 1] ?? null) && donnees.every((l) => estVide(l[largeur - 1] ?? null))) {
+    while (
+      largeur > 0 &&
+      estVide(lignes[iEntete]?.[largeur - 1] ?? null) &&
+      donnees.every((l) => estVide(l[largeur - 1] ?? null))
+    ) {
       largeur--;
     }
     onglets.push({
@@ -165,7 +169,17 @@ export function devinerColonnes(entetes: string[]): Partial<Record<Role, string>
   const res: Partial<Record<Role, string>> = {};
   const prises = new Set<string>();
   // Les rôles les plus spécifiques d'abord (« Livraison prévue » avant « Statut »…)
-  const ordre: Role[] = ["livraison_prevue", "livraison_reelle", "date_paiement", "date_echeance", "devise", "po", "fournisseur", "montant", "statut"];
+  const ordre: Role[] = [
+    "livraison_prevue",
+    "livraison_reelle",
+    "date_paiement",
+    "date_echeance",
+    "devise",
+    "po",
+    "fournisseur",
+    "montant",
+    "statut",
+  ];
   for (const r of ordre) {
     const h = entetes.find((e) => !prises.has(e) && INDICES_ROLES[r].test(e));
     if (h) {
@@ -183,14 +197,19 @@ export function validerMapping(d: DonneesChine, m: MappingChine): { valides: Map
   for (const mo of m.onglets) {
     const onglet = d.onglets.find((o) => o.nom === mo.onglet);
     if (!onglet) {
-      problemes.push(`L'onglet « ${mo.onglet} » n'existe plus dans le fichier. Mets à jour le mapping dans Paramètres › Suivi Chine.`);
+      problemes.push(
+        `L'onglet « ${mo.onglet} » n'existe plus dans le fichier. Mets à jour le mapping dans Paramètres › Suivi Chine.`,
+      );
       continue;
     }
     const colonnes: Partial<Record<Role, string>> = {};
     for (const [role, col] of Object.entries(mo.colonnes) as [Role, string | undefined][]) {
       if (!col) continue;
       if (onglet.entetes.includes(col)) colonnes[role] = col;
-      else problemes.push(`La colonne « ${col} » (${LIBELLES_ROLES[role]}) est introuvable dans l'onglet « ${mo.onglet} ».`);
+      else
+        problemes.push(
+          `La colonne « ${col} » (${LIBELLES_ROLES[role]}) est introuvable dans l'onglet « ${mo.onglet} ».`,
+        );
     }
     valides.push({ onglet: mo.onglet, colonnes });
   }
@@ -239,7 +258,20 @@ function serieExcelVersIso(n: number): string {
   return new Date(ms).toISOString().slice(0, 10);
 }
 
-const MOIS_EN: Record<string, number> = { jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6, jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12 };
+const MOIS_EN: Record<string, number> = {
+  jan: 1,
+  feb: 2,
+  mar: 3,
+  apr: 4,
+  may: 5,
+  jun: 6,
+  jul: 7,
+  aug: 8,
+  sep: 9,
+  oct: 10,
+  nov: 11,
+  dec: 12,
+};
 
 /** « 2026-10-15 », « 15/10/2026 », « 15.10.26 », numéro de série Excel… → « YYYY-MM-DD ». */
 export function parserDate(v: Cellule): string | null {
@@ -257,9 +289,11 @@ export function parserDate(v: Cellule): string | null {
     return `${annee}-${String(mois).padStart(2, "0")}-${String(jour).padStart(2, "0")}`;
   }
   m = /^(\d{1,2})[\s-]([A-Za-z]{3})[a-z]*[\s-,]+(\d{4})$/.exec(t) ?? null;
-  if (m && MOIS_EN[m[2].toLowerCase()]) return `${m[3]}-${String(MOIS_EN[m[2].toLowerCase()]).padStart(2, "0")}-${m[1].padStart(2, "0")}`;
+  if (m && MOIS_EN[m[2].toLowerCase()])
+    return `${m[3]}-${String(MOIS_EN[m[2].toLowerCase()]).padStart(2, "0")}-${m[1].padStart(2, "0")}`;
   m = /^([A-Za-z]{3})[a-z]*\.?\s+(\d{1,2}),?\s+(\d{4})$/.exec(t);
-  if (m && MOIS_EN[m[1].toLowerCase()]) return `${m[3]}-${String(MOIS_EN[m[1].toLowerCase()]).padStart(2, "0")}-${m[2].padStart(2, "0")}`;
+  if (m && MOIS_EN[m[1].toLowerCase()])
+    return `${m[3]}-${String(MOIS_EN[m[1].toLowerCase()]).padStart(2, "0")}-${m[2].padStart(2, "0")}`;
   return null;
 }
 
@@ -465,18 +499,46 @@ export function diffSnapshots(avant: DonneesChine, apres: DonneesChine, m?: Mapp
   for (const oApres of apres.onglets) {
     const oAvant = avant.onglets.find((o) => o.nom === oApres.nom);
     if (!oAvant) {
-      onglets.push({ onglet: oApres.nom, entetes: oApres.entetes, statut: "ajoute", colonneCle: null, ajoutees: oApres.lignes, supprimees: [], modifiees: [] });
+      onglets.push({
+        onglet: oApres.nom,
+        entetes: oApres.entetes,
+        statut: "ajoute",
+        colonneCle: null,
+        ajoutees: oApres.lignes,
+        supprimees: [],
+        modifiees: [],
+      });
       continue;
     }
     const cle = choisirColonneCle(oAvant, oApres, m);
-    const iAvant = indexer({ ...oAvant, lignes: oAvant.lignes.map((l) => aligner(l, oAvant.entetes, oApres.entetes)), entetes: oApres.entetes }, cle);
+    const iAvant = indexer(
+      {
+        ...oAvant,
+        lignes: oAvant.lignes.map((l) => aligner(l, oAvant.entetes, oApres.entetes)),
+        entetes: oApres.entetes,
+      },
+      cle,
+    );
     const iApres = indexer(oApres, cle);
-    const d: DiffOnglet = { onglet: oApres.nom, entetes: oApres.entetes, statut: "modifie", colonneCle: cle, ajoutees: [], supprimees: [], modifiees: [] };
+    const d: DiffOnglet = {
+      onglet: oApres.nom,
+      entetes: oApres.entetes,
+      statut: "modifie",
+      colonneCle: cle,
+      ajoutees: [],
+      supprimees: [],
+      modifiees: [],
+    };
     for (const [k, l] of iApres) {
       const a = iAvant.get(k);
       if (!a) d.ajoutees.push(l);
       else if (signature(a) !== signature(l)) {
-        d.modifiees.push({ cle: k.replace(/#\d+$/, ""), avant: a, apres: l, colonnes: oApres.entetes.filter((_, i) => signature([a[i]]) !== signature([l[i]])) });
+        d.modifiees.push({
+          cle: k.replace(/#\d+$/, ""),
+          avant: a,
+          apres: l,
+          colonnes: oApres.entetes.filter((_, i) => signature([a[i]]) !== signature([l[i]])),
+        });
       }
     }
     for (const [k, l] of iAvant) if (!iApres.has(k)) d.supprimees.push(l);
@@ -484,7 +546,15 @@ export function diffSnapshots(avant: DonneesChine, apres: DonneesChine, m?: Mapp
   }
   for (const oAvant of avant.onglets) {
     if (!apres.onglets.some((o) => o.nom === oAvant.nom)) {
-      onglets.push({ onglet: oAvant.nom, entetes: oAvant.entetes, statut: "supprime", colonneCle: null, ajoutees: [], supprimees: oAvant.lignes, modifiees: [] });
+      onglets.push({
+        onglet: oAvant.nom,
+        entetes: oAvant.entetes,
+        statut: "supprime",
+        colonneCle: null,
+        ajoutees: [],
+        supprimees: oAvant.lignes,
+        modifiees: [],
+      });
     }
   }
   return {
@@ -502,6 +572,8 @@ export function lireDonnees(brut: unknown): DonneesChine {
   const d = brut as Partial<DonneesChine> | null;
   if (!d || !Array.isArray(d.onglets)) return { onglets: [] };
   return {
-    onglets: d.onglets.filter((o) => o && typeof o.nom === "string" && Array.isArray(o.entetes) && Array.isArray(o.lignes)),
+    onglets: d.onglets.filter(
+      (o) => o && typeof o.nom === "string" && Array.isArray(o.entetes) && Array.isArray(o.lignes),
+    ),
   };
 }

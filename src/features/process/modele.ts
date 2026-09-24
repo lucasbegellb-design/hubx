@@ -11,8 +11,13 @@ export const SECTIONS_MODELE = [
   "Dernière révision",
 ] as const;
 
-const titre = (texte: string): JSONContent => ({ type: "heading", attrs: { level: 2 }, content: [{ type: "text", text: texte }] });
-const para = (texte?: string): JSONContent => (texte ? { type: "paragraph", content: [{ type: "text", text: texte }] } : { type: "paragraph" });
+const titre = (texte: string): JSONContent => ({
+  type: "heading",
+  attrs: { level: 2 },
+  content: [{ type: "text", text: texte }],
+});
+const para = (texte?: string): JSONContent =>
+  texte ? { type: "paragraph", content: [{ type: "text", text: texte }] } : { type: "paragraph" };
 const liste = (items: string[], ordonnee = false): JSONContent => ({
   type: ordonnee ? "orderedList" : "bulletList",
   content: (items.length ? items : [""]).map((i) => ({ type: "listItem", content: [para(i)] })),
@@ -82,7 +87,9 @@ function texteNoeud(n: JSONContent): string {
 /** Met à jour le paragraphe qui suit le titre « Dernière révision » (ou l'ajoute). */
 export function avecRevision(doc: JSONContent, texte: string): JSONContent {
   const contenu = [...(doc.content ?? [])];
-  const i = contenu.findIndex((n) => n.type === "heading" && texteNoeud(n).trim().toLowerCase() === "dernière révision");
+  const i = contenu.findIndex(
+    (n) => n.type === "heading" && texteNoeud(n).trim().toLowerCase() === "dernière révision",
+  );
   if (i === -1) return { ...doc, content: [...contenu, titre("Dernière révision"), para(texte)] };
   const suivant = contenu[i + 1];
   if (suivant && suivant.type === "paragraph") contenu[i + 1] = para(texte);

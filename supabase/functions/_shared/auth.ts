@@ -2,9 +2,7 @@
 import { createClient, type SupabaseClient } from "npm:@supabase/supabase-js@2";
 import { HttpError } from "./http.ts";
 
-export type Appelant =
-  | { type: "membre"; userId: string; role: "admin" | "membre"; nom: string }
-  | { type: "systeme" };
+export type Appelant = { type: "membre"; userId: string; role: "admin" | "membre"; nom: string } | { type: "systeme" };
 
 let admin: SupabaseClient | null = null;
 

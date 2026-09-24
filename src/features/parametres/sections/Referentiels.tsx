@@ -9,7 +9,15 @@ import { useEcriture } from "@/hooks/useEcriture";
 import { messageErreur } from "@/lib/supabase";
 import { useEcrireReferentiel } from "../api";
 
-function ChampNom({ valeur, onValider, desactive }: { valeur: string; onValider: (v: string) => void; desactive?: boolean }) {
+function ChampNom({
+  valeur,
+  onValider,
+  desactive,
+}: {
+  valeur: string;
+  onValider: (v: string) => void;
+  desactive?: boolean;
+}) {
   const [v, setV] = useState(valeur);
   return (
     <Input
@@ -41,7 +49,10 @@ export function SectionReferentiels() {
     const b = listeD[i + delta];
     if (!a || !b) return;
     ecrireD.mutate({ type: "maj", id: a.id, valeurs: { ordre: b.ordre } }, { onError: erreur });
-    ecrireD.mutate({ type: "maj", id: b.id, valeurs: { ordre: a.ordre === b.ordre ? a.ordre + delta : a.ordre } }, { onError: erreur });
+    ecrireD.mutate(
+      { type: "maj", id: b.id, valeurs: { ordre: a.ordre === b.ordre ? a.ordre + delta : a.ordre } },
+      { onError: erreur },
+    );
   }
 
   return (
@@ -50,7 +61,9 @@ export function SectionReferentiels() {
         <div>
           <p className="font-medium">Domaines</p>
           <p className="text-sm text-muted-foreground">
-            {estAdmin ? "Un domaine utilisé par des tâches ne peut pas être supprimé : renomme-le plutôt." : "Modifiables par l'administrateur."}
+            {estAdmin
+              ? "Un domaine utilisé par des tâches ne peut pas être supprimé : renomme-le plutôt."
+              : "Modifiables par l'administrateur."}
           </p>
         </div>
         <ul className="space-y-1.5">
@@ -59,18 +72,41 @@ export function SectionReferentiels() {
               <input
                 type="color"
                 value={d.couleur}
-                onChange={(e) => ecrireD.mutate({ type: "maj", id: d.id, valeurs: { couleur: e.target.value.toUpperCase() } }, { onError: erreur })}
+                onChange={(e) =>
+                  ecrireD.mutate(
+                    { type: "maj", id: d.id, valeurs: { couleur: e.target.value.toUpperCase() } },
+                    { onError: erreur },
+                  )
+                }
                 disabled={!estAdmin || !peutEcrire}
                 aria-label={`Couleur de ${d.nom}`}
                 className="h-8 w-9 cursor-pointer rounded border bg-transparent p-0.5"
               />
-              <ChampNom valeur={d.nom} onValider={(nom) => ecrireD.mutate({ type: "maj", id: d.id, valeurs: { nom } }, { onError: erreur })} desactive={!estAdmin || !peutEcrire} />
+              <ChampNom
+                valeur={d.nom}
+                onValider={(nom) => ecrireD.mutate({ type: "maj", id: d.id, valeurs: { nom } }, { onError: erreur })}
+                desactive={!estAdmin || !peutEcrire}
+              />
               {estAdmin ? (
                 <>
-                  <Button variant="ghost" size="icon" className="size-8" aria-label="Monter" onClick={() => deplacer(i, -1)} disabled={i === 0 || !peutEcrire}>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="size-8"
+                    aria-label="Monter"
+                    onClick={() => deplacer(i, -1)}
+                    disabled={i === 0 || !peutEcrire}
+                  >
                     <ArrowUp />
                   </Button>
-                  <Button variant="ghost" size="icon" className="size-8" aria-label="Descendre" onClick={() => deplacer(i, 1)} disabled={i === listeD.length - 1 || !peutEcrire}>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="size-8"
+                    aria-label="Descendre"
+                    onClick={() => deplacer(i, 1)}
+                    disabled={i === listeD.length - 1 || !peutEcrire}
+                  >
                     <ArrowDown />
                   </Button>
                   <Button
@@ -79,7 +115,12 @@ export function SectionReferentiels() {
                     className="size-8"
                     aria-label={`Supprimer ${d.nom}`}
                     disabled={!peutEcrire}
-                    onClick={() => ecrireD.mutate({ type: "supprimer", id: d.id }, { onSuccess: () => toast.success("Supprimé"), onError: erreur })}
+                    onClick={() =>
+                      ecrireD.mutate(
+                        { type: "supprimer", id: d.id },
+                        { onSuccess: () => toast.success("Supprimé"), onError: erreur },
+                      )
+                    }
                   >
                     <Trash2 />
                   </Button>
@@ -90,7 +131,12 @@ export function SectionReferentiels() {
         </ul>
         {estAdmin ? (
           <div className="flex max-w-md gap-2">
-            <Input value={nouveauD} onChange={(e) => setNouveauD(e.target.value)} placeholder="Nouveau domaine" className="h-8" />
+            <Input
+              value={nouveauD}
+              onChange={(e) => setNouveauD(e.target.value)}
+              placeholder="Nouveau domaine"
+              className="h-8"
+            />
             <Button
               size="sm"
               variant="outline"
@@ -111,12 +157,18 @@ export function SectionReferentiels() {
       <div className="space-y-3 border-t pt-6">
         <div>
           <p className="font-medium">Projets</p>
-          <p className="text-sm text-muted-foreground">Un projet archivé reste consultable mais sort des vues par défaut et des alertes.</p>
+          <p className="text-sm text-muted-foreground">
+            Un projet archivé reste consultable mais sort des vues par défaut et des alertes.
+          </p>
         </div>
         <ul className="space-y-1.5">
           {(projets.data ?? []).map((p) => (
             <li key={p.id} className="flex items-center gap-2">
-              <ChampNom valeur={p.nom} onValider={(nom) => ecrireP.mutate({ type: "maj", id: p.id, valeurs: { nom } }, { onError: erreur })} desactive={!peutEcrire} />
+              <ChampNom
+                valeur={p.nom}
+                onValider={(nom) => ecrireP.mutate({ type: "maj", id: p.id, valeurs: { nom } }, { onError: erreur })}
+                desactive={!peutEcrire}
+              />
               <span className="w-16 text-sm text-muted-foreground">{p.statut === "archive" ? "Archivé" : "Actif"}</span>
               <Button
                 variant="ghost"
@@ -127,7 +179,10 @@ export function SectionReferentiels() {
                 onClick={() =>
                   ecrireP.mutate(
                     { type: "maj", id: p.id, valeurs: { statut: p.statut === "archive" ? "actif" : "archive" } },
-                    { onSuccess: () => toast.success(p.statut === "archive" ? "Désarchivé" : "Archivé"), onError: erreur },
+                    {
+                      onSuccess: () => toast.success(p.statut === "archive" ? "Désarchivé" : "Archivé"),
+                      onError: erreur,
+                    },
                   )
                 }
               >
@@ -140,7 +195,12 @@ export function SectionReferentiels() {
                   className="size-8"
                   aria-label={`Supprimer ${p.nom}`}
                   disabled={!peutEcrire}
-                  onClick={() => ecrireP.mutate({ type: "supprimer", id: p.id }, { onSuccess: () => toast.success("Supprimé"), onError: erreur })}
+                  onClick={() =>
+                    ecrireP.mutate(
+                      { type: "supprimer", id: p.id },
+                      { onSuccess: () => toast.success("Supprimé"), onError: erreur },
+                    )
+                  }
                 >
                   <Trash2 />
                 </Button>
@@ -149,12 +209,22 @@ export function SectionReferentiels() {
           ))}
         </ul>
         <div className="flex max-w-md gap-2">
-          <Input value={nouveauP} onChange={(e) => setNouveauP(e.target.value)} placeholder="Nouveau projet" className="h-8" />
+          <Input
+            value={nouveauP}
+            onChange={(e) => setNouveauP(e.target.value)}
+            placeholder="Nouveau projet"
+            className="h-8"
+          />
           <Button
             size="sm"
             variant="outline"
             disabled={!nouveauP.trim() || !peutEcrire}
-            onClick={() => ecrireP.mutate({ type: "ajouter", valeurs: { nom: nouveauP.trim() } }, { onSuccess: () => (setNouveauP(""), toast.success("Ajouté")), onError: erreur })}
+            onClick={() =>
+              ecrireP.mutate(
+                { type: "ajouter", valeurs: { nom: nouveauP.trim() } },
+                { onSuccess: () => (setNouveauP(""), toast.success("Ajouté")), onError: erreur },
+              )
+            }
           >
             <Plus aria-hidden /> Ajouter
           </Button>

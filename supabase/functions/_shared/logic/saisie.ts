@@ -22,11 +22,7 @@ export interface SaisieAnalysee {
 }
 
 export function normaliser(s: string): string {
-  return s
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .toLowerCase()
-    .trim();
+  return s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
 }
 
 const JOURS: Record<string, number> = {
@@ -45,7 +41,8 @@ export function interpreterDate(jeton: string, aujourdhui: string): string | nul
   if (["auj", "aujourdhui", "aujourd'hui", "today"].includes(j)) return aujourdhui;
   if (j === "demain") return ajouterJours(aujourdhui, 1);
   if (j === "apres-demain" || j === "apresdemain") return ajouterJours(aujourdhui, 2);
-  if (j === "semaine") return ajouterJours(aujourdhui, 5 - jourSemaine(aujourdhui) + (jourSemaine(aujourdhui) > 5 ? 7 : 0));
+  if (j === "semaine")
+    return ajouterJours(aujourdhui, 5 - jourSemaine(aujourdhui) + (jourSemaine(aujourdhui) > 5 ? 7 : 0));
   const plus = /^\+(\d{1,3})j?$/.exec(j);
   if (plus) return ajouterJours(aujourdhui, Number(plus[1]));
   for (const [nom, num] of Object.entries(JOURS)) {

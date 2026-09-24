@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import type { Insertion, MiseAJour, Postit } from "@/lib/types";
 import { verifierEcriture } from "@/hooks/useEcriture";
+import { schemaPostit, valider } from "@/lib/schemas";
 
 const CLE = ["postits", "liste"] as const;
 
@@ -29,7 +30,7 @@ export function useCreerPostit() {
   return useMutation({
     mutationFn: async (p: Insertion<"postits">) => {
       if (!verifierEcriture()) throw new Error("hors-ligne");
-      const { data, error } = await supabase.from("postits").insert(p).select().single();
+      const { data, error } = await supabase.from("postits").insert(valider(schemaPostit, p)).select().single();
       if (error) throw error;
       return data;
     },
@@ -45,7 +46,12 @@ export function useMajPostit() {
   return useMutation({
     mutationFn: async ({ id, ...maj }: MiseAJour<"postits"> & { id: string }) => {
       if (!verifierEcriture()) throw new Error("hors-ligne");
-      const { data, error } = await supabase.from("postits").update(maj).eq("id", id).select().single();
+      const { data, error } = await supabase
+        .from("postits")
+        .update(valider(schemaPostit, maj))
+        .eq("id", id)
+        .select()
+        .single();
       if (error) throw error;
       return data;
     },
