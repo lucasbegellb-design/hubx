@@ -1,0 +1,15 @@
+import { defineConfig } from "vitest/config";
+import path from "node:path";
+
+export default defineConfig({
+  resolve: {
+    alias: {
+      "@shared": path.resolve(__dirname, "supabase/functions/_shared/logic"),
+      "@": path.resolve(__dirname, "src"),
+    },
+  },
+  test: {
+    include: ["tests/**/*.test.ts"],
+    environment: "node",
+  },
+});

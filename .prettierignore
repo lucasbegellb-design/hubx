@@ -1,0 +1,8 @@
+dist
+src-tauri/target
+src-tauri/gen
+src/components/ui
+src/lib/database.types.ts
+supabase/functions/sync-chine/fixture.ts
+package-lock.json
+fixtures

@@ -1,0 +1,152 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Clair — cahier des charges §6 */
+    --background: 210 14.3% 97.3%; /* #F7F8F9 */
+    --foreground: 213 27.5% 15.7%; /* #1D2733 */
+    --card: 0 0% 100%; /* #FFFFFF */
+    --card-foreground: 213 27.5% 15.7%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 213 27.5% 15.7%;
+    --primary: 204 45% 33.5%; /* #2F5D7C */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 204 17.2% 94.3%;
+    --secondary-foreground: 213 27.5% 15.7%;
+    --muted: 204 17.2% 94.3%; /* #EEF1F3 */
+    --muted-foreground: 210 12.1% 42%; /* #5E6B78 */
+    --accent: 204 31.3% 93.7%; /* #EAF0F4 */
+    --accent-foreground: 213 27.5% 15.7%;
+    --destructive: 4 76.5% 40%; /* #B42318 */
+    --destructive-foreground: 0 0% 100%;
+    --border: 210 16.7% 90.6%; /* #E3E7EB */
+    --input: 210 16.7% 90.6%;
+    --ring: 204 45% 33.5%;
+    --radius: 8px;
+    --urgent: 4 76.5% 40%; /* #B42318 */
+    --retard: 22 91.5% 37.1%; /* #B54708 */
+    --fait: 145 46.2% 33.5%; /* #2E7D4F */
+    --postit-sable: 40 52.2% 91%;
+    --postit-sauge: 115 21.6% 90%;
+    --postit-ciel: 208 36.2% 90.8%;
+    --postit-lavande: 265 27.3% 91.4%;
+    color-scheme: light;
+  }
+
+  .dark {
+    --background: 213 21.6% 10%; /* #14191F */
+    --foreground: 210 19% 91.8%; /* #E6EAEE */
+    --card: 212 21.7% 13.5%; /* #1B222A */
+    --card-foreground: 210 19% 91.8%;
+    --popover: 212 21.7% 13.5%;
+    --popover-foreground: 210 19% 91.8%;
+    --primary: 205 44% 60.8%; /* #6FA3C7 */
+    --primary-foreground: 213 21.6% 10%;
+    --secondary: 212 19.5% 17.1%;
+    --secondary-foreground: 210 19% 91.8%;
+    --muted: 212 19.5% 17.1%;
+    --muted-foreground: 210 14.8% 65.5%;
+    --accent: 210 28% 19.6%;
+    --accent-foreground: 210 19% 91.8%;
+    --destructive: 5 81.8% 72%;
+    --destructive-foreground: 213 21.6% 10%;
+    --border: 211 19.6% 21%;
+    --input: 211 19.6% 21%;
+    --ring: 205 44% 60.8%;
+    --urgent: 5 81.8% 72%;
+    --retard: 30 76.3% 63.5%;
+    --fait: 146 40.8% 56.3%;
+    --postit-sable: 37 13.4% 19%;
+    --postit-sauge: 135 12.2% 19.2%;
+    --postit-ciel: 209 22.8% 19.8%;
+    --postit-lavande: 258 12.4% 20.6%;
+    color-scheme: dark;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-background font-sans text-base text-foreground antialiased;
+    font-feature-settings: "kern";
+    overflow: hidden;
+  }
+
+  /* Focus clavier visible partout */
+  :focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-1 ring-offset-background;
+  }
+
+  ::selection {
+    @apply bg-primary/20;
+  }
+}
+
+@layer utilities {
+  /* Chiffres tabulaires : tableaux et montants */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+  .scrollbar-thin {
+    scrollbar-width: thin;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Éditeur TipTap (process) */
+.tiptap {
+  @apply min-h-[320px] outline-none;
+}
+.tiptap:focus-visible {
+  @apply ring-0 ring-offset-0;
+}
+.prose-xtim h2 {
+  @apply mb-1 mt-5 text-lg font-semibold;
+}
+.prose-xtim h3 {
+  @apply mb-1 mt-4 text-base font-semibold;
+}
+.prose-xtim p {
+  @apply my-1.5 leading-6;
+}
+.prose-xtim ul {
+  @apply my-1.5 list-disc pl-5;
+}
+.prose-xtim ol {
+  @apply my-1.5 list-decimal pl-5;
+}
+.prose-xtim li p {
+  @apply my-0.5;
+}
+.prose-xtim blockquote {
+  @apply border-l-2 pl-3 text-muted-foreground;
+}
+.prose-xtim code {
+  @apply rounded bg-muted px-1 font-mono text-sm;
+}
+.prose-xtim hr {
+  @apply my-4;
+}
+.tiptap p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  @apply pointer-events-none float-left h-0 text-muted-foreground;
+}
