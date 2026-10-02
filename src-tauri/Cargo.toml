@@ -33,8 +33,8 @@ tauri-plugin-window-state = "2"
 
 # Réglage mémoire de WebView2 (mêmes versions que celles utilisées par Tauri/wry)
 [target.'cfg(windows)'.dependencies]
-webview2-com = "0.38"
-windows = "0.61"
+webview2-com = "0.39"
+windows = "0.62"
 
 # Binaire léger (cf. https://tauri.app/concept/size/)
 [profile.release]
