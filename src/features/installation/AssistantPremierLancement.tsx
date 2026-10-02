@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { ChoixIa, problemeIa, valeurIaInitiale, type ValeurIa } from "@/features/parametres/ChoixIa";
 import { codeInvitation, enregistrerConfigServeur, lireCodeInvitation, type ConfigServeur } from "@/lib/config";
 import { ouvrirUrl } from "@/lib/tauri";
 import { cn } from "@/lib/utils";
@@ -26,7 +27,6 @@ import { installerServeur, type ClesServices, type Etape } from "./installation"
 type Ecran = "accueil" | "rejoindre" | "jeton" | "projet" | "compte" | "cles" | "installation" | "fin";
 
 const LIEN_JETONS = "https://supabase.com/dashboard/account/tokens";
-const LIEN_ANTHROPIC = "https://console.anthropic.com/settings/keys";
 const LIEN_GUIDE_AZURE =
   "https://github.com/lucasbegellb-design/hubx/blob/main/SETUP.md#3-connecter-le-fichier-excel-dedwin-application-azure";
 
@@ -229,6 +229,8 @@ export default function AssistantPremierLancement() {
   const [ref, setRef] = useState<string | null>(null);
   const [admin, setAdmin] = useState({ nom: "", email: "", motDePasse: "", confirmation: "" });
   const [services, setServices] = useState<ClesServices>({});
+  const [ia, setIa] = useState<ValeurIa>(valeurIaInitiale());
+  const [choixServices, setChoixServices] = useState<ClesServices>({});
   const [etapes, setEtapes] = useState<Etape[]>([]);
   const [config, setConfig] = useState<ConfigServeur | null>(null);
   const [erreur, setErreur] = useState<string | null>(null);
@@ -283,7 +285,15 @@ export default function AssistantPremierLancement() {
     setEcran("cles");
   }
 
-  async function lancerInstallation() {
+  function installerAvecCles() {
+    const choix: ClesServices = { ...services, ia: ia.cle.trim() ? ia : undefined };
+    const probleme = ia.cle.trim() ? problemeIa(ia) : null;
+    if (probleme) return setErreur(probleme);
+    void lancerInstallation(choix);
+  }
+
+  async function lancerInstallation(choix: ClesServices) {
+    setChoixServices(choix);
     setErreur(null);
     setEcran("installation");
     try {
@@ -291,7 +301,7 @@ export default function AssistantPremierLancement() {
         jeton: jeton.trim(),
         ref: ref!,
         admin: { nom: admin.nom, email: admin.email, motDePasse: admin.motDePasse },
-        services,
+        services: choix,
         onEtapes: setEtapes,
       });
       setConfig(c);
@@ -574,19 +584,12 @@ export default function AssistantPremierLancement() {
           retour={() => setEcran("compte")}
         >
           <section className="space-y-2 rounded-lg border p-4">
-            <p className="font-medium">Intelligence artificielle (Anthropic)</p>
+            <p className="font-medium">Intelligence artificielle</p>
             <p className="text-sm text-muted-foreground">
-              Analyse des documents déposés, structuration des process, synthèse des rapports. Paiement à l'usage
-              (quelques euros par mois). <Lien href={LIEN_ANTHROPIC}>Créer une clé</Lien>
+              Analyse des documents déposés, structuration des process, synthèse des rapports. Mistral propose une offre
+              gratuite : crée un compte, puis une clé API, et colle-la ci-dessous.
             </p>
-            <Input
-              type="password"
-              aria-label="Clé API Anthropic"
-              placeholder="sk-ant-…"
-              value={services.anthropic ?? ""}
-              onChange={(e) => setServices({ ...services, anthropic: e.target.value })}
-              className="font-mono text-sm"
-            />
+            <ChoixIa valeur={ia} onChange={setIa} />
           </section>
           <section className="space-y-2 rounded-lg border p-4">
             <p className="font-medium">Fichier Excel d'Edwin (Microsoft 365)</p>
@@ -625,11 +628,12 @@ export default function AssistantPremierLancement() {
           <p className="text-xs text-muted-foreground">
             Les clés sont stockées chiffrées sur ton serveur et ne sont jamais relisibles depuis l'application.
           </p>
+          {erreur ? <MessageErreur>{erreur}</MessageErreur> : null}
           <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => (setServices({}), lancerInstallation())}>
+            <Button variant="outline" onClick={() => void lancerInstallation({})}>
               Plus tard
             </Button>
-            <Button onClick={lancerInstallation}>Installer</Button>
+            <Button onClick={installerAvecCles}>Installer</Button>
           </div>
         </Cadre>
       );
@@ -645,7 +649,7 @@ export default function AssistantPremierLancement() {
                 <Button variant="outline" onClick={() => setEcran("cles")}>
                   Retour
                 </Button>
-                <Button onClick={lancerInstallation}>Réessayer</Button>
+                <Button onClick={() => void lancerInstallation(choixServices)}>Réessayer</Button>
               </div>
             </>
           ) : null}

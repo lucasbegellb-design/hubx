@@ -5,10 +5,11 @@ import { VERSION_SCHEMA_APP } from "./paquet";
 
 export interface EtatConfiguration {
   ia: boolean;
+  fournisseur: string;
+  modele: string;
   azure: boolean;
   cron: boolean;
   url: boolean;
-  modele: string;
   snapshots: number;
 }
 

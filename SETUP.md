@@ -44,9 +44,9 @@ pour démarrer, l'offre Pro à ~25 $/mois ajoute des sauvegardes quotidiennes).
    Un projet existant peut aussi être choisi : l'installation est sans risque pour un projet vide ou déjà équipé de Hub XTIM.
 4. **Compte administrateur** : ton nom, ton e-mail et un mot de passe (10 caractères minimum).
 5. **Clés des services** (facultatif, modifiables plus tard dans **Paramètres › Clés et connexions**) :
-   - **Intelligence artificielle** : créer une clé sur https://console.anthropic.com/settings/keys (paiement à l'usage,
-     quelques euros par mois) et la coller. Sans clé, tout fonctionne sauf l'analyse des documents, la structuration
-     des process et la synthèse rédigée des rapports.
+   - **Intelligence artificielle** : choisir le fournisseur (voir [§ 2.1](#21-choisir-le-fournisseur-dia)) et coller sa
+     clé API. Par défaut **Mistral AI**, gratuit. Sans clé, tout fonctionne sauf l'analyse des documents, la
+     structuration des process et la synthèse rédigée des rapports.
    - **Fichier Excel d'Edwin** : voir [§ 3](#3-connecter-le-fichier-excel-dedwin-application-azure). Sans ces identifiants,
      le suivi Chine fonctionne en mode démo sur un fichier d'exemple.
 6. **Installer** : l'assistant crée la base de données, installe les fonctions serveur, ferme les inscriptions
@@ -56,6 +56,27 @@ pour démarrer, l'offre Pro à ~25 $/mois ajoute des sauvegardes quotidiennes).
 
 Les clés sont stockées **chiffrées sur le serveur** (coffre Supabase) et ne sont jamais relisibles depuis l'application :
 on peut seulement les remplacer ou les tester.
+
+### 2.1 Choisir le fournisseur d'IA
+
+L'IA sert à analyser les documents, structurer les process et rédiger la synthèse des rapports. Les appels partent du
+serveur ; le fournisseur, le modèle et la clé se changent à tout moment dans **Paramètres › Clés et connexions**
+(bouton **Tester** pour vérifier).
+
+| Fournisseur                   | Coût                                                                         | Remarques                                                                                    |
+| ----------------------------- | ---------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| **Mistral AI** (recommandé)   | Gratuit avec l'offre _Experiment_ (sans carte bancaire), limité en débit     | Entreprise française, serveurs en Europe. Lit aussi les images et les PDF scannés.           |
+| **DeepSeek**                  | Crédit d'essai à l'inscription, puis quelques centimes par million de jetons | Texte uniquement (pas d'images ni de PDF scannés). Serveurs en Chine.                        |
+| **Qwen** (Alibaba Cloud)      | Quota gratuit à l'ouverture (région internationale), puis bon marché         | Texte uniquement avec les modèles proposés.                                                  |
+| **Autre** (compatible OpenAI) | Selon le service                                                             | OpenRouter (modèles `:free`), Groq, Gemini… : saisir l'adresse de l'API et le nom du modèle. |
+
+**Créer une clé Mistral gratuite** : compte sur https://console.mistral.ai → choisir l'offre **Experiment** (vérification
+par SMS) → **API Keys → Create new key** → coller la clé dans Hub XTIM. Avec l'offre gratuite, Mistral peut utiliser les
+échanges pour entraîner ses modèles ; pour des documents confidentiels, passer à l'offre payante (quelques euros par mois
+pour l'usage de Hub XTIM) qui l'exclut.
+
+Exemples d'adresses pour « Autre » : OpenRouter `https://openrouter.ai/api/v1`, Groq `https://api.groq.com/openai/v1`,
+Gemini `https://generativelanguage.googleapis.com/v1beta/openai`.
 
 ## 3. Connecter le fichier Excel d'Edwin (application Azure)
 
@@ -167,8 +188,8 @@ Puis, dans le tableau de bord Supabase :
 - **Authentication → Sign In / Providers** : désactiver « Allow new users to sign up ».
 - **SQL Editor** : `select public.enregistrer_secret('url', 'https://VOTRE-REF.supabase.co');` (tâches automatiques).
 - Clés des services : soit dans l'app (Paramètres › Clés et connexions), soit en secrets des fonctions
-  (`npx supabase secrets set ANTHROPIC_API_KEY=… AZURE_TENANT_ID=… AZURE_CLIENT_ID=… AZURE_CLIENT_SECRET=…`,
-  prioritaires sur ceux saisis dans l'app).
+  (`npx supabase secrets set IA_API_KEY=… AZURE_TENANT_ID=… AZURE_CLIENT_ID=… AZURE_CLIENT_SECRET=…`,
+  prioritaires sur ceux saisis dans l'app ; le fournisseur et le modèle se choisissent toujours dans l'app).
 - Premier administrateur : **Authentication → Users → Add user** (Auto Confirm), puis se connecter dans l'app et cliquer
   **Devenir administrateur**.
 - `supabase/seed.sql` et `supabase/seeds/` sont des données de **démonstration locale** : ne pas les exécuter en production.

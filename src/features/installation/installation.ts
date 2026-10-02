@@ -31,7 +31,8 @@ export interface CompteAdmin {
 }
 
 export interface ClesServices {
-  anthropic?: string;
+  /** Fournisseur d'IA choisi et sa clé (Mistral, DeepSeek, Qwen ou service compatible OpenAI). */
+  ia?: { fournisseur: string; modele: string; url: string; cle: string };
   azureTenant?: string;
   azureClient?: string;
   azureSecret?: string;
@@ -146,8 +147,20 @@ export async function installerServeur(o: Options): Promise<{ url: string; anonK
   });
 
   await etape("services", async (d) => {
+    const ia = o.services.ia;
+    if (ia?.cle.trim()) {
+      const { error } = await serveur
+        .from("parametres")
+        .update({
+          ia_fournisseur: ia.fournisseur,
+          modele_ia: ia.modele.trim(),
+          ia_url: ia.fournisseur === "autre" ? ia.url.trim() : null,
+        })
+        .eq("ligne_unique", true);
+      if (error) throw new Error(`Fournisseur d'IA non enregistré : ${error.message}`);
+    }
     const valeurs: [string, string | undefined][] = [
-      ["anthropic_api_key", o.services.anthropic],
+      ["ia_api_key", ia?.cle],
       ["azure_tenant_id", o.services.azureTenant],
       ["azure_client_id", o.services.azureClient],
       ["azure_client_secret", o.services.azureSecret],

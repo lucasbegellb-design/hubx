@@ -1,10 +1,10 @@
 // Analyse IA d'un document déposé : catégorie, résumé, infos clés, tâches suggérées.
 import { encodeBase64 } from "jsr:@std/encoding@1/base64";
-import type Anthropic from "npm:@anthropic-ai/sdk@^0";
 import { clientAdmin, verifierAppelant } from "../_shared/auth.ts";
-import { extraireTexte } from "../_shared/fichiers.ts";
+import { extraireTexte, texteDuPdf } from "../_shared/fichiers.ts";
 import { HttpError, json, lireCorps, servir } from "../_shared/http.ts";
-import { demanderJson, iaDisponible } from "../_shared/ia.ts";
+import { configIa, demanderJson, type Morceau } from "../_shared/ia.ts";
+import { majuscule, nomService } from "../_shared/logic/ia.ts";
 import { aujourdhuiParis } from "../_shared/logic/dates.ts";
 
 const CATEGORIES = [
@@ -25,7 +25,9 @@ const CATEGORIES = [
 
 const MAX_PDF = 20 * 1024 * 1024;
 const MAX_IMAGE = 5 * 1024 * 1024;
-const MAX_TEXTE = 150_000;
+const MAX_TEXTE = 120_000;
+/** En dessous, un PDF est considéré comme scanné (sans couche texte). */
+const MIN_TEXTE_PDF = 80;
 const IMAGES = ["image/jpeg", "image/png", "image/gif", "image/webp"];
 
 interface Analyse {
@@ -86,28 +88,45 @@ servir(async (req) => {
     return json({ ok: false, erreur: message });
   };
 
-  if (!(await iaDisponible()))
-    return echec("Analyse IA indisponible : clé API Anthropic non configurée (Paramètres › Clés et connexions).");
+  const ia = await configIa();
+  if (!ia.cle) return echec("Analyse IA indisponible : aucune clé API enregistrée (Paramètres › Clés et connexions).");
+  const nomIa = nomService(ia.fournisseur);
 
   const { data: fichier, error } = await db.storage.from("documents").download(doc.storage_path);
   if (error || !fichier) return echec("Fichier introuvable dans le stockage. Dépose-le à nouveau.");
   const octets = new Uint8Array(await fichier.arrayBuffer());
   const mime = (doc.mime || fichier.type || "").toLowerCase();
 
-  const contenu: Anthropic.ContentBlockParam[] = [];
+  const contenu: Morceau[] = [];
   let extrait = false;
+  const ajouterTexte = (texte: string) => {
+    if (texte.length > MAX_TEXTE) {
+      texte = texte.slice(0, MAX_TEXTE);
+      extrait = true;
+    }
+    contenu.push({ type: "texte", texte: `<document nom="${doc.nom}">\n${texte}\n</document>` });
+  };
   if (mime === "application/pdf" || doc.nom.toLowerCase().endsWith(".pdf")) {
     if (octets.length > MAX_PDF) return echec("PDF trop volumineux pour l'analyse (20 Mo maximum).");
-    contenu.push({
-      type: "document",
-      source: { type: "base64", media_type: "application/pdf", data: encodeBase64(octets) },
-    });
+    let texte: string;
+    try {
+      texte = await texteDuPdf(octets);
+    } catch {
+      return echec("PDF illisible (corrompu ou protégé par mot de passe).");
+    }
+    if (texte.trim().length >= MIN_TEXTE_PDF) ajouterTexte(texte);
+    else if (ia.fournisseur.pdf) contenu.push({ type: "pdf", base64: encodeBase64(octets) });
+    else
+      return echec(
+        `PDF scanné (sans texte) : ${nomIa} ne sait pas le lire. Mistral le peut (Paramètres › Clés et connexions).`,
+      );
   } else if (IMAGES.includes(mime)) {
+    if (!ia.fournisseur.images)
+      return echec(
+        `${majuscule(nomIa)} ne lit pas les images : choisis Mistral dans Paramètres › Clés et connexions pour les analyser.`,
+      );
     if (octets.length > MAX_IMAGE) return echec("Image trop lourde pour l'analyse (5 Mo maximum).");
-    contenu.push({
-      type: "image",
-      source: { type: "base64", media_type: mime as "image/png", data: encodeBase64(octets) },
-    });
+    contenu.push({ type: "image", mime, base64: encodeBase64(octets) });
   } else {
     let texte: string | null;
     try {
@@ -118,18 +137,14 @@ servir(async (req) => {
     if (texte === null)
       return echec("Format non pris en charge pour l'analyse (PDF, images, Word, Excel, PowerPoint, texte).");
     if (!texte.trim()) return echec("Aucun texte exploitable dans ce fichier.");
-    if (texte.length > MAX_TEXTE) {
-      texte = texte.slice(0, MAX_TEXTE);
-      extrait = true;
-    }
-    contenu.push({ type: "text", text: `<document nom="${doc.nom}">\n${texte}\n</document>` });
+    ajouterTexte(texte);
   }
 
   const { data: domaines } = await db.from("domaines").select("id, nom");
   const noms = (domaines ?? []).map((d) => d.nom);
   contenu.push({
-    type: "text",
-    text:
+    type: "texte",
+    texte:
       `Nom du fichier : ${doc.nom}\nDate du jour : ${aujourdhuiParis()}\n` +
       (extrait ? "Attention : seul le début de ce document très long t'est fourni.\n" : "") +
       "Analyse ce document pour XTIM.",

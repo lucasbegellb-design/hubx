@@ -2,6 +2,7 @@
 // @deno-types="https://cdn.sheetjs.com/xlsx-0.20.3/package/types/index.d.ts"
 import * as XLSX from "https://cdn.sheetjs.com/xlsx-0.20.3/package/xlsx.mjs";
 import { strFromU8, unzipSync } from "npm:fflate@0.8.2";
+import { extractText, getDocumentProxy } from "npm:unpdf@1.8.1";
 
 export { XLSX };
 
@@ -53,4 +54,14 @@ export function extraireTexte(octets: Uint8Array, nom: string, mime: string | nu
   if (["xlsx", "xls", "ods", "csv"].includes(ext) || /spreadsheet|excel/.test(mime ?? "")) return texteTableur(octets);
   if (["txt", "md"].includes(ext) || mime?.startsWith("text/")) return new TextDecoder().decode(octets);
   return null;
+}
+
+/** Texte d'un PDF (vide s'il est scanné, sans couche texte). Lève une erreur si le fichier est illisible. */
+export async function texteDuPdf(octets: Uint8Array): Promise<string> {
+  const pdf = await getDocumentProxy(new Uint8Array(octets));
+  const { text } = await extractText(pdf, { mergePages: false });
+  return text
+    .map((page, i) => (page.trim() ? `--- Page ${i + 1} ---\n${page.trim()}` : ""))
+    .filter(Boolean)
+    .join("\n\n");
 }

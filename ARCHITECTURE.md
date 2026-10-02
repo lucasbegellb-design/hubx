@@ -24,10 +24,11 @@
 │ pg_cron + pg_net ─► sync-chine (*/15 min), generate-report (vendredi / fin de mois)    │
 └──────┬─────────────────────────────────────────┬───────────────────────────────────────┘
        │ client credentials (Files.Read.All)     │ clé API (secret serveur)
-┌──────▼──────────────┐                 ┌────────▼──────────┐
-│ Microsoft Graph     │                 │ API Anthropic     │
-│ OneDrive d'Edwin    │                 │ (claude-sonnet-5) │
-└─────────────────────┘                 └───────────────────┘
+┌──────▼──────────────┐                 ┌────────▼──────────────┐
+│ Microsoft Graph     │                 │ API d'IA au choix     │
+│ OneDrive d'Edwin    │                 │ Mistral (défaut),     │
+└─────────────────────┘                 │ DeepSeek, Qwen, autre │
+                                        └───────────────────────┘
 ```
 
 ## Arborescence
@@ -71,7 +72,7 @@ Toutes les tables ont `id uuid`, `created_at`, `updated_at` (trigger) et la RLS 
 - `journal_activite`, `chine_snapshots`, `rapports` : aucune écriture client (triggers ou fonctions en service role).
 - Les Edge Functions sont déployées avec `verify_jwt = false` et **vérifient elles-mêmes** le JWT puis l'appartenance
   à `membres` (`_shared/auth.ts`) ; pg_cron s'authentifie avec l'en-tête `x-cron-secret`.
-- Le client ne contient que l'URL et la clé publique. Clé serveur, secrets Azure et clé Anthropic : secrets des fonctions.
+- Le client ne contient que l'URL et la clé publique. Clé serveur, secrets Azure et clé d'IA : secrets des fonctions ou Vault.
 
 ## Flux principaux
 
@@ -131,11 +132,18 @@ Uniquement dans les Edge Functions (`_shared/ia.ts`, SDK officiel, sorties struc
   dans le Vault → compte administrateur (API d'administration Auth avec la clé serveur, en mémoire seulement) → clés des services.
 - **Mise à jour du serveur** : `version_schema()` comparée à la dernière migration embarquée ; si l'app est plus récente,
   l'administrateur voit un bandeau et réapplique migrations manquantes + fonctions avec un jeton.
-- **Clés des services** (Anthropic, Azure) : saisies dans Paramètres › Clés et connexions (`definir_secret`, admin),
+- **Clés des services** (IA, Azure) : saisies dans Paramètres › Clés et connexions (`definir_secret`, admin),
   stockées chiffrées dans le **Vault** Supabase sous `hubx_<nom>`, lues seulement par les Edge Functions
   (`lire_secret`, service role, `_shared/secrets.ts`, cache 60 s). Les variables d'environnement des fonctions restent
   prioritaires. Le secret de planification `hubx_cron_secret` est généré par la migration. La fonction `configuration`
-  renvoie la présence des clés (booléens) et teste Anthropic / Microsoft.
+  renvoie la présence des clés (booléens) et teste le fournisseur d'IA / Microsoft.
+- **IA** : `_shared/ia.ts` appelle `POST <adresse>/chat/completions` (format OpenAI, compris par Mistral, DeepSeek, Qwen,
+  OpenRouter, Groq…) avec la clé `ia_api_key`. Fournisseur, modèle et adresse dans `parametres` (presets dans
+  `_shared/logic/ia.ts`, partagés avec l'app). Réponses JSON fiabilisées sans dépendre du fournisseur : mode
+  `json_object`, schéma + exemple dans la consigne, mise en conformité tolérante (`conformer` : casse des valeurs,
+  dates JJ/MM/AAAA, champs superflus…), puis une relance avec les défauts constatés. Une nouvelle tentative sur 429/5xx.
+  Documents : texte extrait sur le serveur (PDF via unpdf, Office via fflate/SheetJS) envoyé à n'importe quel modèle ;
+  images et PDF scannés envoyés tels quels seulement aux fournisseurs qui les lisent (Mistral).
 
 ## Bureau (Tauri)
 

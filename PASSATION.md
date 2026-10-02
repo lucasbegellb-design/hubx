@@ -11,7 +11,7 @@ publier des mises à jour et le faire évoluer. Il complète [SETUP.md](SETUP.md
 - **Où sont les données** : projet Supabase `hub-xtim` (base Postgres en Europe + stockage des fichiers).
   Rien n'est stocké uniquement sur un PC (hors brouillons de saisie en cours).
 - **Qui administre** : le(s) compte(s) au rôle _Administrateur_ (Paramètres › Comptes et rôles).
-- **Ce qui coûte** : Supabase (gratuit ou Pro), API Anthropic (à l'usage), GitHub (gratuit). Aucun autre abonnement.
+- **Ce qui coûte** : Supabase (gratuit ou Pro), fournisseur d'IA (Mistral gratuit par défaut, ou payant à l'usage), GitHub (gratuit). Aucun autre abonnement.
 
 ## 2. Accès à transmettre (checklist de départ)
 
@@ -21,8 +21,8 @@ publier des mises à jour et le faire évoluer. Il complète [SETUP.md](SETUP.md
 - [ ] Compte **GitHub** : ajouter le successeur comme administrateur du dépôt `hubx` (Settings → Collaborators),
       ou transférer le dépôt à un compte / une organisation XTIM (Settings → Transfer).
 - [ ] **Clé privée de mise à jour** (`hub-xtim.key`) et son mot de passe.
-- [ ] Console **Anthropic** : ajouter le successeur à l'organisation, ou créer une nouvelle clé à son nom
-      (Paramètres › Clés et connexions) et révoquer l'ancienne.
+- [ ] Compte du **fournisseur d'IA** (Mistral par défaut, console.mistral.ai) : ajouter le successeur à l'organisation,
+      ou créer une nouvelle clé à son nom (Paramètres › Clés et connexions) et révoquer l'ancienne.
 - [ ] Application **Azure** « Hub XTIM – lecture Suivi Chine » : ajouter le successeur comme propriétaire ;
       noter la date d'expiration du secret client.
 - [ ] Dans l'app : nommer le successeur **Administrateur**, puis retirer l'accès du compte sortant
@@ -47,7 +47,7 @@ publier des mises à jour et le faire évoluer. Il complète [SETUP.md](SETUP.md
 | Quoi                    | Quand                                             | Action                                                                                                                                                    |
 | ----------------------- | ------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Secret client Azure** | à la date notée lors de la création (24 mois max) | Entra → l'application → Certificats et secrets → nouveau secret, puis Paramètres › Clés et connexions → Fichier Excel d'Edwin ; supprimer l'ancien secret |
-| Crédit Anthropic        | selon l'offre                                     | Console Anthropic → Billing                                                                                                                               |
+| Quota / crédit d'IA     | selon l'offre du fournisseur                      | Console du fournisseur (Mistral : console.mistral.ai → Limits / Billing) ; en cas de limite atteinte, changer de modèle ou d'offre                        |
 | Projet Supabase gratuit | se met en pause après 7 jours sans activité       | Passer en Pro ou relancer depuis le tableau de bord                                                                                                       |
 
 ## 4. Exporter et sauvegarder les données

@@ -8,7 +8,7 @@ Interface 100 % en français. Source de vérité du besoin : cahier des charges 
 - Desktop : Tauri 2 (`src-tauri/`, Rust). Plugins : notification, global-shortcut, autostart, updater, tray (core), single-instance, window-state, dialog, fs, process, opener, http.
 - Front : React 18 + TS strict + Vite, Tailwind 3 + shadcn/ui (registre v3, `npx shadcn@2.3.0 add <comp>`), TanStack Query, Zustand (état UI seulement), react-hook-form + zod, date-fns (fr), cmdk, TipTap, Recharts, @react-pdf/renderer (chargé à la demande).
 - Backend : Supabase (Postgres + RLS, Auth email/mdp, Realtime, Storage, Edge Functions Deno, pg_cron + pg_net).
-- IA : API Anthropic uniquement depuis les Edge Functions (secret `ANTHROPIC_API_KEY`). Modèle dans `parametres.modele_ia` (défaut `claude-sonnet-5`).
+- IA : fournisseur au choix, API « Chat Completions » (format OpenAI) appelée uniquement depuis les Edge Functions (`_shared/ia.ts`, `fetch`, sans SDK) : Mistral par défaut (offre gratuite, `mistral-small-latest`), DeepSeek, Qwen ou tout service compatible. Choix dans `parametres.ia_fournisseur` / `modele_ia` / `ia_url`, clé dans le Vault (`ia_api_key`, ou secret `IA_API_KEY`). Presets et logique JSON dans `_shared/logic/ia.ts`.
 
 ## Commandes
 

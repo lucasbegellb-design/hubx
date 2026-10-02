@@ -3,7 +3,7 @@
 import { clientAdmin } from "./client.ts";
 
 export type NomSecret =
-  "anthropic_api_key" | "azure_tenant_id" | "azure_client_id" | "azure_client_secret" | "cron_secret" | "url";
+  "ia_api_key" | "azure_tenant_id" | "azure_client_id" | "azure_client_secret" | "cron_secret" | "url";
 
 const DUREE_CACHE = 60_000;
 const cache = new Map<NomSecret, { valeur: string | null; le: number }>();

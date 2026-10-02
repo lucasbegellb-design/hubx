@@ -2,7 +2,7 @@
 // Les valeurs ne sont jamais renvoyées : seulement leur présence et le résultat des tests.
 import { clientAdmin, verifierAppelant } from "../_shared/auth.ts";
 import { HttpError, json, lireCorps, servir } from "../_shared/http.ts";
-import { modeleConfigure, testerIa } from "../_shared/ia.ts";
+import { configIa, testerIa } from "../_shared/ia.ts";
 import { oublierSecrets, secret } from "../_shared/secrets.ts";
 import { identifiantsAzure, jeton } from "../sync-chine/graph.ts";
 
@@ -12,20 +12,20 @@ servir(async (req) => {
   oublierSecrets(); // une clé vient peut-être d'être modifiée
 
   if (action === "etat") {
-    const [ia, azure, cron, url, modele] = await Promise.all([
-      secret("anthropic_api_key", "ANTHROPIC_API_KEY"),
+    const [ia, azure, cron, url] = await Promise.all([
+      configIa(),
       identifiantsAzure(),
       secret("cron_secret", "CRON_SECRET"),
       secret("url"),
-      modeleConfigure(),
     ]);
     const { count } = await clientAdmin().from("chine_snapshots").select("id", { count: "exact", head: true });
     return json({
-      ia: Boolean(ia),
+      ia: Boolean(ia.cle),
+      fournisseur: ia.fournisseur.id,
+      modele: ia.modele,
       azure: Boolean(azure),
       cron: Boolean(cron),
       url: Boolean(url),
-      modele,
       snapshots: count ?? 0,
     });
   }

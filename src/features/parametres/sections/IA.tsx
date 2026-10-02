@@ -1,76 +1,37 @@
-import { useEffect, useState } from "react";
+import { fournisseur } from "@shared/ia";
+import { useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/features/auth/AuthProvider";
 import { useMajParametres, useParametres } from "../api";
 
-const SUGGESTIONS = [
-  ["claude-sonnet-5", "Sonnet 5 — équilibré (défaut)"],
-  ["claude-opus-5", "Opus 5 — plus précis, plus coûteux"],
-  ["claude-haiku-4-5", "Haiku 4.5 — rapide et économique"],
-];
-
 export function SectionIA() {
   const { estAdmin } = useAuth();
   const p = useParametres();
   const maj = useMajParametres();
-  const [modele, setModele] = useState("");
-  useEffect(() => setModele(p.data?.modele_ia ?? ""), [p.data?.modele_ia]);
+  const [, setParams] = useSearchParams();
   if (!p.data) return null;
   const id = p.data.id;
 
   return (
     <div className="space-y-6">
       <div className="space-y-1.5">
-        <Label htmlFor="modele">Modèle IA</Label>
+        <p className="text-sm font-medium leading-none">Fournisseur d'IA</p>
         <p className="text-sm text-muted-foreground">
-          Utilisé pour l'analyse des documents, la structuration des process et la synthèse des rapports. La clé API
-          reste sur le serveur (secret ANTHROPIC_API_KEY).
+          Utilisé pour l'analyse des documents, la structuration des process et la synthèse des rapports.
         </p>
-        <div className="flex gap-2">
-          <Input
-            id="modele"
-            value={modele}
-            onChange={(e) => setModele(e.target.value)}
-            className="max-w-xs font-mono text-sm"
-            disabled={!estAdmin}
-            list="modeles"
-          />
-          <datalist id="modeles">
-            {SUGGESTIONS.map(([v, l]) => (
-              <option key={v} value={v}>
-                {l}
-              </option>
-            ))}
-          </datalist>
-          <Button
-            variant="outline"
-            disabled={!estAdmin || modele.trim().length < 3 || modele.trim() === p.data.modele_ia}
-            onClick={() =>
-              maj.mutate({ id, modele_ia: modele.trim() }, { onSuccess: () => toast.success("Modèle enregistré") })
-            }
-          >
-            Enregistrer
-          </Button>
+        <div className="flex flex-wrap items-center gap-3">
+          <p className="text-sm">
+            {fournisseur(p.data.ia_fournisseur).nom} · <span className="font-mono">{p.data.modele_ia}</span>
+          </p>
+          {estAdmin ? (
+            <Button variant="outline" size="sm" onClick={() => setParams({ section: "cles" }, { replace: true })}>
+              Changer de fournisseur ou de clé
+            </Button>
+          ) : null}
         </div>
-        <ul className="text-sm text-muted-foreground">
-          {SUGGESTIONS.map(([v, l]) => (
-            <li key={v}>
-              <button
-                type="button"
-                className="font-mono hover:text-foreground disabled:cursor-default"
-                disabled={!estAdmin}
-                onClick={() => setModele(v)}
-              >
-                {v}
-              </button>{" "}
-              — {l.split("— ")[1]}
-            </li>
-          ))}
-        </ul>
       </div>
       <div className="flex items-center justify-between gap-4 border-t pt-5">
         <div>

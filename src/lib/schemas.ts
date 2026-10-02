@@ -1,5 +1,6 @@
 // Validation côté client (zod), alignée sur les contraintes SQL des migrations.
 // Les erreurs sont traduites en messages lisibles avant tout envoi au serveur.
+import { ID_FOURNISSEURS, urlApiValide } from "@shared/ia";
 import { z, type ZodTypeAny } from "zod";
 
 const date = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date invalide (AAAA-MM-JJ).");
@@ -73,6 +74,18 @@ export const schemaLienPartage = z
   .refine((v) => v.startsWith("https://"), "Le lien doit commencer par https:// (« Copier le lien » dans OneDrive).");
 
 export const schemaModele = z.string().trim().min(3, "Nom de modèle trop court.").max(100, "Nom de modèle trop long.");
+
+/** Fournisseur d'IA (aligné sur les CHECK de `parametres`). */
+export const schemaIa = z.object({
+  ia_fournisseur: z.enum(ID_FOURNISSEURS),
+  modele_ia: schemaModele,
+  ia_url: z
+    .string()
+    .trim()
+    .max(300, "Adresse trop longue.")
+    .refine(urlApiValide, "Adresse de l'API invalide (https://…).")
+    .nullable(),
+});
 
 /**
  * Valide une création (objet complet) ou une mise à jour (champs partiels) et renvoie les données nettoyées.

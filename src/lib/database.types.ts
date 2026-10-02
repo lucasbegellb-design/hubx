@@ -261,6 +261,8 @@ export type Database = {
       parametres: {
         Row: {
           created_at: string
+          ia_fournisseur: string
+          ia_url: string | null
           id: string
           ligne_unique: boolean
           modele_ia: string
@@ -269,6 +271,8 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          ia_fournisseur?: string
+          ia_url?: string | null
           id?: string
           ligne_unique?: boolean
           modele_ia?: string
@@ -277,6 +281,8 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          ia_fournisseur?: string
+          ia_url?: string | null
           id?: string
           ligne_unique?: boolean
           modele_ia?: string

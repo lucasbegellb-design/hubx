@@ -1,5 +1,6 @@
 import { Check, Copy, ExternalLink, Loader2, LogOut, RefreshCw, X } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { fournisseur } from "@shared/ia";
+import { useEffect, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 import { MessageErreur } from "@/components/common";
 import { Button } from "@/components/ui/button";
@@ -15,6 +16,8 @@ import { queryClient } from "@/lib/queryClient";
 import { messageErreur, supabase, urlServeur } from "@/lib/supabase";
 import { ouvrirUrl } from "@/lib/tauri";
 import { cn } from "@/lib/utils";
+import { useMajParametres, useParametres } from "../api";
+import { ChoixIa, problemeIa, type ValeurIa } from "../ChoixIa";
 
 const LIEN_GUIDE_AZURE =
   "https://github.com/lucasbegellb-design/hubx/blob/main/SETUP.md#3-connecter-le-fichier-excel-dedwin-application-azure";
@@ -54,7 +57,9 @@ export function SectionCles() {
   const { peutEcrire } = useEcriture();
   const etat = useEtatConfiguration();
   const version = useVersionServeur();
-  const [cleIa, setCleIa] = useState("");
+  const p = useParametres();
+  const majParametres = useMajParametres();
+  const [ia, setIa] = useState<ValeurIa | null>(null);
   const [azure, setAzure] = useState({ tenant: "", client: "", secret: "" });
   const [resultat, setResultat] = useState<Record<string, { ok: boolean; message: string }>>({});
   const [occupe, setOccupe] = useState<string | null>(null);
@@ -62,8 +67,54 @@ export function SectionCles() {
   const config = lireConfigServeur();
   const e = etat.data;
 
+  useEffect(() => {
+    if (p.data && !ia)
+      setIa({
+        fournisseur: fournisseur(p.data.ia_fournisseur).id,
+        modele: p.data.modele_ia,
+        url: p.data.ia_url ?? "",
+        cle: "",
+      });
+  }, [p.data, ia]);
+  const changementFournisseur = Boolean(ia && p.data && ia.fournisseur !== p.data.ia_fournisseur);
+  const reglagesIaModifies = Boolean(
+    ia &&
+    p.data &&
+    (changementFournisseur ||
+      ia.modele.trim() !== p.data.modele_ia ||
+      (ia.fournisseur === "autre" && ia.url.trim() !== (p.data.ia_url ?? ""))),
+  );
+
+  async function enregistrerIa() {
+    if (!ia || !p.data) return;
+    const probleme = problemeIa(ia);
+    if (probleme) return { ok: false, message: probleme };
+    if (reglagesIaModifies)
+      await majParametres.mutateAsync({
+        id: p.data.id,
+        ia_fournisseur: ia.fournisseur,
+        modele_ia: ia.modele.trim(),
+        ia_url: ia.fournisseur === "autre" ? ia.url.trim() : null,
+      });
+    if (ia.cle.trim()) await enregistrer({ ia_api_key: ia.cle });
+    else await queryClient.invalidateQueries({ queryKey: ["parametres", "configuration"] });
+    setIa({ ...ia, cle: "" });
+    if (!ia.cle.trim() && !e?.ia) return { ok: true, message: "Réglages enregistrés. Il reste à coller la clé API." };
+    const r = await appelerFonction<{ ok: boolean; erreur?: string; modele?: string; fournisseur?: string }>(
+      "configuration",
+      { action: "tester_ia" },
+    );
+    return {
+      ok: r.ok,
+      message: r.ok
+        ? `Enregistré et vérifié : ${r.fournisseur} répond (modèle ${r.modele}).`
+        : `Enregistré, mais le test échoue : ${r.erreur}`,
+    };
+  }
+
   async function action(id: string, fn: () => Promise<{ ok: boolean; message: string } | void>) {
     setOccupe(id);
+    setResultat(({ [id]: _ancien, ...autres }) => autres);
     try {
       const r = await fn();
       if (r) setResultat((x) => ({ ...x, [id]: r }));
@@ -76,14 +127,15 @@ export function SectionCles() {
 
   const tester = (quoi: "tester_ia" | "tester_azure", id: string) =>
     action(id, async () => {
-      const r = await appelerFonction<{ ok: boolean; erreur?: string; modele?: string }>("configuration", {
-        action: quoi,
-      });
+      const r = await appelerFonction<{ ok: boolean; erreur?: string; modele?: string; fournisseur?: string }>(
+        "configuration",
+        { action: quoi },
+      );
       return {
         ok: r.ok,
         message: r.ok
           ? quoi === "tester_ia"
-            ? `Connexion réussie (modèle ${r.modele}).`
+            ? `Connexion réussie : ${r.fournisseur} répond (modèle ${r.modele}).`
             : "Connexion à Microsoft réussie."
           : (r.erreur ?? "Échec du test."),
       };
@@ -133,56 +185,42 @@ export function SectionCles() {
         ) : null}
       </Bloc>
 
-      <Bloc
-        titre="Intelligence artificielle (Anthropic)"
-        statut={<Statut ok={e?.ia} oui="Clé enregistrée" non="Aucune clé" />}
-      >
+      <Bloc titre="Intelligence artificielle" statut={<Statut ok={e?.ia} oui="Clé enregistrée" non="Aucune clé" />}>
         <p className="text-sm text-muted-foreground">
-          Analyse des documents, structuration des process, synthèse des rapports.{" "}
-          <button
-            type="button"
-            className="inline-flex items-center gap-1 text-primary hover:underline"
-            onClick={() => ouvrirUrl("https://console.anthropic.com/settings/keys")}
-          >
-            Créer une clé <ExternalLink className="size-3.5" aria-hidden />
-          </button>
+          Analyse des documents, structuration des process, synthèse des rapports. Les appels partent du serveur : la
+          clé n'est jamais relisible depuis l'application.
         </p>
-        {estAdmin ? (
-          <div className="flex flex-wrap gap-2">
-            <Input
-              type="password"
-              value={cleIa}
-              onChange={(x) => setCleIa(x.target.value)}
-              placeholder={e?.ia ? "Nouvelle clé (remplace l'actuelle)" : "sk-ant-…"}
-              className="min-w-64 flex-1 font-mono text-sm"
-              aria-label="Clé API Anthropic"
-            />
-            <Button
-              variant="outline"
-              disabled={!cleIa.trim() || Boolean(occupe) || !peutEcrire}
-              onClick={() =>
-                action("ia", async () => {
-                  await enregistrer({ anthropic_api_key: cleIa });
-                  setCleIa("");
-                  const r = await appelerFonction<{ ok: boolean; erreur?: string; modele?: string }>("configuration", {
-                    action: "tester_ia",
-                  });
-                  return {
-                    ok: r.ok,
-                    message: r.ok
-                      ? `Clé enregistrée et vérifiée (modèle ${r.modele}).`
-                      : `Clé enregistrée mais le test échoue : ${r.erreur}`,
-                  };
-                })
-              }
-            >
-              {occupe === "ia" ? <Loader2 className="animate-spin" aria-hidden /> : null}
-              Enregistrer
-            </Button>
-            <Button variant="ghost" onClick={() => tester("tester_ia", "ia")} disabled={!e?.ia || Boolean(occupe)}>
-              Tester
-            </Button>
-          </div>
+        {estAdmin && ia && p.data ? (
+          <>
+            <ChoixIa valeur={ia} onChange={setIa} cleEnregistree={Boolean(e?.ia)} desactive={Boolean(occupe)} />
+            {changementFournisseur && !ia.cle.trim() ? (
+              <p className="text-sm text-muted-foreground">
+                Colle la clé {fournisseur(ia.fournisseur).nom} pour changer de fournisseur.
+              </p>
+            ) : null}
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                disabled={
+                  !peutEcrire ||
+                  Boolean(occupe) ||
+                  (!reglagesIaModifies && !ia.cle.trim()) ||
+                  (changementFournisseur && !ia.cle.trim())
+                }
+                onClick={() => action("ia", enregistrerIa)}
+              >
+                {occupe === "ia" ? <Loader2 className="animate-spin" aria-hidden /> : null}
+                Enregistrer
+              </Button>
+              <Button variant="ghost" onClick={() => tester("tester_ia", "ia")} disabled={!e?.ia || Boolean(occupe)}>
+                Tester
+              </Button>
+            </div>
+          </>
+        ) : p.data ? (
+          <p className="text-sm">
+            {fournisseur(p.data.ia_fournisseur).nom} · <span className="font-mono">{p.data.modele_ia}</span>
+          </p>
         ) : null}
         <Resultat id="ia" />
       </Bloc>

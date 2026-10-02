@@ -17,12 +17,12 @@ Une ligne par arbitrage non bloquant.
 - Domaines modifiables par l'admin seulement ; projets par tous les membres (suppression admin).
 - Référentiels (domaines, projet Swift, lignes uniques chine_source/parametres) dans une migration ; `seed.sql` = démo locale uniquement.
 - Edge Functions en `verify_jwt = false` + vérification JWT/membre dans le code : compatible nouvelles clés API et appel pg_cron via `x-cron-secret`.
-- Appels IA via le SDK officiel `npm:@anthropic-ai/sdk` + structured outputs (`output_config.format`), pas de fetch brut.
+- IA (révisé) : plus d'API Anthropic. Client unique « Chat Completions » (format OpenAI) en `fetch`, sans SDK, pour Mistral (défaut : offre gratuite, entreprise française, données en Europe, lit images et PDF), DeepSeek, Qwen ou tout service compatible (OpenRouter, Groq, Gemini…). Appels toujours depuis les Edge Functions (clé dans le Vault, rapports automatiques sans poste allumé). JSON obtenu par `json_object` + schéma dans la consigne + mise en conformité tolérante + une relance, plutôt que `json_schema` strict dont le support varie selon les fournisseurs. PDF : texte extrait sur le serveur (unpdf) pour être lisible par tous les modèles ; ancienne clé Anthropic supprimée du Vault par la migration.
 - Fenêtre de capture : créée à la demande par Rust puis fermée (économie de RAM) ; le raccourci global est enregistré côté JS pour être personnalisable.
 - Process : enregistrement explicite (Ctrl+S) pour ne pas créer une version à chaque frappe ; brouillon local conservé jusqu'à l'enregistrement ; « Dernière révision » renseignée automatiquement.
 - Pack de passation : sommaire cliquable (liens internes) sans numéros de page (non calculables de façon fiable avec react-pdf).
 - PDF : police IBM Plex Sans (sous-ensemble latin) ; les caractères chinois éventuels ne s'affichent pas dans les exports PDF.
-- Documents : analyse lancée par le client juste après le dépôt ; en cas d'échec d'appel, statut « erreur » + message et bouton « Relancer ». Limites : PDF 20 Mo, image 5 Mo, texte 150 000 caractères (analyse sur le début, signalée).
+- Documents : analyse lancée par le client juste après le dépôt ; en cas d'échec d'appel, statut « erreur » + message et bouton « Relancer ». Limites : PDF 20 Mo, image 5 Mo, texte 120 000 caractères (analyse sur le début, signalée).
 - Word/PowerPoint/OpenDocument : texte extrait côté fonction (fflate) ; Excel/CSV via SheetJS (CDN officiel, pas le paquet npm obsolète).
 - Glisser-déposer : `dragDropEnabled: false` sur la fenêtre Tauri pour utiliser le drag & drop HTML5.
 - Dév local : `npm run fonctions:dev` sert toutes les Edge Functions via le Deno du poste (quand le conteneur edge-runtime n'a pas d'accès npm) ; activé par `VITE_FUNCTIONS_URL`.
