@@ -18,7 +18,7 @@ Checklist des phases (cf. cahier des charges §9). Cocher au fur et à mesure.
 
 - [x] 10. v0.3.0 — mises à jour automatiques signées, sauvegarde automatique hebdomadaire
 - [x] 11. v0.4.0 — tâches récurrentes, sous-tâches, commentaires et @mentions
-- [ ] 12. v0.5.0 — calendrier + abonnement Outlook
+- [x] 12. v0.5.0 — calendrier + abonnement Outlook
 - [ ] 13. v0.6.0 — santé des process + « Exécuter ce process »
 - [ ] 14. v0.7.0 — recherche intelligente, « Demande à Hub », brief du matin
 - [ ] 15. v0.8.0 — hors ligne complet

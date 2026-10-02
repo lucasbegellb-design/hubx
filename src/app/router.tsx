@@ -8,6 +8,7 @@ const PAGES = {
   aujourdhui: () => import("@/features/aujourdhui/PageAujourdhui"),
   taches: () => import("@/features/taches/PageTaches"),
   postits: () => import("@/features/postits/PagePostits"),
+  calendrier: () => import("@/features/calendrier/PageCalendrier"),
   process: () => import("@/features/process/PageProcess"),
   processDetail: () => import("@/features/process/PageProcessDetail"),
   chine: () => import("@/features/chine/PageChine"),
@@ -38,6 +39,7 @@ export const router = createHashRouter([
       },
       { path: "taches", lazy: page("taches") },
       { path: "postits", lazy: page("postits") },
+      { path: "calendrier", lazy: page("calendrier") },
       { path: "process", lazy: page("process") },
       {
         path: "process/:id",

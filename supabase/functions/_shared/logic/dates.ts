@@ -27,6 +27,11 @@ export function aujourdhuiParis(maintenant: Date = new Date()): string {
   return dateParis(maintenant);
 }
 
+/** Heure et minutes (« 09:05 ») à Paris d'un instant donné. */
+export function heureMinuteParis(instant: Date | string): string {
+  return fmtHeure.format(typeof instant === "string" ? new Date(instant) : instant);
+}
+
 /** Heure (0-23) à Paris. */
 export function heureParis(maintenant: Date = new Date()): number {
   return Number(fmtHeure.format(maintenant).slice(0, 2));

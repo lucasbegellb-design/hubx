@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Kbd } from "@/components/common";
+import { AbonnementCalendrier } from "@/features/calendrier/AbonnementCalendrier";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,7 +12,8 @@ import { RACCOURCI_CAPTURE_DEFAUT, useUi, type Theme } from "@/stores/ui";
 
 const RACCOURCIS: [string, string][] = [
   ["Ctrl K", "Palette de commandes : naviguer, créer, chercher partout"],
-  ["Ctrl 1 … 7", "Aller à Aujourd'hui, Tâches, Post-its, Process, Suivi Chine, Documents, Rapports"],
+  ["Ctrl 1 … 8", "Aller à Aujourd'hui, Tâches, Post-its, Calendrier, Process, Suivi Chine, Documents, Rapports"],
+  ["← → T", "Calendrier : période précédente, suivante, aujourd'hui"],
   ["N", "Nouvelle tâche / nouveau post-it / nouveau process / déposer un document (selon la page)"],
   ["X", "Marquer la tâche sélectionnée comme faite"],
   ["E", "Éditer la tâche sélectionnée"],
@@ -138,6 +140,8 @@ export function SectionBureau() {
         </div>
         {!desktop ? <p className="text-sm text-muted-foreground">Disponible dans l'application de bureau.</p> : null}
       </div>
+
+      <AbonnementCalendrier />
 
       <div className="space-y-2 border-t pt-5">
         <Label>Raccourcis clavier</Label>

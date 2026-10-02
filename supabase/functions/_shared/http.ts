@@ -24,11 +24,15 @@ export function json(body: unknown, status = 200): Response {
 
 type Gestionnaire = (req: Request) => Promise<Response>;
 
-/** Enveloppe un handler : CORS, erreurs converties en JSON `{ erreur }`, aucun détail sensible loggé. */
-export function servir(handler: Gestionnaire) {
+/**
+ * Enveloppe un handler : CORS, erreurs converties en JSON `{ erreur }`, aucun détail sensible loggé.
+ * Méthode POST par défaut (`methodes: ["GET"]` pour un flux lu par un tiers, ex. calendrier Outlook).
+ */
+export function servir(handler: Gestionnaire, options: { methodes?: string[] } = {}) {
+  const methodes = options.methodes ?? ["POST"];
   const gerer = async (req: Request): Promise<Response> => {
     if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
-    if (req.method !== "POST") return json({ erreur: "Méthode non autorisée." }, 405);
+    if (!methodes.includes(req.method)) return json({ erreur: "Méthode non autorisée." }, 405);
     try {
       return await handler(req);
     } catch (e) {

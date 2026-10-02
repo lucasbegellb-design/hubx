@@ -436,3 +436,6 @@ verify_jwt = false
 
 [functions.sauvegarde]
 verify_jwt = false
+
+[functions.calendrier]
+verify_jwt = false

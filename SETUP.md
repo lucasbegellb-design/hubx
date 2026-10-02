@@ -114,6 +114,9 @@ Cette étape demande un compte **administrateur Microsoft 365**.
   pour les rappels.
 - Raccourci global de capture rapide : `Ctrl + Maj + Espace` (modifiable au même endroit).
 - **Paramètres › Mises à jour et export → Exporter toutes les données** : à faire régulièrement (sauvegarde).
+- **Paramètres › Apparence et bureau → Calendrier dans Outlook → Créer mon lien d'abonnement** (chacun le sien) :
+  dans Outlook, Calendrier › Ajouter un calendrier › S'abonner à partir du web, coller le lien. Les échéances, rappels et
+  paiements Chine apparaissent dans Outlook (lecture seule, actualisé toutes les quelques heures par Outlook).
 
 ## 6. Publier les versions suivantes et les mises à jour automatiques
 

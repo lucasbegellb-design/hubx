@@ -22,6 +22,7 @@
 │                                                            sauvegardes)                │
 │ Edge Functions (Deno) : sync-chine · analyze-document · structure-process ·            │
 │                         generate-report · manage-members · configuration · sauvegarde │
+│                         calendrier (GET, flux iCal par jeton)                          │
 │ pg_cron + pg_net ─► sync-chine (*/15 min), generate-report (vendredi / fin de mois),   │
 │                     sauvegarde (dimanche)                                              │
 └──────┬─────────────────────────────────────────┬───────────────────────────────────────┘
@@ -58,6 +59,7 @@ Toutes les tables ont `id uuid`, `created_at`, `updated_at` (trigger) et la RLS 
 | `domaines`, `projets`            | Référentiels                              | Domaines : admin ; projet archivé = hors vues par défaut                                                                                                                                                                                                                                                            |
 | `taches`                         | Tâches                                    | `done_at` géré par trigger ; suppression douce (`deleted_at`) ; `recurrence` (jsonb) + `serie_id` / `suite_de` : à la clôture, le trigger `taches_occurrence_suivante` crée la suivante (`prochaine_echeance`, même calcul que `_shared/logic/recurrence.ts`) avec les étapes décochées ; rouvrir aussitôt l'annule |
 | `sous_taches`                    | Étapes (checklist) d'une tâche            | Membres ; supprimées avec la tâche                                                                                                                                                                                                                                                                                  |
+| `calendriers`                    | Lien d'abonnement iCal par membre         | Seul le SHA-256 du jeton est stocké (RPC `generer_jeton_calendrier`) ; ni temps réel ni export                                                                                                                                                                                                                      |
 | `commentaires`                   | Fil de discussion d'une tâche             | Écriture par l'auteur seulement ; `mentions` (uuid[]) → notification realtime + « Pour toi »                                                                                                                                                                                                                        |
 | `postits`                        | Post-its et rappels                       | Privés par défaut (`partage`), `rappel_envoye` remis à faux si le rappel change                                                                                                                                                                                                                                     |
 | `process`, `process_versions`    | Process et historique                     | Version créée par trigger à chaque changement de contenu ; recherche plein texte française                                                                                                                                                                                                                          |
@@ -79,6 +81,14 @@ Toutes les tables ont `id uuid`, `created_at`, `updated_at` (trigger) et la RLS 
 - Le client ne contient que l'URL et la clé publique. Clé serveur, secrets Azure et clé d'IA : secrets des fonctions ou Vault.
 
 ## Flux principaux
+
+### Calendrier
+
+- Page `/calendrier` : `_shared/logic/calendrier.ts` transforme tâches, rappels, lignes Chine et rapports automatiques
+  en événements par jour ; glisser une tâche sur un jour appelle `useMajTache`.
+- Flux iCal (`calendrier`, GET `?jeton=`) : `servir(…, { methodes: ["GET"] })`, jeton de 48 caractères hex comparé à
+  son hachage, événements de l'utilisateur (`_shared/logic/ical.ts` : RFC 5545, pliage à 75 octets, journées entières,
+  rappels horodatés en UTC avec alarme).
 
 ### Sauvegardes et mises à jour
 

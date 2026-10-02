@@ -38,6 +38,7 @@ Interface 100 % en français. Source de vérité du besoin : cahier des charges 
 - Textes UI en français, casse de phrase, tutoiement. Toast = libellé du bouton au participe (« Archiver » → « Archivé »).
 - Couleurs uniquement via tokens Tailwind (`bg-card`, `text-muted-foreground`, `text-urgent`, `text-retard`, `text-fait`…). Pas d'ombres décoratives, bordures fines.
 - Toute écriture passe par une mutation qui appelle `verifierEcriture()` (hors ligne → refus immédiat) puis `valider(schema…)` (`src/lib/schemas.ts`, aligné sur les CHECK SQL) ; les requêtes utilisent les clés `[table, ...]` (invalidées par le realtime).
+- Edge Functions en POST ; un flux lu par un tiers (ex. iCal) passe par `servir(handler, { methodes: ["GET"] })` et un jeton haché. Adresse publique : `urlFonction(nom)`.
 - Appels d'Edge Functions : toujours via `appelerFonction()` (`src/lib/fonctions.ts`) qui traduit les erreurs `{ erreur }` en messages lisibles.
 - Nouvelle Edge Function : dossier `supabase/functions/<nom>` + entrée `[functions.<nom>] verify_jwt = false` dans `config.toml` + `FONCTIONS` dans `src/features/installation/paquet.ts` (le test `tests/installation.test.ts` vérifie la cohérence ; `scripts/fonctions-dev.ts` découvre les dossiers seul). Planification : `cron.schedule(..., 'select public.appeler_fonction(''<nom>'')')`.
 - Clés des services : lues via `secret()` (`_shared/secrets.ts` : variable d'env puis Vault `hubx_<nom>`), écrites par l'admin via `definir_secret` ; jamais renvoyées au client.

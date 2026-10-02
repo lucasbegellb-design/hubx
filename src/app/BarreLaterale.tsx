@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import {
   BarChart3,
   BookOpen,
+  CalendarDays,
   CheckSquare,
   FileText,
   Search,
@@ -24,6 +25,7 @@ export const NAVIGATION: { to: string; libelle: string; icone: LucideIcon }[] = 
   { to: "/aujourdhui", libelle: "Aujourd'hui", icone: Sun },
   { to: "/taches", libelle: "Tâches", icone: CheckSquare },
   { to: "/postits", libelle: "Post-its", icone: StickyNote },
+  { to: "/calendrier", libelle: "Calendrier", icone: CalendarDays },
   { to: "/process", libelle: "Process", icone: BookOpen },
   { to: "/chine", libelle: "Suivi Chine", icone: Ship },
   { to: "/documents", libelle: "Documents", icone: FileText },
@@ -86,7 +88,7 @@ export function BarreLaterale() {
   const ouvrirPalette = useUi((s) => s.setPaletteOuverte);
   const naviguer = useNavigate();
 
-  // Ctrl+1…7 : navigation rapide entre modules
+  // Ctrl+1…8 : navigation rapide entre modules
   useRaccourci("mod+1", () => naviguer(NAVIGATION[0].to));
   useRaccourci("mod+2", () => naviguer(NAVIGATION[1].to));
   useRaccourci("mod+3", () => naviguer(NAVIGATION[2].to));
@@ -94,6 +96,7 @@ export function BarreLaterale() {
   useRaccourci("mod+5", () => naviguer(NAVIGATION[4].to));
   useRaccourci("mod+6", () => naviguer(NAVIGATION[5].to));
   useRaccourci("mod+7", () => naviguer(NAVIGATION[6].to));
+  useRaccourci("mod+8", () => naviguer(NAVIGATION[7].to));
 
   return (
     <nav aria-label="Navigation principale" className="flex w-52 shrink-0 flex-col border-r bg-card px-2 py-3">

@@ -1,5 +1,5 @@
 import { FunctionsFetchError, FunctionsHttpError, FunctionsRelayError } from "@supabase/supabase-js";
-import { supabase } from "./supabase";
+import { supabase, urlServeur } from "./supabase";
 
 const URL_DEV = import.meta.env.VITE_FUNCTIONS_URL as string | undefined;
 
@@ -16,6 +16,11 @@ async function appelerDev<T>(nom: string, corps: Record<string, unknown>): Promi
   const j = await r.json().catch(() => ({}));
   if (!r.ok) throw new Error(j?.erreur ?? `Le service « ${nom} » a répondu avec une erreur.`);
   return j as T;
+}
+
+/** Adresse publique d'une Edge Function (ex. flux iCal lu par Outlook). */
+export function urlFonction(nom: string): string {
+  return URL_DEV ? `${URL_DEV}/${nom}` : `${urlServeur.replace(/\/+$/, "")}/functions/v1/${nom}`;
 }
 
 /** Appelle une Edge Function et renvoie son JSON, ou lève une Error au message lisible. */

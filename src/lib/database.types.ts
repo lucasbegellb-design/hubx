@@ -9,6 +9,27 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      calendriers: {
+        Row: {
+          created_at: string
+          jeton_hash: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          jeton_hash: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          jeton_hash?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       chine_snapshots: {
         Row: {
           created_at: string
@@ -686,6 +707,7 @@ export type Database = {
       }
       est_admin: { Args: never; Returns: boolean }
       est_membre: { Args: never; Returns: boolean }
+      generer_jeton_calendrier: { Args: never; Returns: string }
       lire_secret: { Args: { p_nom: string }; Returns: string }
       marquer_ouverture: { Args: never; Returns: string }
       planifier_rapports: { Args: never; Returns: undefined }
@@ -697,6 +719,7 @@ export type Database = {
       renommer_moi: { Args: { p_nom: string }; Returns: undefined }
       resume_entite: { Args: { p_row: Json; p_table: string }; Returns: Json }
       secrets_presents: { Args: never; Returns: Json }
+      supprimer_jeton_calendrier: { Args: never; Returns: undefined }
       version_schema: { Args: never; Returns: string }
     }
     Enums: {
