@@ -97,7 +97,9 @@ servir(async (req) => {
           .order("at")
           .range(de, a),
       ),
-      db.from("process").select("id, titre, domaine_id, statut, deleted_at"),
+      db
+        .from("process")
+        .select("id, titre, domaine_id, statut, deleted_at, responsable, revision_mois, revise_le, updated_at"),
       db
         .from("documents")
         .select("id, nom, categorie, domaine_id, projet_id, created_at, deleted_at")

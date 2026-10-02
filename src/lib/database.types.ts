@@ -410,6 +410,8 @@ export type Database = {
           modifie_par: string | null
           recherche: unknown
           responsable: string | null
+          revise_le: string | null
+          revision_mois: number
           statut: string
           titre: string
           updated_at: string
@@ -425,6 +427,8 @@ export type Database = {
           modifie_par?: string | null
           recherche?: unknown
           responsable?: string | null
+          revise_le?: string | null
+          revision_mois?: number
           statut?: string
           titre: string
           updated_at?: string
@@ -440,6 +444,8 @@ export type Database = {
           modifie_par?: string | null
           recherche?: unknown
           responsable?: string | null
+          revise_le?: string | null
+          revision_mois?: number
           statut?: string
           titre?: string
           updated_at?: string
@@ -615,6 +621,7 @@ export type Database = {
           id: string
           notes: string
           priorite: string
+          process_id: string | null
           projet_id: string | null
           recurrence: Json | null
           serie_id: string | null
@@ -635,6 +642,7 @@ export type Database = {
           id?: string
           notes?: string
           priorite?: string
+          process_id?: string | null
           projet_id?: string | null
           recurrence?: Json | null
           serie_id?: string | null
@@ -655,6 +663,7 @@ export type Database = {
           id?: string
           notes?: string
           priorite?: string
+          process_id?: string | null
           projet_id?: string | null
           recurrence?: Json | null
           serie_id?: string | null
@@ -669,6 +678,13 @@ export type Database = {
             columns: ["domaine_id"]
             isOneToOne: false
             referencedRelation: "domaines"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "taches_process_id_fkey"
+            columns: ["process_id"]
+            isOneToOne: false
+            referencedRelation: "process"
             referencedColumns: ["id"]
           },
           {

@@ -18,6 +18,7 @@ import { LIBELLE_STATUT_PROCESS, type StatutProcess } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { useCreerProcess, useProcessListe, useRechercheProcess } from "./api";
 import { exporterPackPassation } from "./exports";
+import { BadgeRevision, PanneauSante } from "./Sante";
 
 const TOUS = "__tous__";
 
@@ -170,6 +171,7 @@ export default function PageProcess() {
           </EtatVide>
         ) : (
           <div className="max-w-5xl space-y-6">
+            {!q && domaine === TOUS ? <PanneauSante process={liste.data ?? []} /> : null}
             {groupes.map((g) => (
               <Section key={g.domaine?.id ?? "aucun"} titre={g.domaine?.nom ?? "Sans domaine"} compteur={g.ps.length}>
                 <ul className="divide-y rounded-lg border bg-card">
@@ -180,6 +182,7 @@ export default function PageProcess() {
                         {p.responsable ? (
                           <span className="hidden text-sm text-muted-foreground md:inline">{p.responsable}</span>
                         ) : null}
+                        <BadgeRevision process={p} />
                         <BadgeStatutProcess statut={p.statut} />
                         <span className="w-40 shrink-0 text-right text-sm text-muted-foreground">
                           modifié {ilYa(p.updated_at)}

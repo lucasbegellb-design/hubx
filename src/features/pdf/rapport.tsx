@@ -162,6 +162,24 @@ export async function pdfRapport(d: DonneesRapport, synthese: string | null, par
           <Text style={st.vide}>Aucun.</Text>
         )}
 
+        {d.process_a_reviser ? (
+          <>
+            <Text style={s.h2}>Process à réviser</Text>
+            {d.process_a_reviser.length ? (
+              d.process_a_reviser.map((p, i) => (
+                <View key={i} style={st.ligne} wrap={false}>
+                  <Text style={st.cellule}>{p.titre}</Text>
+                  <Text style={st.droite}>
+                    {p.domaine} · prévue le {dateFr(p.prevue_le)}
+                  </Text>
+                </View>
+              ))
+            ) : (
+              <Text style={st.vide}>Tous les process actifs sont à jour.</Text>
+            )}
+          </>
+        ) : null}
+
         <Text style={s.h2}>Documents ajoutés</Text>
         {d.documents.length ? (
           d.documents.map((x, i) => (

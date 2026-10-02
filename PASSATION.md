@@ -28,7 +28,8 @@ publier des mises à jour et le faire évoluer. Il complète [SETUP.md](SETUP.md
 - [ ] Dans l'app : nommer le successeur **Administrateur**, puis retirer l'accès du compte sortant
       (Paramètres › Comptes et rôles → icône « retirer ») : son compte est bloqué, ses données restent.
 - [ ] Faire un **export complet** (§ 4) et le ranger sur le serveur/OneDrive de l'entreprise.
-- [ ] Générer le **pack de passation** (Process › Pack de passation) et vérifier que chaque process actif est à jour.
+- [ ] Générer le **pack de passation** (Process › Pack de passation) et vérifier que chaque process actif est à jour :
+      le panneau **Santé des process** (page Process) ne doit plus rien signaler.
 
 ## 3. Administration courante
 

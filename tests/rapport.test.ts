@@ -219,3 +219,43 @@ describe("agrégation des rapports", () => {
     expect(rendreMarkdown(r, "Semaine calme.")).toContain("Semaine calme.");
   });
 });
+
+describe("process à réviser (rapport mensuel)", () => {
+  const process = [
+    {
+      id: "pr1",
+      titre: "Payer un fournisseur",
+      domaine_id: D.compta,
+      statut: "actif",
+      deleted_at: null,
+      responsable: "Lucas",
+      revision_mois: 6,
+      revise_le: null,
+      updated_at: "2026-01-10T09:00:00Z",
+    },
+    {
+      id: "pr2",
+      titre: "Récent",
+      domaine_id: D.com,
+      statut: "actif",
+      deleted_at: null,
+      responsable: "Lucas",
+      revision_mois: 6,
+      revise_le: null,
+      updated_at: "2026-09-01T09:00:00Z",
+    },
+  ];
+
+  it("liste les process dont la révision est due, seulement en mensuel", () => {
+    const mensuel = construireRapport(
+      entree([], { type: "mensuel", periode: { debut: "2026-09-01", fin: "2026-09-30" }, process }),
+    );
+    expect(mensuel.process_a_reviser).toEqual([
+      { titre: "Payer un fournisseur", domaine: "Compta", prevue_le: "2026-07-10" },
+    ]);
+    const md = rendreMarkdown(mensuel, null);
+    expect(md).toContain("## Process à réviser");
+    expect(md).toContain("- Payer un fournisseur (Compta) — révision prévue le");
+    expect(construireRapport(entree([], { process })).process_a_reviser).toBeUndefined();
+  });
+});

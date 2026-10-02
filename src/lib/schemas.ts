@@ -66,6 +66,8 @@ export const schemaProcess = z.object({
   contenu: z.object({ type: z.literal("doc") }).passthrough(),
   contenu_texte: z.string(),
   deleted_at: instant.nullable(),
+  revision_mois: z.number().int().min(1, "Révision : 1 mois minimum.").max(36, "Révision : 36 mois maximum."),
+  revise_le: date.nullable(),
 });
 
 export const schemaDocument = z.object({

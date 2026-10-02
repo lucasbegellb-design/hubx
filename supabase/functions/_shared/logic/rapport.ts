@@ -11,6 +11,7 @@ import {
 } from "./chine.ts";
 import { ajouterJours, bornesInstant, dateParis, type Periode } from "./dates.ts";
 import { joursDeRetard } from "./echeances.ts";
+import { etatRevision, santeProcess } from "./process.ts";
 
 export type TypeRapport = "demande" | "hebdo" | "mensuel";
 
@@ -49,7 +50,17 @@ export interface EntreeRapport {
   membres: { user_id: string; nom: string }[];
   taches: TacheRapport[];
   journal: JournalRapport[];
-  process: { id: string; titre: string; domaine_id: string | null; statut: string; deleted_at: string | null }[];
+  process: {
+    id: string;
+    titre: string;
+    domaine_id: string | null;
+    statut: string;
+    deleted_at: string | null;
+    responsable?: string | null;
+    revision_mois?: number;
+    revise_le?: string | null;
+    updated_at?: string;
+  }[];
   documents: {
     id: string;
     nom: string;
@@ -125,6 +136,8 @@ export interface DonneesRapport {
     livraisons_en_retard: { fournisseur: string | null; po: string | null; prevue: string; jours: number }[];
   };
   process: { titre: string; domaine: string; action: "créé" | "modifié"; statut: string }[];
+  /** Rapport mensuel : process actifs dont la révision est due (passation). */
+  process_a_reviser?: { titre: string; domaine: string; prevue_le: string }[];
   documents: { nom: string; categorie: string | null; domaine: string; ajoute_le: string }[];
   a_venir: { j7: TacheResumee[]; j30: TacheResumee[] };
 }
@@ -260,9 +273,28 @@ export function construireRapport(e: EntreeRapport): DonneesRapport {
     en_retard,
     chine,
     process,
+    ...(e.type === "mensuel" ? { process_a_reviser: processAReviser(e) } : {}),
     documents,
     a_venir: { j7: a7, j30: a30 },
   };
+}
+
+function processAReviser(e: EntreeRapport): NonNullable<DonneesRapport["process_a_reviser"]> {
+  const complets = e.process
+    .filter((p) => p.updated_at)
+    .map((p) => ({
+      ...p,
+      responsable: p.responsable ?? null,
+      revision_mois: p.revision_mois ?? 6,
+      revise_le: p.revise_le ?? null,
+      updated_at: p.updated_at!,
+    }));
+  const noms = new Map(e.domaines.map((d) => [d.id, d.nom]));
+  return santeProcess(complets, [], e.aujourdhui).aReviser.map((p) => ({
+    titre: p.titre,
+    domaine: (p.domaine_id && noms.get(p.domaine_id)) || SANS_DOMAINE,
+    prevue_le: etatRevision(p, e.aujourdhui).prochaine,
+  }));
 }
 
 function rapportChine(e: EntreeRapport): DonneesRapport["chine"] {
@@ -434,6 +466,17 @@ export function rendreMarkdown(d: DonneesRapport, synthese: string | null): stri
 
   s.push("## Process créés ou modifiés");
   s.push(d.process.length ? d.process.map((p) => `- ${p.titre} (${p.domaine}) — ${p.action}`).join("\n") : "_Aucun._");
+
+  if (d.process_a_reviser) {
+    s.push("## Process à réviser");
+    s.push(
+      d.process_a_reviser.length
+        ? d.process_a_reviser
+            .map((p) => `- ${p.titre} (${p.domaine}) — révision prévue le ${dateFr(p.prevue_le)}`)
+            .join("\n")
+        : "_Tous les process actifs sont à jour._",
+    );
+  }
 
   s.push("## Documents ajoutés");
   s.push(

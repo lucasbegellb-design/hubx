@@ -196,6 +196,24 @@ export function VueRapport({
         )}
       </Section>
 
+      {d.process_a_reviser ? (
+        <Section titre="Process à réviser" compteur={d.process_a_reviser.length}>
+          {d.process_a_reviser.length ? (
+            <ul className="divide-y rounded-lg border bg-card text-sm">
+              {d.process_a_reviser.map((p, i) => (
+                <li key={i} className="flex gap-3 px-3 py-2">
+                  <span className="flex-1">{p.titre}</span>
+                  <span className="text-muted-foreground">{p.domaine}</span>
+                  <span className="w-36 text-right text-retard">prévue le {dateFr(p.prevue_le)}</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-muted-foreground">Tous les process actifs sont à jour.</p>
+          )}
+        </Section>
+      ) : null}
+
       <Section titre="Documents ajoutés" compteur={d.documents.length}>
         {d.documents.length ? (
           <ul className="divide-y rounded-lg border bg-card text-sm">

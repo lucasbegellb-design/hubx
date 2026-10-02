@@ -1,5 +1,5 @@
 import type { JSONContent } from "@tiptap/core";
-import { ArrowLeft, FileDown, FileText, History, MoreHorizontal, Save, Sparkles, Trash2 } from "lucide-react";
+import { ArrowLeft, FileDown, FileText, History, MoreHorizontal, Play, Save, Sparkles, Trash2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
@@ -21,12 +21,13 @@ import { useEcriture } from "@/hooks/useEcriture";
 import { useRaccourci } from "@/hooks/useRaccourci";
 import { ilYa } from "@/lib/format";
 import { LIBELLE_STATUT_PROCESS, type Process, type ProcessVersion, type StatutProcess } from "@/lib/types";
-import { useEnregistrerProcess, useProcess } from "./api";
+import { useEnregistrerProcess, useExecuterProcess, useProcess } from "./api";
 import { DialogueStructurer } from "./DialogueStructurer";
 import { BarreOutils, EditorContent, useEditeurProcess } from "./Editeur";
 import { exporterMarkdown, exporterPdf } from "./exports";
 import { avecRevision } from "./modele";
 import { PanneauVersions } from "./PanneauVersions";
+import { BarreRevision, Executions } from "./Revision";
 
 const AUCUN = "__aucun__";
 const cleBrouillon = (id: string) => `hubx-process-${id}`;
@@ -41,7 +42,8 @@ function lireBrouillon(id: string): JSONContent | null {
 }
 
 function Editeur({ process: p }: { process: Process }) {
-  const { membre } = useAuth();
+  const { membre, userId } = useAuth();
+  const executer = useExecuterProcess();
   const r = useReferentiels();
   const naviguer = useNavigate();
   const enregistrer = useEnregistrerProcess();
@@ -127,6 +129,20 @@ function Editeur({ process: p }: { process: Process }) {
 
   const contenuCourant = () => editor?.getJSON() ?? (p.contenu as JSONContent);
 
+  async function lancerExecution() {
+    try {
+      const r = await executer.mutateAsync({ process: p, contenu: contenuCourant(), userId });
+      toast.success(
+        r.etapes
+          ? `Tâche créée avec ${r.etapes} étape${r.etapes > 1 ? "s" : ""}`
+          : "Tâche créée (aucune étape trouvée)",
+        { action: { label: "Ouvrir", onClick: () => naviguer(`/taches?t=${r.tache.id}`) } },
+      );
+    } catch (e) {
+      if ((e as Error).message !== "hors-ligne") toast.error("Exécution impossible. Réessaie.");
+    }
+  }
+
   return (
     <div className="flex h-full">
       <div className="flex min-w-0 flex-1 flex-col">
@@ -146,6 +162,15 @@ function Editeur({ process: p }: { process: Process }) {
             disabled={!peutEcrire}
             className="h-9 flex-1 border-transparent bg-transparent px-2 text-xl font-semibold hover:border-input focus-visible:border-input"
           />
+          <Button
+            variant="outline"
+            onClick={lancerExecution}
+            disabled={!peutEcrire || executer.isPending}
+            title="Crée une tâche du jour avec les étapes de ce process"
+          >
+            <Play aria-hidden />
+            Exécuter
+          </Button>
           <Button variant="outline" onClick={() => setStructurer(true)} disabled={!peutEcrire}>
             <Sparkles aria-hidden />
             Structurer un brouillon
@@ -254,6 +279,9 @@ function Editeur({ process: p }: { process: Process }) {
           <div className="flex-1" />
           {editor ? <BarreOutils editor={editor} /> : null}
         </div>
+        <div className="border-b bg-card px-6 py-1.5">
+          <BarreRevision process={p} onChamp={champ} />
+        </div>
 
         <div className="flex-1 overflow-y-auto scrollbar-thin">
           <div className="mx-auto max-w-3xl px-8 py-6">
@@ -271,6 +299,7 @@ function Editeur({ process: p }: { process: Process }) {
               </div>
             ) : null}
             <EditorContent editor={editor} />
+            <Executions processId={p.id} />
           </div>
         </div>
       </div>

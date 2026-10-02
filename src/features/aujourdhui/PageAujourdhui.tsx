@@ -11,6 +11,7 @@ import { AlertesChineResume } from "@/features/chine/AlertesChineResume";
 import { usePostits } from "@/features/postits/api";
 import { useReferentiels } from "@/features/referentiels/api";
 import { useBasculerFait, useTaches } from "@/features/taches/api";
+import { ProcessAReviserResume } from "@/features/process/Sante";
 import { useCommentaires } from "@/features/taches/apiDetail";
 import { LigneTache } from "@/features/taches/LigneTache";
 import { dateCourte, dateLongue, heure, ilYa } from "@/lib/format";
@@ -209,6 +210,8 @@ export default function PageAujourdhui() {
             ) : null}
 
             <PourToi />
+
+            <ProcessAReviserResume />
 
             <AlertesChineResume />
 
