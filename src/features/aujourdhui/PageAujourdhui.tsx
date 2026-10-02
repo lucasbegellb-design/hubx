@@ -1,4 +1,4 @@
-import { Bell, FileText } from "lucide-react";
+import { AtSign, Bell, FileText } from "lucide-react";
 import { useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { aujourdhuiParis, dateParis } from "@shared/dates.ts";
@@ -11,6 +11,7 @@ import { AlertesChineResume } from "@/features/chine/AlertesChineResume";
 import { usePostits } from "@/features/postits/api";
 import { useReferentiels } from "@/features/referentiels/api";
 import { useBasculerFait, useTaches } from "@/features/taches/api";
+import { useCommentaires } from "@/features/taches/apiDetail";
 import { LigneTache } from "@/features/taches/LigneTache";
 import { dateCourte, dateLongue, heure, ilYa } from "@/lib/format";
 import type { Journal } from "@/lib/types";
@@ -57,6 +58,43 @@ function phraseJournal(j: Journal, nom: string): { texte: string; lien: string }
         lien: `/postits?p=${j.entite_id}`,
       };
   }
+}
+
+/** Commentaires des 7 derniers jours qui me mentionnent. */
+function PourToi() {
+  const { userId } = useAuth();
+  const r = useReferentiels();
+  const taches = useTaches();
+  const { tous } = useCommentaires();
+  const depuis = new Date(Date.now() - 7 * 86_400_000).toISOString();
+  const mentions = tous
+    .filter((c) => c.mentions.includes(userId) && c.auteur !== userId && c.created_at >= depuis)
+    .slice(-5)
+    .reverse();
+  if (!mentions.length) return null;
+  const titre = (id: string) => taches.data?.find((t) => t.id === id)?.titre ?? "une tâche";
+  return (
+    <Section titre="Pour toi" compteur={mentions.length}>
+      <ul className="space-y-1">
+        {mentions.map((c) => (
+          <li key={c.id}>
+            <Link
+              to={`/taches?t=${c.tache_id}`}
+              className="flex items-baseline gap-2 rounded-md px-2 py-1.5 hover:bg-accent/50"
+            >
+              <AtSign className="size-3.5 shrink-0 translate-y-0.5 text-muted-foreground" aria-hidden />
+              <span className="min-w-0 flex-1">
+                <span className="line-clamp-2">{c.contenu}</span>
+                <span className="text-sm text-muted-foreground">
+                  {r.nomMembre(c.auteur)} sur « {titre(c.tache_id)} » · {ilYa(c.created_at)}
+                </span>
+              </span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </Section>
+  );
 }
 
 export default function PageAujourdhui() {
@@ -169,6 +207,8 @@ export default function PageAujourdhui() {
                 </ul>
               </Section>
             ) : null}
+
+            <PourToi />
 
             <AlertesChineResume />
 

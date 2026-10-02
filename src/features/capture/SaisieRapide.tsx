@@ -1,5 +1,6 @@
 import { forwardRef, useImperativeHandle, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { toast } from "sonner";
+import { libelleRecurrence } from "@shared/recurrence";
 import { analyserSaisie, type TypeSaisie } from "@shared/saisie.ts";
 import { aujourdhuiParis } from "@shared/dates.ts";
 import { Input } from "@/components/ui/input";
@@ -97,6 +98,7 @@ export const SaisieRapide = forwardRef<HTMLInputElement, ProprietesSaisie>(funct
           priorite: analyse.urgente ? "urgente" : "normale",
           statut: typeEffectif === "fait" ? "fait" : "a_faire",
           assigne_a: userId,
+          recurrence: typeEffectif === "tache" ? analyse.recurrence : null,
         });
         toast.success(typeEffectif === "fait" ? "Enregistré comme fait" : "Tâche ajoutée");
       }
@@ -121,6 +123,8 @@ export const SaisieRapide = forwardRef<HTMLInputElement, ProprietesSaisie>(funct
   if (typeEffectif !== "postit") {
     if (analyse.projetId) indices.push(ref.projets.get(analyse.projetId)?.nom ?? "");
     if (analyse.echeance && typeEffectif === "tache") indices.push(`échéance ${dateCourte(analyse.echeance)}`);
+    if (analyse.recurrence && typeEffectif === "tache")
+      indices.push(libelleRecurrence(analyse.recurrence).toLowerCase());
     if (analyse.urgente) indices.push("urgente");
     if (analyse.inconnus.length) indices.push(`non reconnu : ${analyse.inconnus.join(" ")}`);
   }

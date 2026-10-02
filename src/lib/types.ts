@@ -18,6 +18,8 @@ export type ChineSnapshot = Ligne<"chine_snapshots">;
 export type Rapport = Ligne<"rapports">;
 export type Parametres = Ligne<"parametres">;
 export type Journal = Ligne<"journal_activite">;
+export type SousTache = Ligne<"sous_taches">;
+export type Commentaire = Ligne<"commentaires">;
 
 export type StatutTache = "a_faire" | "en_cours" | "en_attente" | "fait";
 export type Priorite = "normale" | "urgente";

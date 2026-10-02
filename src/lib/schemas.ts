@@ -19,6 +19,32 @@ export const schemaTache = z.object({
   assigne_a: uuid.nullable(),
   deleted_at: instant.nullable(),
   done_at: instant.nullable(),
+  recurrence: z
+    .object({
+      frequence: z.enum(["jour", "semaine", "mois", "annee"]),
+      intervalle: z.number().int().min(1, "Intervalle : 1 minimum.").max(12, "Intervalle : 12 maximum.").optional(),
+      jours_semaine: z.array(z.number().int().min(1).max(7)).optional(),
+      jour_mois: z.number().int().min(1).max(31).optional(),
+      jusqu_au: date.nullable().optional(),
+    })
+    .nullable(),
+});
+
+export const schemaSousTache = z.object({
+  titre: z.string().trim().min(1, "L'étape est vide.").max(300, "Étape trop longue (300 caractères maximum)."),
+  fait: z.boolean(),
+  ordre: z.number().int(),
+});
+
+export const schemaCommentaire = z.object({
+  contenu: z
+    .string()
+    .trim()
+    .min(1, "Le commentaire est vide.")
+    .max(5000, "Commentaire trop long (5 000 caractères maximum)."),
+  mentions: z.array(uuid),
+  deleted_at: instant.nullable(),
+  modifie_at: instant.nullable(),
 });
 
 export const schemaPostit = z.object({

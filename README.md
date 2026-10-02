@@ -12,16 +12,16 @@ process documentés, documentation technique complète.
 
 ## Modules
 
-| Module          | Ce qu'il fait                                                                                                                                                 |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Aujourd'hui** | Tâches en retard, du jour et urgentes, rappels du jour, alertes Chine, ce qui a changé depuis la dernière ouverture, dernier rapport. Barre de saisie rapide. |
-| **Tâches**      | Liste groupée par échéance, filtres, recherche, panneau de détail, raccourcis `N` `X` `E` `F` `/`, action « Fait ».                                           |
-| **Post-its**    | Mur de post-its privés ou partagés, épinglage, rappels (notification Windows), conversion en tâche.                                                           |
-| **Process**     | Bibliothèque au modèle XTIM, versions restaurables, « Structurer un brouillon » (IA), exports PDF/Markdown, pack de passation.                                |
-| **Suivi Chine** | Lecture seule du fichier Excel d'Edwin (OneDrive), onglets filtrables, mapping des colonnes, montants, alertes, historique des évolutions.                    |
-| **Documents**   | Bibliothèque par glisser-déposer, analyse IA (catégorie, résumé, infos clés, tâches suggérées).                                                               |
-| **Rapports**    | À la demande ou automatiques (vendredi 17 h, dernier jour ouvré 17 h), chiffres calculés, synthèse IA, export PDF.                                            |
-| **Paramètres**  | Comptes et rôles, domaines et projets, source Chine, IA, raccourcis, thème, démarrage auto, mises à jour automatiques, export et sauvegardes hebdomadaires.   |
+| Module          | Ce qu'il fait                                                                                                                                                         |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Aujourd'hui** | Tâches en retard, du jour et urgentes, rappels du jour, alertes Chine, ce qui a changé depuis la dernière ouverture, dernier rapport. Barre de saisie rapide.         |
+| **Tâches**      | Liste groupée par échéance, filtres, recherche, panneau de détail, tâches récurrentes, étapes (checklist), commentaires et @mentions, raccourcis `N` `X` `E` `F` `/`. |
+| **Post-its**    | Mur de post-its privés ou partagés, épinglage, rappels (notification Windows), conversion en tâche.                                                                   |
+| **Process**     | Bibliothèque au modèle XTIM, versions restaurables, « Structurer un brouillon » (IA), exports PDF/Markdown, pack de passation.                                        |
+| **Suivi Chine** | Lecture seule du fichier Excel d'Edwin (OneDrive), onglets filtrables, mapping des colonnes, montants, alertes, historique des évolutions.                            |
+| **Documents**   | Bibliothèque par glisser-déposer, analyse IA (catégorie, résumé, infos clés, tâches suggérées).                                                                       |
+| **Rapports**    | À la demande ou automatiques (vendredi 17 h, dernier jour ouvré 17 h), chiffres calculés, synthèse IA, export PDF.                                                    |
+| **Paramètres**  | Comptes et rôles, domaines et projets, source Chine, IA, raccourcis, thème, démarrage auto, mises à jour automatiques, export et sauvegardes hebdomadaires.           |
 
 ## Installation
 

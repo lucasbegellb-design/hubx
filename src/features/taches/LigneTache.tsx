@@ -1,4 +1,4 @@
-import { Check } from "lucide-react";
+import { Check, ListChecks, MessageSquare, Repeat } from "lucide-react";
 import { forwardRef } from "react";
 import { ajouterJours } from "@shared/dates.ts";
 import { joursDeRetard } from "@shared/echeances.ts";
@@ -8,6 +8,7 @@ import type { Tache } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/features/auth/AuthProvider";
 import { useReferentiels } from "@/features/referentiels/api";
+import { useCommentaires, useSousTaches } from "./apiDetail";
 
 export function libelleEcheance(echeance: string, aujourdhui: string): { texte: string; retard: boolean } {
   if (echeance < aujourdhui) {
@@ -17,6 +18,35 @@ export function libelleEcheance(echeance: string, aujourdhui: string): { texte: 
   if (echeance === aujourdhui) return { texte: "aujourd'hui", retard: false };
   if (echeance === ajouterJours(aujourdhui, 1)) return { texte: "demain", retard: false };
   return { texte: dateCourte(echeance), retard: false };
+}
+
+/** Petits repères : répétition, avancement de la checklist, nombre de commentaires. */
+function Indicateurs({ tache }: { tache: Tache }) {
+  const etapes = useSousTaches().get(tache.id) ?? [];
+  const commentaires = useCommentaires().parTache.get(tache.id)?.length ?? 0;
+  if (!tache.recurrence && !etapes.length && !commentaires) return null;
+  const faites = etapes.filter((e) => e.fait).length;
+  return (
+    <span className="flex shrink-0 items-center gap-2 self-center text-xs text-muted-foreground">
+      {tache.recurrence ? (
+        <span title="Tâche récurrente">
+          <Repeat className="size-3.5" aria-label="Récurrente" />
+        </span>
+      ) : null}
+      {etapes.length ? (
+        <span className="flex items-center gap-0.5 tabular" title={`${faites} étape(s) faite(s) sur ${etapes.length}`}>
+          <ListChecks className="size-3.5" aria-hidden />
+          {faites}/{etapes.length}
+        </span>
+      ) : null}
+      {commentaires ? (
+        <span className="flex items-center gap-0.5 tabular" title={`${commentaires} commentaire(s)`}>
+          <MessageSquare className="size-3.5" aria-hidden />
+          {commentaires}
+        </span>
+      ) : null}
+    </span>
+  );
 }
 
 interface Props {
@@ -91,6 +121,7 @@ export const LigneTache = forwardRef<HTMLButtonElement, Props>(function LigneTac
         ) : t.statut === "en_cours" ? (
           <span className="shrink-0 text-sm text-muted-foreground">· en cours</span>
         ) : null}
+        <Indicateurs tache={t} />
       </button>
       {!compacte && projet ? (
         <span className="hidden shrink-0 text-sm text-muted-foreground lg:inline">{projet.nom}</span>

@@ -1,7 +1,9 @@
 // Analyse de la saisie rapide en une ligne.
 //   Préfixes : « t: » tâche (défaut), « p: » post-it, « f: » fait.
 //   Jetons   : #domaine  +projet  !  @demain @vendredi @12/10 @+3
+//   Répétition en toutes lettres : « chaque mois », « tous les lundis », « toutes les 2 semaines »…
 import { ajouterJours, jourSemaine } from "./dates.ts";
+import { extraireRecurrence, premiereEcheance, type Recurrence } from "./recurrence.ts";
 
 export type TypeSaisie = "tache" | "postit" | "fait";
 
@@ -17,6 +19,8 @@ export interface SaisieAnalysee {
   projetId: string | null;
   echeance: string | null;
   urgente: boolean;
+  /** Répétition détectée (tâches seulement). */
+  recurrence: Recurrence | null;
   /** Jetons non reconnus, à signaler (ex. « #compt » sans domaine correspondant). */
   inconnus: string[];
 }
@@ -97,12 +101,19 @@ export function analyserSaisie(
     projetId: null,
     echeance: null,
     urgente: false,
+    recurrence: null,
     inconnus: [],
   };
   // Les post-its gardent leur texte intact.
   if (type === "postit") {
     res.titre = brut;
     return res;
+  }
+
+  if (type !== "fait") {
+    const r = extraireRecurrence(brut);
+    res.recurrence = r.recurrence;
+    brut = r.reste;
   }
 
   const mots: string[] = [];
@@ -130,6 +141,10 @@ export function analyserSaisie(
   if (res.titre.endsWith("!")) {
     res.urgente = true;
     res.titre = res.titre.replace(/\s*!+$/, "");
+  }
+  if (res.recurrence) {
+    res.echeance ??= premiereEcheance(res.recurrence, contexte.aujourdhui);
+    if (res.recurrence.frequence === "mois") res.recurrence.jour_mois ??= Number(res.echeance.slice(8, 10));
   }
   return res;
 }

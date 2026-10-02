@@ -5,6 +5,8 @@ export const TABLES_EXPORT = [
   "domaines",
   "projets",
   "taches",
+  "sous_taches",
+  "commentaires",
   "postits",
   "process",
   "process_versions",

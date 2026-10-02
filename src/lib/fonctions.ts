@@ -34,7 +34,9 @@ export async function appelerFonction<T>(nom: string, corps: Record<string, unkn
     throw new Error(message);
   }
   if (error instanceof FunctionsRelayError || error instanceof FunctionsFetchError) {
-    throw new Error(`Service « ${nom} » injoignable. Vérifie ta connexion ; si le problème persiste, l'administrateur peut « Mettre à jour le serveur » (Paramètres › Clés et connexions).`);
+    throw new Error(
+      `Service « ${nom} » injoignable. Vérifie ta connexion ; si le problème persiste, l'administrateur peut « Mettre à jour le serveur » (Paramètres › Clés et connexions).`,
+    );
   }
   throw new Error(error.message);
 }

@@ -15,7 +15,11 @@ import { useRaccourci } from "@/hooks/useRaccourci";
 import { dateHeure, ilYa } from "@/lib/format";
 import { LIBELLE_STATUT, type StatutTache, type Tache } from "@/lib/types";
 import { useBrouillon } from "@/stores/ui";
+import type { Recurrence } from "@shared/recurrence";
 import { useMajTache, useSupprimerTache } from "./api";
+import { Commentaires } from "./Commentaires";
+import { Etapes } from "./Etapes";
+import { Repetition } from "./Repetition";
 
 const AUCUN = "__aucun__";
 
@@ -210,6 +214,14 @@ export function PanneauTache({ tache, onFermer }: { tache: Tache; onFermer: () =
           </div>
         </div>
 
+        <Repetition
+          recurrence={tache.recurrence as Recurrence | null}
+          echeance={tache.echeance}
+          aujourdhui={aujourdhui}
+          onChange={(recurrence) => set({ recurrence })}
+          desactive={!peutEcrire}
+        />
+
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
             <Label>Domaine</Label>
@@ -277,6 +289,8 @@ export function PanneauTache({ tache, onFermer }: { tache: Tache; onFermer: () =
           </Select>
         </div>
 
+        <Etapes tacheId={tache.id} />
+
         <div className="space-y-1.5">
           <Label htmlFor="notes">Notes</Label>
           <Textarea
@@ -288,6 +302,10 @@ export function PanneauTache({ tache, onFermer }: { tache: Tache; onFermer: () =
             placeholder="Contexte, liens, contacts…"
             disabled={!peutEcrire}
           />
+        </div>
+
+        <div className="border-t pt-4">
+          <Commentaires tacheId={tache.id} />
         </div>
       </div>
 

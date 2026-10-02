@@ -1,7 +1,8 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useAuth } from "@/features/auth/AuthProvider";
+import { useReferentiels } from "@/features/referentiels/api";
 import { dateCourte, heure } from "@/lib/format";
 import { ecouterRealtime } from "@/lib/realtime";
 import { supabase } from "@/lib/supabase";
@@ -76,6 +77,31 @@ function useNotificationsRapports() {
   );
 }
 
+/** @mention dans un commentaire : toast « Ouvrir » + notification native. */
+function useNotificationsMentions(userId: string) {
+  const naviguer = useNavigate();
+  const { nomMembre } = useReferentiels();
+  const nom = useRef(nomMembre);
+  nom.current = nomMembre;
+  useEffect(
+    () =>
+      ecouterRealtime((table, evt, ligne) => {
+        if (table !== "commentaires" || evt !== "INSERT" || !userId) return;
+        const mentions = (ligne.mentions as string[] | null) ?? [];
+        if (!mentions.includes(userId) || ligne.auteur === userId) return;
+        const titre = `${nom.current(ligne.auteur as string) || "Quelqu'un"} t'a mentionné`;
+        const extrait = String(ligne.contenu ?? "").slice(0, 180);
+        toast(titre, {
+          description: extrait,
+          duration: 15_000,
+          action: { label: "Ouvrir", onClick: () => naviguer(`/taches?t=${ligne.tache_id}`) },
+        });
+        notifier(titre, extrait);
+      }),
+    [userId, naviguer],
+  );
+}
+
 /** Raccourci global (Ctrl+Maj+Espace par défaut) : ouvre la fenêtre de capture, même app en arrière-plan. */
 function useRaccourciGlobal() {
   const raccourci = useUi((s) => s.raccourciCapture);
@@ -120,6 +146,7 @@ export function ServicesArrierePlan() {
   useMisesAJour();
   useRappels(userId);
   useNotificationsRapports();
+  useNotificationsMentions(userId);
   useRaccourciGlobal();
   return null;
 }

@@ -82,6 +82,7 @@ export function PaletteCommandes() {
           priorite: saisie.urgente ? "urgente" : "normale",
           statut: type === "fait" ? "fait" : "a_faire",
           assigne_a: userId,
+          recurrence: type === "tache" ? saisie.recurrence : null,
         });
         toast.success(type === "fait" ? "Enregistré comme fait" : "Tâche ajoutée");
       }

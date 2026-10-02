@@ -5,6 +5,8 @@ import { supabase } from "./supabase";
 /** Tables écoutées : toute modification invalide les requêtes dont la clé commence par le nom de table. */
 const TABLES = [
   "taches",
+  "sous_taches",
+  "commentaires",
   "postits",
   "process",
   "documents",

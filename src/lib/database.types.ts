@@ -81,6 +81,50 @@ export type Database = {
         }
         Relationships: []
       }
+      commentaires: {
+        Row: {
+          auteur: string
+          contenu: string
+          created_at: string
+          deleted_at: string | null
+          id: string
+          mentions: string[]
+          modifie_at: string | null
+          tache_id: string
+          updated_at: string
+        }
+        Insert: {
+          auteur?: string
+          contenu: string
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          mentions?: string[]
+          modifie_at?: string | null
+          tache_id: string
+          updated_at?: string
+        }
+        Update: {
+          auteur?: string
+          contenu?: string
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          mentions?: string[]
+          modifie_at?: string | null
+          tache_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commentaires_tache_id_fkey"
+            columns: ["tache_id"]
+            isOneToOne: false
+            referencedRelation: "taches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       documents: {
         Row: {
           ajoute_par: string | null
@@ -499,6 +543,44 @@ export type Database = {
         }
         Relationships: []
       }
+      sous_taches: {
+        Row: {
+          created_at: string
+          fait: boolean
+          id: string
+          ordre: number
+          tache_id: string
+          titre: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          fait?: boolean
+          id?: string
+          ordre?: number
+          tache_id: string
+          titre: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          fait?: boolean
+          id?: string
+          ordre?: number
+          tache_id?: string
+          titre?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sous_taches_tache_id_fkey"
+            columns: ["tache_id"]
+            isOneToOne: false
+            referencedRelation: "taches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       taches: {
         Row: {
           assigne_a: string | null
@@ -513,7 +595,10 @@ export type Database = {
           notes: string
           priorite: string
           projet_id: string | null
+          recurrence: Json | null
+          serie_id: string | null
           statut: string
+          suite_de: string | null
           titre: string
           updated_at: string
         }
@@ -530,7 +615,10 @@ export type Database = {
           notes?: string
           priorite?: string
           projet_id?: string | null
+          recurrence?: Json | null
+          serie_id?: string | null
           statut?: string
+          suite_de?: string | null
           titre: string
           updated_at?: string
         }
@@ -547,7 +635,10 @@ export type Database = {
           notes?: string
           priorite?: string
           projet_id?: string | null
+          recurrence?: Json | null
+          serie_id?: string | null
           statut?: string
+          suite_de?: string | null
           titre?: string
           updated_at?: string
         }
@@ -564,6 +655,13 @@ export type Database = {
             columns: ["projet_id"]
             isOneToOne: false
             referencedRelation: "projets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "taches_suite_de_fkey"
+            columns: ["suite_de"]
+            isOneToOne: false
+            referencedRelation: "taches"
             referencedColumns: ["id"]
           },
         ]
@@ -592,6 +690,10 @@ export type Database = {
       marquer_ouverture: { Args: never; Returns: string }
       planifier_rapports: { Args: never; Returns: undefined }
       premier_admin_possible: { Args: never; Returns: boolean }
+      prochaine_echeance: {
+        Args: { p_base: string; p_regle: Json }
+        Returns: string
+      }
       renommer_moi: { Args: { p_nom: string }; Returns: undefined }
       resume_entite: { Args: { p_row: Json; p_table: string }; Returns: Json }
       secrets_presents: { Args: never; Returns: Json }

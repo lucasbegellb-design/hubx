@@ -1,6 +1,6 @@
 [package]
 name = "hub-xtim"
-version = "0.3.0"
+version = "0.4.0"
 description = "Hub XTIM — tâches, process, documents, suivi Chine et rapports"
 authors = ["XTIM SAS"]
 edition = "2021"
