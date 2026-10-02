@@ -567,13 +567,29 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      appeler_fonction: {
+        Args: { p_corps?: Json; p_nom: string }
+        Returns: number
+      }
+      definir_secret: {
+        Args: { p_nom: string; p_valeur: string }
+        Returns: undefined
+      }
       devenir_premier_admin: { Args: { p_nom: string }; Returns: undefined }
+      enregistrer_secret: {
+        Args: { p_nom: string; p_valeur: string }
+        Returns: undefined
+      }
       est_admin: { Args: never; Returns: boolean }
       est_membre: { Args: never; Returns: boolean }
+      lire_secret: { Args: { p_nom: string }; Returns: string }
       marquer_ouverture: { Args: never; Returns: string }
+      planifier_rapports: { Args: never; Returns: undefined }
       premier_admin_possible: { Args: never; Returns: boolean }
       renommer_moi: { Args: { p_nom: string }; Returns: undefined }
       resume_entite: { Args: { p_row: Json; p_table: string }; Returns: Json }
+      secrets_presents: { Args: never; Returns: Json }
+      version_schema: { Args: never; Returns: string }
     }
     Enums: {
       [_ in never]: never

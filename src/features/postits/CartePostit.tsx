@@ -162,9 +162,7 @@ export function CartePostit({ postit: p, miseEnAvant }: { postit: Postit; miseEn
             className="w-full whitespace-pre-wrap break-words rounded text-left leading-6"
             aria-label="Modifier le post-it"
           >
-            {p.epingle ? (
-              <Pin className="float-right ml-2 size-3.5 text-foreground/75" aria-label="Épinglé" />
-            ) : null}
+            {p.epingle ? <Pin className="float-right ml-2 size-3.5 text-foreground/75" aria-label="Épinglé" /> : null}
             {p.contenu}
           </button>
         )}

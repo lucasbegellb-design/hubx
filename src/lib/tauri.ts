@@ -64,6 +64,23 @@ export async function enregistrerFichier(
   return nomParDefaut;
 }
 
+/**
+ * Premier rendu terminé : la fenêtre principale s'affiche (sans flash blanc),
+ * la fenêtre de capture apparaît et prend le focus.
+ */
+export async function signalerInterfacePrete(): Promise<void> {
+  if (!estTauri()) return;
+  const { getCurrentWindow } = await import("@tauri-apps/api/window");
+  const fenetre = getCurrentWindow();
+  if (fenetre.label === "capture") {
+    await fenetre.show();
+    await fenetre.setFocus();
+    return;
+  }
+  const { invoke } = await import("@tauri-apps/api/core");
+  await invoke("interface_prete");
+}
+
 export async function montrerFenetrePrincipale(): Promise<void> {
   if (!estTauri()) return;
   const { invoke } = await import("@tauri-apps/api/core");

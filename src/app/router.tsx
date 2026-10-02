@@ -1,11 +1,31 @@
 import { Navigate, createHashRouter } from "react-router-dom";
 import { AppShell } from "./AppShell";
 
-// Routes chargées à la demande (démarrage rapide, RAM réduite)
+// Pages chargées à la demande (démarrage rapide), puis préchargées en tâche de fond
+// pour que la navigation soit instantanée.
+const PAGES = {
+  capture: () => import("@/features/capture/FenetreCapture"),
+  aujourdhui: () => import("@/features/aujourdhui/PageAujourdhui"),
+  taches: () => import("@/features/taches/PageTaches"),
+  postits: () => import("@/features/postits/PagePostits"),
+  process: () => import("@/features/process/PageProcess"),
+  processDetail: () => import("@/features/process/PageProcessDetail"),
+  chine: () => import("@/features/chine/PageChine"),
+  documents: () => import("@/features/documents/PageDocuments"),
+  rapports: () => import("@/features/rapports/PageRapports"),
+  parametres: () => import("@/features/parametres/PageParametres"),
+};
+
+const page = (cle: keyof typeof PAGES) => async () => ({ Component: (await PAGES[cle]()).default });
+
+export function prechargerPages() {
+  for (const [cle, charger] of Object.entries(PAGES)) if (cle !== "capture") void charger();
+}
+
 export const router = createHashRouter([
   {
     path: "/capture",
-    lazy: async () => ({ Component: (await import("@/features/capture/FenetreCapture")).default }),
+    lazy: page("capture"),
   },
   {
     path: "/",
@@ -14,27 +34,27 @@ export const router = createHashRouter([
       { index: true, element: <Navigate to="/aujourdhui" replace /> },
       {
         path: "aujourdhui",
-        lazy: async () => ({ Component: (await import("@/features/aujourdhui/PageAujourdhui")).default }),
+        lazy: page("aujourdhui"),
       },
-      { path: "taches", lazy: async () => ({ Component: (await import("@/features/taches/PageTaches")).default }) },
-      { path: "postits", lazy: async () => ({ Component: (await import("@/features/postits/PagePostits")).default }) },
-      { path: "process", lazy: async () => ({ Component: (await import("@/features/process/PageProcess")).default }) },
+      { path: "taches", lazy: page("taches") },
+      { path: "postits", lazy: page("postits") },
+      { path: "process", lazy: page("process") },
       {
         path: "process/:id",
-        lazy: async () => ({ Component: (await import("@/features/process/PageProcessDetail")).default }),
+        lazy: page("processDetail"),
       },
-      { path: "chine", lazy: async () => ({ Component: (await import("@/features/chine/PageChine")).default }) },
+      { path: "chine", lazy: page("chine") },
       {
         path: "documents",
-        lazy: async () => ({ Component: (await import("@/features/documents/PageDocuments")).default }),
+        lazy: page("documents"),
       },
       {
         path: "rapports",
-        lazy: async () => ({ Component: (await import("@/features/rapports/PageRapports")).default }),
+        lazy: page("rapports"),
       },
       {
         path: "parametres",
-        lazy: async () => ({ Component: (await import("@/features/parametres/PageParametres")).default }),
+        lazy: page("parametres"),
       },
       { path: "*", element: <Navigate to="/aujourdhui" replace /> },
     ],

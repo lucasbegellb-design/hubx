@@ -1,16 +1,19 @@
-import { QueryClientProvider } from "@tanstack/react-query";
-import type { ReactNode } from "react";
+import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
+import { lazy, Suspense, type ReactNode } from "react";
 import { RouterProvider } from "react-router-dom";
 import { EcranChargement } from "@/components/common";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/features/auth/AuthProvider";
-import { PageAccesRefuse, PageConfigServeur, PageConnexion } from "@/features/auth/pages";
+import { PageAccesRefuse, PageConnexion } from "@/features/auth/pages";
+import { optionsPersistance } from "@/lib/persistance";
 import { queryClient } from "@/lib/queryClient";
 import { supabaseOuNull } from "@/lib/supabase";
 import { useApplyTheme } from "@/stores/ui";
 import { estFenetreCapture } from "./app/fenetre";
 import { router } from "./app/router";
+
+const AssistantPremierLancement = lazy(() => import("@/features/installation/AssistantPremierLancement"));
 
 function PorteAuth({ children }: { children: ReactNode }) {
   const { sessionChargee, session, membreCharge, membre } = useAuth();
@@ -24,7 +27,7 @@ function PorteAuth({ children }: { children: ReactNode }) {
 export default function App() {
   useApplyTheme();
   return (
-    <QueryClientProvider client={queryClient}>
+    <PersistQueryClientProvider client={queryClient} persistOptions={optionsPersistance}>
       <TooltipProvider delayDuration={400}>
         {supabaseOuNull ? (
           <AuthProvider marquerOuverture={!estFenetreCapture}>
@@ -33,10 +36,12 @@ export default function App() {
             </PorteAuth>
           </AuthProvider>
         ) : (
-          <PageConfigServeur />
+          <Suspense fallback={<EcranChargement />}>
+            <AssistantPremierLancement />
+          </Suspense>
         )}
         <Toaster />
       </TooltipProvider>
-    </QueryClientProvider>
+    </PersistQueryClientProvider>
   );
 }

@@ -4,6 +4,7 @@ import { useAuth } from "@/features/auth/AuthProvider";
 import { ParametresChine } from "@/features/chine/ParametresChine";
 import { cn } from "@/lib/utils";
 import { SectionBureau } from "./sections/Bureau";
+import { SectionCles } from "./sections/Cles";
 import { SectionCompte } from "./sections/Compte";
 import { SectionComptes } from "./sections/Comptes";
 import { SectionIA } from "./sections/IA";
@@ -13,6 +14,7 @@ import { SectionSysteme } from "./sections/Systeme";
 const SECTIONS = [
   { id: "compte", libelle: "Mon compte", composant: SectionCompte },
   { id: "bureau", libelle: "Apparence et bureau", composant: SectionBureau },
+  { id: "cles", libelle: "Clés et connexions", composant: SectionCles },
   { id: "comptes", libelle: "Comptes et rôles", composant: SectionComptes },
   { id: "referentiels", libelle: "Domaines et projets", composant: SectionReferentiels },
   { id: "chine", libelle: "Suivi Chine", composant: ParametresChine, admin: true },

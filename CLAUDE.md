@@ -5,7 +5,7 @@ Interface 100 % en français. Source de vérité du besoin : cahier des charges 
 
 ## Stack (imposée, ne pas changer)
 
-- Desktop : Tauri 2 (`src-tauri/`, Rust). Plugins : notification, global-shortcut, autostart, updater, tray (core), single-instance, window-state, dialog, fs, process, opener.
+- Desktop : Tauri 2 (`src-tauri/`, Rust). Plugins : notification, global-shortcut, autostart, updater, tray (core), single-instance, window-state, dialog, fs, process, opener, http.
 - Front : React 18 + TS strict + Vite, Tailwind 3 + shadcn/ui (registre v3, `npx shadcn@2.3.0 add <comp>`), TanStack Query, Zustand (état UI seulement), react-hook-form + zod, date-fns (fr), cmdk, TipTap, Recharts, @react-pdf/renderer (chargé à la demande).
 - Backend : Supabase (Postgres + RLS, Auth email/mdp, Realtime, Storage, Edge Functions Deno, pg_cron + pg_net).
 - IA : API Anthropic uniquement depuis les Edge Functions (secret `ANTHROPIC_API_KEY`). Modèle dans `parametres.modele_ia` (défaut `claude-sonnet-5`).
@@ -26,6 +26,7 @@ Interface 100 % en français. Source de vérité du besoin : cahier des charges 
 - `src/app` : providers, routeur (routes lazy), coquille (barre latérale, bandeau hors ligne, palette).
 - `src/features/<module>` : une page + `api.ts` (queries/mutations TanStack) + composants du module.
 - `src/components/ui` : shadcn (ne pas réécrire à la main) ; `src/components/*` : composants communs.
+- `src/features/installation` : assistant de premier lancement, client de l'API de gestion Supabase, mise à jour du serveur.
 - `src/lib` : client Supabase, types générés (`database.types.ts`), realtime, pont Tauri (`tauri.ts`), formatage.
 - `supabase/functions/_shared/logic` : **logique métier pure** partagée client (alias `@shared`) + Edge Functions. Pas de dépendance, imports relatifs avec extension `.ts`, pas de `Deno.*`.
 - `supabase/functions/<fn>` : Edge Functions (sync-chine, analyze-document, structure-process, generate-report, manage-members). Elles vérifient elles-mêmes JWT + membre (`_shared/auth.ts`, `verify_jwt = false`), pg_cron passe `x-cron-secret`.
@@ -38,6 +39,9 @@ Interface 100 % en français. Source de vérité du besoin : cahier des charges 
 - Couleurs uniquement via tokens Tailwind (`bg-card`, `text-muted-foreground`, `text-urgent`, `text-retard`, `text-fait`…). Pas d'ombres décoratives, bordures fines.
 - Toute écriture passe par une mutation qui appelle `verifierEcriture()` (hors ligne → refus immédiat) puis `valider(schema…)` (`src/lib/schemas.ts`, aligné sur les CHECK SQL) ; les requêtes utilisent les clés `[table, ...]` (invalidées par le realtime).
 - Appels d'Edge Functions : toujours via `appelerFonction()` (`src/lib/fonctions.ts`) qui traduit les erreurs `{ erreur }` en messages lisibles.
+- Nouvelle Edge Function : dossier `supabase/functions/<nom>` + entrée `[functions.<nom>] verify_jwt = false` dans `config.toml` + `FONCTIONS` dans `src/features/installation/paquet.ts` + `scripts/fonctions-dev.ts` (le test `tests/installation.test.ts` vérifie la liste).
+- Clés des services : lues via `secret()` (`_shared/secrets.ts` : variable d'env puis Vault `hubx_<nom>`), écrites par l'admin via `definir_secret` ; jamais renvoyées au client.
+- Nouvelle migration : elle sera appliquée par l'assistant / « Mettre à jour le serveur » (SQL exécuté d'un bloc) — l'écrire rejouable autant que possible.
 - Nouvelle table : migration + RLS + ajout à la publication `supabase_realtime` + `npm run gen:types` + clé realtime dans `src/lib/realtime.ts` + export complet (`exportComplet.ts`).
 - Tests : toute logique métier nouvelle va dans `_shared/logic` avec un test dans `tests/`.
 - Dates métier (échéances) = chaînes `YYYY-MM-DD` en heure de Paris (`@shared/dates.ts`).

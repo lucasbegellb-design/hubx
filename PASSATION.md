@@ -22,7 +22,7 @@ publier des mises à jour et le faire évoluer. Il complète [SETUP.md](SETUP.md
       ou transférer le dépôt à un compte / une organisation XTIM (Settings → Transfer).
 - [ ] **Clé privée de mise à jour** (`hub-xtim.key`) et son mot de passe.
 - [ ] Console **Anthropic** : ajouter le successeur à l'organisation, ou créer une nouvelle clé à son nom
-      (`npx supabase secrets set ANTHROPIC_API_KEY=...`) et révoquer l'ancienne.
+      (Paramètres › Clés et connexions) et révoquer l'ancienne.
 - [ ] Application **Azure** « Hub XTIM – lecture Suivi Chine » : ajouter le successeur comme propriétaire ;
       noter la date d'expiration du secret client.
 - [ ] Dans l'app : nommer le successeur **Administrateur**, puis retirer l'accès du compte sortant
@@ -44,11 +44,11 @@ publier des mises à jour et le faire évoluer. Il complète [SETUP.md](SETUP.md
 
 ### Échéances à surveiller
 
-| Quoi                    | Quand                                             | Action                                                                                                                                       |
-| ----------------------- | ------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Secret client Azure** | à la date notée lors de la création (24 mois max) | Entra → l'application → Certificats et secrets → nouveau secret, puis `npx supabase secrets set AZURE_CLIENT_SECRET=...`, supprimer l'ancien |
-| Crédit Anthropic        | selon l'offre                                     | Console Anthropic → Billing                                                                                                                  |
-| Projet Supabase gratuit | se met en pause après 7 jours sans activité       | Passer en Pro ou relancer depuis le tableau de bord                                                                                          |
+| Quoi                    | Quand                                             | Action                                                                                                                                                    |
+| ----------------------- | ------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Secret client Azure** | à la date notée lors de la création (24 mois max) | Entra → l'application → Certificats et secrets → nouveau secret, puis Paramètres › Clés et connexions → Fichier Excel d'Edwin ; supprimer l'ancien secret |
+| Crédit Anthropic        | selon l'offre                                     | Console Anthropic → Billing                                                                                                                               |
+| Projet Supabase gratuit | se met en pause après 7 jours sans activité       | Passer en Pro ou relancer depuis le tableau de bord                                                                                                       |
 
 ## 4. Exporter et sauvegarder les données
 
@@ -75,8 +75,9 @@ publier des mises à jour et le faire évoluer. Il complète [SETUP.md](SETUP.md
 2. Incrémenter la version : `npm version 0.2.0 --no-git-tag-version`, committer.
 3. Taguer et pousser : `git tag v0.2.0 && git push origin main --tags`.
 4. GitHub Actions construit Windows + macOS et publie la release : les postes proposent la mise à jour au démarrage.
-5. Si le schéma a changé : `npx supabase db push` **avant** de publier. Si une fonction a changé :
-   `npx supabase functions deploy <nom>`.
+5. Si le serveur a changé (migration ou fonction), l'administrateur clique **Mettre à jour le serveur** dans le bandeau
+   qui apparaît après la mise à jour de l'app (ou, en ligne de commande : `npx supabase db push` puis
+   `npx supabase functions deploy`).
 
 Règles : ne jamais modifier une migration déjà appliquée (en créer une nouvelle : `npx supabase migration new <nom>`) ;
 toujours tester localement (`npx supabase start`, `npx supabase db reset`).

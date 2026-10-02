@@ -44,7 +44,7 @@ servir(async (req) => {
   const { data: source } = await db.from("chine_source").select("*").limit(1).maybeSingle();
   if (!source) throw new HttpError(500, "Configuration du Suivi Chine absente (migration non appliquée ?).");
 
-  const azure = identifiantsAzure();
+  const azure = await identifiantsAzure();
   const mode = azure ? "onedrive" : "mock";
 
   try {

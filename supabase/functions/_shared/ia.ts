@@ -1,12 +1,17 @@
 // Appels à l'API Anthropic (SDK officiel) — la clé ne quitte jamais le serveur.
 import Anthropic from "npm:@anthropic-ai/sdk@^0";
-import { clientAdmin } from "./auth.ts";
+import { clientAdmin } from "./client.ts";
+import { secret } from "./secrets.ts";
 import { HttpError } from "./http.ts";
 
 export const MODELE_DEFAUT = "claude-sonnet-5";
 
-export function iaDisponible(): boolean {
-  return Boolean(Deno.env.get("ANTHROPIC_API_KEY"));
+export async function cleAnthropic(): Promise<string | null> {
+  return await secret("anthropic_api_key", "ANTHROPIC_API_KEY");
+}
+
+export async function iaDisponible(): Promise<boolean> {
+  return Boolean(await cleAnthropic());
 }
 
 export async function modeleConfigure(): Promise<string> {
@@ -26,8 +31,9 @@ export async function demanderJson<T>(options: {
   schema: Record<string, unknown>;
   maxTokens?: number;
 }): Promise<T> {
-  const cle = Deno.env.get("ANTHROPIC_API_KEY");
-  if (!cle) throw new HttpError(503, "Analyse IA indisponible : clé API Anthropic non configurée (voir SETUP.md).");
+  const cle = await cleAnthropic();
+  if (!cle)
+    throw new HttpError(503, "IA indisponible : clé API Anthropic non configurée (Paramètres › Clés et connexions).");
   const client = new Anthropic({ apiKey: cle, maxRetries: 2 });
   const modele = await modeleConfigure();
 
@@ -42,7 +48,7 @@ export async function demanderJson<T>(options: {
     } as Anthropic.MessageCreateParamsNonStreaming);
   } catch (e) {
     if (e instanceof Anthropic.AuthenticationError)
-      throw new HttpError(502, "Clé API Anthropic refusée. Vérifie le secret ANTHROPIC_API_KEY.");
+      throw new HttpError(502, "Clé API Anthropic refusée : vérifie-la dans Paramètres › Clés et connexions.");
     if (e instanceof Anthropic.NotFoundError)
       throw new HttpError(502, `Modèle IA « ${modele} » introuvable. Corrige-le dans Paramètres > IA.`);
     if (e instanceof Anthropic.RateLimitError)
@@ -64,5 +70,33 @@ export async function demanderJson<T>(options: {
     return JSON.parse(texte) as T;
   } catch {
     throw new HttpError(502, "Réponse IA illisible. Réessaie.");
+  }
+}
+
+/** Petit appel de vérification (bouton « Tester » des paramètres). */
+export async function testerIa(): Promise<{ ok: true; modele: string } | { ok: false; erreur: string }> {
+  const cle = await cleAnthropic();
+  if (!cle) return { ok: false, erreur: "Aucune clé API Anthropic enregistrée." };
+  const modele = await modeleConfigure();
+  try {
+    const client = new Anthropic({ apiKey: cle, maxRetries: 1 });
+    await client.messages.create({
+      model: modele,
+      max_tokens: 16,
+      messages: [{ role: "user", content: "Réponds simplement : OK" }],
+    });
+    return { ok: true, modele };
+  } catch (e) {
+    if (e instanceof Anthropic.AuthenticationError)
+      return { ok: false, erreur: "Clé refusée par Anthropic (invalide ou révoquée)." };
+    if (e instanceof Anthropic.NotFoundError)
+      return { ok: false, erreur: `Modèle « ${modele} » introuvable : corrige-le dans Paramètres › IA et rapports.` };
+    if (e instanceof Anthropic.PermissionDeniedError)
+      return { ok: false, erreur: "Clé valide mais sans accès à ce modèle ou crédit épuisé." };
+    if (e instanceof Anthropic.RateLimitError)
+      return { ok: false, erreur: "Limite d'utilisation atteinte : réessaie dans quelques minutes." };
+    if (e instanceof Anthropic.APIError)
+      return { ok: false, erreur: `Anthropic a répondu avec l'erreur ${e.status ?? "?"}.` };
+    return { ok: false, erreur: "API Anthropic injoignable depuis le serveur." };
   }
 }

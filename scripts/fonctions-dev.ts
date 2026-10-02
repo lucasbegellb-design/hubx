@@ -4,7 +4,14 @@
 const registre: ((req: Request) => Promise<Response>)[] = [];
 (globalThis as { __hubxFonctions?: typeof registre }).__hubxFonctions = registre;
 
-const NOMS = ["sync-chine", "analyze-document", "structure-process", "generate-report", "manage-members"];
+const NOMS = [
+  "sync-chine",
+  "analyze-document",
+  "structure-process",
+  "generate-report",
+  "manage-members",
+  "configuration",
+];
 const routes = new Map<string, (req: Request) => Promise<Response>>();
 for (const nom of NOMS) {
   const avant = registre.length;

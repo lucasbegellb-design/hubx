@@ -1,34 +1,11 @@
 // Vérification de l'appelant : JWT Supabase + appartenance à `membres`, ou secret pg_cron.
-import { createClient, type SupabaseClient } from "npm:@supabase/supabase-js@2";
+import { clientAdmin } from "./client.ts";
 import { HttpError } from "./http.ts";
+import { secret } from "./secrets.ts";
+
+export { clientAdmin };
 
 export type Appelant = { type: "membre"; userId: string; role: "admin" | "membre"; nom: string } | { type: "systeme" };
-
-let admin: SupabaseClient | null = null;
-
-/** Clé serveur : clé « service_role » historique, sinon première clé secrète (nouveau format sb_secret_…). */
-function cleServeur(): string {
-  const historique = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-  if (historique) return historique;
-  try {
-    const cles = JSON.parse(Deno.env.get("SUPABASE_SECRET_KEYS") ?? "{}") as Record<string, string>;
-    const premiere = cles.default ?? Object.values(cles)[0];
-    if (premiere) return premiere;
-  } catch {
-    /* format inattendu */
-  }
-  throw new HttpError(500, "Clé serveur Supabase absente de l'environnement des fonctions.");
-}
-
-/** Client service role (contourne la RLS) — uniquement côté serveur. */
-export function clientAdmin(): SupabaseClient {
-  if (!admin) {
-    admin = createClient(Deno.env.get("SUPABASE_URL")!, cleServeur(), {
-      auth: { persistSession: false, autoRefreshToken: false },
-    });
-  }
-  return admin;
-}
 
 function egaliteConstante(a: string, b: string): boolean {
   if (a.length !== b.length) return false;
@@ -41,7 +18,7 @@ export async function verifierAppelant(
   req: Request,
   options: { autoriserCron?: boolean; adminSeulement?: boolean } = {},
 ): Promise<Appelant> {
-  const secretCron = Deno.env.get("CRON_SECRET");
+  const secretCron = options.autoriserCron ? await secret("cron_secret", "CRON_SECRET") : null;
   const enteteCron = req.headers.get("x-cron-secret");
   if (options.autoriserCron && secretCron && enteteCron && egaliteConstante(enteteCron, secretCron)) {
     return { type: "systeme" };

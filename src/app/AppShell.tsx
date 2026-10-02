@@ -1,11 +1,26 @@
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
 import { demarrerRealtime } from "@/lib/realtime";
+import { BandeauConfiguration } from "./BandeauConfiguration";
 import { BandeauHorsLigne } from "./BandeauHorsLigne";
 import { BarreLaterale } from "./BarreLaterale";
 import { PaletteCommandes } from "@/features/palette/PaletteCommandes";
+import { useAnalyseChine } from "@/features/chine/api";
+import { useDocuments } from "@/features/documents/api";
+import { useProcessListe } from "@/features/process/api";
+import { useRapports } from "@/features/rapports/api";
+import { prechargerPages } from "./router";
 import { ServicesArrierePlan } from "./ServicesArrierePlan";
+
+/** Données des autres modules chargées en tâche de fond : chaque page s'ouvre déjà remplie. */
+function Prechargement() {
+  useProcessListe();
+  useDocuments();
+  useRapports();
+  useAnalyseChine();
+  return null;
+}
 
 export function SquelettePage() {
   return (
@@ -22,8 +37,15 @@ export function SquelettePage() {
 }
 
 export function AppShell() {
+  const [prechargement, setPrechargement] = useState(false);
   useEffect(() => {
     demarrerRealtime();
+    // Après le premier affichage : pages et données des autres modules, sans ralentir le démarrage
+    const t = window.setTimeout(() => {
+      prechargerPages();
+      setPrechargement(true);
+    }, 1500);
+    return () => window.clearTimeout(t);
   }, []);
 
   return (
@@ -31,6 +53,7 @@ export function AppShell() {
       <BarreLaterale />
       <div className="flex min-w-0 flex-1 flex-col">
         <BandeauHorsLigne />
+        <BandeauConfiguration />
         <main className="min-h-0 flex-1 overflow-hidden">
           <Suspense fallback={<SquelettePage />}>
             <Outlet />
@@ -39,6 +62,7 @@ export function AppShell() {
       </div>
       <PaletteCommandes />
       <ServicesArrierePlan />
+      {prechargement ? <Prechargement /> : null}
     </div>
   );
 }

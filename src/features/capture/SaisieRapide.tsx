@@ -162,7 +162,7 @@ export const SaisieRapide = forwardRef<HTMLInputElement, ProprietesSaisie>(funct
         </div>
         {typeEffectif !== "postit" ? (
           <Select
-            value={domaineId ?? undefined}
+            value={domaineId ?? ""}
             onValueChange={(v) => {
               setDomaineChoisi(v);
               try {

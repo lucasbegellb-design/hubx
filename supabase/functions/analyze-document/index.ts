@@ -86,7 +86,8 @@ servir(async (req) => {
     return json({ ok: false, erreur: message });
   };
 
-  if (!iaDisponible()) return echec("Analyse IA indisponible : clé API Anthropic non configurée (voir SETUP.md).");
+  if (!(await iaDisponible()))
+    return echec("Analyse IA indisponible : clé API Anthropic non configurée (Paramètres › Clés et connexions).");
 
   const { data: fichier, error } = await db.storage.from("documents").download(doc.storage_path);
   if (error || !fichier) return echec("Fichier introuvable dans le stockage. Dépose-le à nouveau.");

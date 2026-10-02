@@ -119,16 +119,42 @@ Client : rendu React depuis `donnees`, export PDF (react-pdf) et Markdown.
 Uniquement dans les Edge Functions (`_shared/ia.ts`, SDK officiel, sorties structurées JSON). Modèle lu dans
 `parametres.modele_ia`. Aucune fonction ne bloque sans clé : message clair, et les rapports restent complets.
 
+## Installation et clés des services
+
+- **Assistant de premier lancement** (`src/features/installation/`) : sans configuration, l'app propose « Installer »
+  (administrateur) ou « Rejoindre » (code d'invitation `HUBX1.…` = adresse + clé publique encodées).
+- L'installation utilise l'**API de gestion Supabase** (`api.supabase.com`) avec un jeton d'accès saisi par l'administrateur,
+  gardé en mémoire et jamais enregistré. Les appels passent par le plugin Tauri `http` (pas de CORS côté WebView).
+  Étapes idempotentes : clés du projet → migrations embarquées (`import.meta.glob` de `supabase/migrations`, journalisées dans
+  `supabase_migrations.schema_migrations` comme le fait la CLI) → déploiement des six fonctions (sources embarquées,
+  fichiers résolus par `imports.ts`, chemins relatifs au dossier `functions`) → inscriptions fermées → adresse du serveur
+  dans le Vault → compte administrateur (API d'administration Auth avec la clé serveur, en mémoire seulement) → clés des services.
+- **Mise à jour du serveur** : `version_schema()` comparée à la dernière migration embarquée ; si l'app est plus récente,
+  l'administrateur voit un bandeau et réapplique migrations manquantes + fonctions avec un jeton.
+- **Clés des services** (Anthropic, Azure) : saisies dans Paramètres › Clés et connexions (`definir_secret`, admin),
+  stockées chiffrées dans le **Vault** Supabase sous `hubx_<nom>`, lues seulement par les Edge Functions
+  (`lire_secret`, service role, `_shared/secrets.ts`, cache 60 s). Les variables d'environnement des fonctions restent
+  prioritaires. Le secret de planification `hubx_cron_secret` est généré par la migration. La fonction `configuration`
+  renvoie la présence des clés (booléens) et teste Anthropic / Microsoft.
+
 ## Bureau (Tauri)
 
 - `src-tauri/src/lib.rs` : zone de notification (Ouvrir / Capture rapide / Quitter), fermeture = masquer,
   instance unique, fenêtre `capture` créée à la demande puis fermée (économie de mémoire), démarrage `--minimized`.
 - Plugins : notification, global-shortcut (enregistré côté JS pour être personnalisable), autostart, updater (+ process
-  pour relancer), window-state (sauf la capture), dialog + fs (enregistrer des fichiers), opener (ouvrir un document).
+  pour relancer), window-state (sauf la capture), dialog + fs (enregistrer des fichiers), opener (ouvrir un document),
+  http (API de gestion Supabase, portée limitée à `api.supabase.com` et `*.supabase.co`).
+- Démarrage sans flash : fenêtre cachée jusqu'au premier rendu (`interface_prete`), fond `#F7F8F9`, filet de sécurité à 5 s.
+- Windows : WebView2 passe en « mémoire réduite » (`MemoryUsageTargetLevel = LOW`) quand la fenêtre est cachée dans la zone
+  de notification, sans suspendre les rappels.
 - `src-tauri/capabilities/default.json` : liste minimale des permissions des deux fenêtres.
 - Mises à jour : `latest.json` publié par la CI dans la GitHub Release, signature vérifiée avec la clé publique de `tauri.conf.json`.
 
 ## Performance
+
+- Cache local des requêtes (TanStack Query persisté dans `localStorage`, 3 jours, vidé à la déconnexion) : l'app affiche
+  les dernières données dès l'ouverture, y compris hors connexion, puis les rafraîchit.
+- Pages et données des autres modules préchargées 1,5 s après l'ouverture : navigation ≈ 100 ms.
 
 - Routes et modules lourds chargés à la demande (TipTap, Recharts, @react-pdf/renderer ne sont pas dans le bundle initial).
 - Une seule connexion Realtime ; cache TanStack Query (60 s de fraîcheur), pas de rechargement au focus.

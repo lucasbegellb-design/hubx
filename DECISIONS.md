@@ -52,3 +52,11 @@ Une ligne par arbitrage non bloquant.
 - Mutations TanStack en `networkMode: "always"` : hors ligne, refus immédiat et explicite plutôt qu'une file d'attente invisible ; la saisie reste possible (brouillon).
 - Texte secondaire des post-its en `text-foreground/75` (contraste AA sur les quatre teintes, vérifié avec axe-core).
 - Workflow manuel « Build Windows » : installeur en artefact, sans publication, pour tester avant une release.
+- Installation depuis l'app : API de gestion Supabase avec un jeton d'accès saisi une fois (jamais stocké) ; création de projet possible (région Paris par défaut) ; étapes idempotentes avec « Réessayer ».
+- Migrations et sources des fonctions embarquées dans l'app (chargées seulement par l'assistant) ; migrations journalisées dans `supabase_migrations.schema_migrations` pour rester compatibles avec la CLI.
+- Clés des services saisies dans l'app et stockées chiffrées dans le Vault (écriture admin, lecture service role uniquement) plutôt qu'en secrets d'Edge Functions : pas de jeton nécessaire pour changer une clé ; les variables d'environnement restent prioritaires.
+- Secret de planification généré par migration (aucune saisie) ; adresse du serveur enregistrée par l'assistant ou le bouton « Réparer ».
+- Code d'invitation `HUBX1.<base64url>` (adresse + clé publique, aucune donnée secrète) pour connecter un collègue sans saisie technique.
+- Plugin Tauri `http` ajouté (appels à api.supabase.com sans CORS), portée restreinte aux domaines Supabase (+ localhost pour les tests).
+- Fluidité : cache TanStack persisté (3 jours, vidé à la déconnexion, hors snapshots Chine et versions de process), préchargement des pages et données après 1,5 s, fenêtre affichée au premier rendu (fond assorti), WebView2 en mémoire réduite quand l'app est cachée (Windows).
+- Mesures (build de production) : liste des tâches visible en 264 ms au lancement avec cache (395 ms sans), navigation entre modules ≈ 100 ms.

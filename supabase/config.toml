@@ -430,3 +430,6 @@ verify_jwt = false
 
 [functions.manage-members]
 verify_jwt = false
+
+[functions.configuration]
+verify_jwt = false

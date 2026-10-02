@@ -164,7 +164,7 @@ servir(async (req) => {
     // Synthèse IA : facultative, jamais bloquante
     let synthese: string | null = null;
     let erreurIa: string | null = null;
-    if (iaDisponible()) {
+    if (await iaDisponible()) {
       try {
         const c = consigneSynthese(donnees);
         const r = await demanderJson<{ synthese: string }>({

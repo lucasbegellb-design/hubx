@@ -23,6 +23,11 @@ process documentés, documentation technique complète.
 | **Rapports**    | À la demande ou automatiques (vendredi 17 h, dernier jour ouvré 17 h), chiffres calculés, synthèse IA, export PDF.                                            |
 | **Paramètres**  | Comptes et rôles, domaines et projets, source Chine, modèle IA, raccourcis, thème, démarrage auto, mises à jour, export complet.                              |
 
+## Installation
+
+Télécharger l'installeur Windows (Releases ou artefact « Build Windows ») et le lancer : l'**assistant de premier
+lancement** installe le serveur Supabase et demande les clés nécessaires, sans ligne de commande. Pas à pas : [SETUP.md](SETUP.md).
+
 ## Démarrage rapide (développement)
 
 Prérequis : Node.js 22, Rust stable, Docker (pour Supabase local), Deno 2 (facultatif).

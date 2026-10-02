@@ -7,6 +7,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import { initialiserDetectionReseau } from "./lib/online";
+import { signalerInterfacePrete } from "./lib/tauri";
 
 initialiserDetectionReseau();
 
@@ -15,3 +16,6 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
     <App />
   </React.StrictMode>,
 );
+
+// Deux images plus tard, le premier rendu est peint : on peut afficher la fenêtre.
+requestAnimationFrame(() => requestAnimationFrame(() => void signalerInterfacePrete()));

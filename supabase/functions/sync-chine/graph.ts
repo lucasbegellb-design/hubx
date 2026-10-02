@@ -1,6 +1,7 @@
 // Accès lecture seule au fichier Excel d'Edwin via Microsoft Graph (client credentials).
 import { encodeBase64 } from "jsr:@std/encoding@1/base64";
 import { HttpError } from "../_shared/http.ts";
+import { secret } from "../_shared/secrets.ts";
 
 export interface IdentifiantsAzure {
   tenant: string;
@@ -8,14 +9,16 @@ export interface IdentifiantsAzure {
   secret: string;
 }
 
-export function identifiantsAzure(): IdentifiantsAzure | null {
-  const tenant = Deno.env.get("AZURE_TENANT_ID");
-  const client = Deno.env.get("AZURE_CLIENT_ID");
-  const secret = Deno.env.get("AZURE_CLIENT_SECRET");
-  return tenant && client && secret ? { tenant, client, secret } : null;
+export async function identifiantsAzure(): Promise<IdentifiantsAzure | null> {
+  const [tenant, client, cle] = await Promise.all([
+    secret("azure_tenant_id", "AZURE_TENANT_ID"),
+    secret("azure_client_id", "AZURE_CLIENT_ID"),
+    secret("azure_client_secret", "AZURE_CLIENT_SECRET"),
+  ]);
+  return tenant && client && cle ? { tenant, client, secret: cle } : null;
 }
 
-async function jeton(id: IdentifiantsAzure): Promise<string> {
+export async function jeton(id: IdentifiantsAzure): Promise<string> {
   const r = await fetch(`https://login.microsoftonline.com/${encodeURIComponent(id.tenant)}/oauth2/v2.0/token`, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -29,7 +32,7 @@ async function jeton(id: IdentifiantsAzure): Promise<string> {
   if (!r.ok) {
     throw new HttpError(
       502,
-      "Connexion Microsoft refusée : vérifie AZURE_TENANT_ID, AZURE_CLIENT_ID et AZURE_CLIENT_SECRET (secret expiré ?).",
+      "Connexion Microsoft refusée : vérifie l'ID de l'annuaire, l'ID d'application et le secret client (expiré ?) dans Paramètres › Clés et connexions.",
     );
   }
   return (await r.json()).access_token as string;
@@ -45,7 +48,7 @@ function erreurGraph(status: number): HttpError {
   if (status === 401 || status === 403) {
     return new HttpError(
       502,
-      "Accès refusé par Microsoft : la permission Files.Read.All (application) et le consentement administrateur sont nécessaires (SETUP.md, étape 4).",
+      "Accès refusé par Microsoft : la permission Files.Read.All (application) et le consentement administrateur sont nécessaires (SETUP.md, § 3).",
     );
   }
   if (status === 404)

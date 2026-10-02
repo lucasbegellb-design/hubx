@@ -20,7 +20,7 @@ export async function verifierMiseAJour(): Promise<EtatMaj> {
     return {
       type: "erreur",
       message: /pubkey|signature|REMPLACER/i.test(m)
-        ? "Mises à jour non configurées (clé de signature absente, voir SETUP.md)."
+        ? "Mises à jour non configurées (clé de signature absente, voir SETUP.md § 6.1)."
         : "Serveur de mises à jour injoignable. Nouvel essai plus tard.",
     };
   }

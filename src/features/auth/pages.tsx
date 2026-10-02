@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MessageErreur } from "@/components/common";
-import { enregistrerConfigServeur } from "@/lib/config";
 import { messageErreur, supabase } from "@/lib/supabase";
 import { queryClient } from "@/lib/queryClient";
 import { useAuth } from "./AuthProvider";
@@ -24,46 +23,6 @@ function Cadre({ titre, sousTitre, children }: { titre: string; sousTitre?: stri
         {children}
       </div>
     </div>
-  );
-}
-
-const schemaServeur = z.object({
-  url: z.string().trim().url("Adresse invalide (ex. https://abcd.supabase.co)."),
-  anonKey: z.string().trim().min(20, "Clé trop courte : copie la clé « anon » ou « publishable » complète."),
-});
-
-/** Premier lancement sans configuration intégrée au build. */
-export function PageConfigServeur() {
-  const form = useForm<z.infer<typeof schemaServeur>>({ resolver: zodResolver(schemaServeur) });
-  const onSubmit = form.handleSubmit((v) => {
-    enregistrerConfigServeur({ url: v.url.replace(/\/$/, ""), anonKey: v.anonKey });
-    location.reload();
-  });
-  return (
-    <Cadre
-      titre="Connexion au serveur"
-      sousTitre="Renseigne une fois l'adresse du projet Supabase (voir SETUP.md, étape 1)."
-    >
-      <form onSubmit={onSubmit} className="space-y-4" noValidate>
-        <div className="space-y-1.5">
-          <Label htmlFor="url">Adresse du projet</Label>
-          <Input id="url" placeholder="https://xxxx.supabase.co" autoFocus {...form.register("url")} />
-          {form.formState.errors.url ? (
-            <p className="text-sm text-urgent">{form.formState.errors.url.message}</p>
-          ) : null}
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="anon">Clé publique (anon)</Label>
-          <Input id="anon" {...form.register("anonKey")} />
-          {form.formState.errors.anonKey ? (
-            <p className="text-sm text-urgent">{form.formState.errors.anonKey.message}</p>
-          ) : null}
-        </div>
-        <Button type="submit" className="w-full">
-          Enregistrer
-        </Button>
-      </form>
-    </Cadre>
   );
 }
 
