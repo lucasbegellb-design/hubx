@@ -44,6 +44,7 @@ Interface 100 % en français. Source de vérité du besoin : cahier des charges 
 - Nouvelle migration : elle sera appliquée par l'assistant / « Mettre à jour le serveur » (SQL exécuté d'un bloc) — l'écrire rejouable autant que possible.
 - Nouvelle table : migration + RLS + ajout à la publication `supabase_realtime` + `npm run gen:types` + clé realtime dans `src/lib/realtime.ts` + export complet (`exportComplet.ts`).
 - Tests : toute logique métier nouvelle va dans `_shared/logic` avec un test dans `tests/`.
+- Monter Tauri ou un plugin : paquet npm `@tauri-apps/*` et crate Rust ensemble, même majeure.mineure (`cargo update` dans `src-tauri/`), sinon `tauri build` échoue (vérifié par `tests/versions-tauri.test.ts`).
 - Dates métier (échéances) = chaînes `YYYY-MM-DD` en heure de Paris (`@shared/dates.ts`).
 - Secrets : seule la clé anon côté client. Jamais de clé service / Azure / Anthropic dans `src/`.
 - Une migration = un fichier horodaté ; ne jamais modifier une migration déjà appliquée en prod.
