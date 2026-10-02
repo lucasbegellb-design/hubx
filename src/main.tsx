@@ -11,11 +11,16 @@ import { signalerInterfacePrete } from "./lib/tauri";
 
 initialiserDetectionReseau();
 
+// Les fenêtres sont créées cachées (pas de flash blanc) et affichées dès le premier rendu validé par React.
+// Pas de requestAnimationFrame ici : il ne s'exécute pas tant que la fenêtre est cachée.
+function SignalPret() {
+  React.useEffect(() => void signalerInterfacePrete(), []);
+  return null;
+}
+
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <App />
+    <SignalPret />
   </React.StrictMode>,
 );
-
-// Deux images plus tard, le premier rendu est peint : on peut afficher la fenêtre.
-requestAnimationFrame(() => requestAnimationFrame(() => void signalerInterfacePrete()));

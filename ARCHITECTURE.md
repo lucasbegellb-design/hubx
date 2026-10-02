@@ -144,7 +144,7 @@ Uniquement dans les Edge Functions (`_shared/ia.ts`, SDK officiel, sorties struc
 - Plugins : notification, global-shortcut (enregistré côté JS pour être personnalisable), autostart, updater (+ process
   pour relancer), window-state (sauf la capture), dialog + fs (enregistrer des fichiers), opener (ouvrir un document),
   http (API de gestion Supabase, portée limitée à `api.supabase.com` et `*.supabase.co`).
-- Démarrage sans flash : fenêtre cachée jusqu'au premier rendu (`interface_prete`), fond `#F7F8F9`, filet de sécurité à 5 s.
+- Démarrage sans flash : fenêtre cachée jusqu'au premier rendu (`interface_prete`, appelé depuis un `useEffect` : `requestAnimationFrame` ne s'exécute pas dans une fenêtre cachée), fond `#F7F8F9`, filet de sécurité à 5 s. Même principe pour la fenêtre de capture.
 - Windows : WebView2 passe en « mémoire réduite » (`MemoryUsageTargetLevel = LOW`) quand la fenêtre est cachée dans la zone
   de notification, sans suspendre les rappels.
 - `src-tauri/capabilities/default.json` : liste minimale des permissions des deux fenêtres.

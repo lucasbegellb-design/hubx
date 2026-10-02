@@ -64,12 +64,15 @@ export async function enregistrerFichier(
   return nomParDefaut;
 }
 
+let interfaceSignalee = false;
+
 /**
  * Premier rendu terminé : la fenêtre principale s'affiche (sans flash blanc),
  * la fenêtre de capture apparaît et prend le focus.
  */
 export async function signalerInterfacePrete(): Promise<void> {
-  if (!estTauri()) return;
+  if (!estTauri() || interfaceSignalee) return;
+  interfaceSignalee = true;
   const { getCurrentWindow } = await import("@tauri-apps/api/window");
   const fenetre = getCurrentWindow();
   if (fenetre.label === "capture") {

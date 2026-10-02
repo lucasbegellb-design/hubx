@@ -135,7 +135,7 @@ export function SectionCles() {
 
       <Bloc
         titre="Intelligence artificielle (Anthropic)"
-        statut={<Statut ok={e?.ia} oui="Connectée" non="Non connectée" />}
+        statut={<Statut ok={e?.ia} oui="Clé enregistrée" non="Aucune clé" />}
       >
         <p className="text-sm text-muted-foreground">
           Analyse des documents, structuration des process, synthèse des rapports.{" "}
@@ -189,7 +189,7 @@ export function SectionCles() {
 
       <Bloc
         titre="Fichier Excel d'Edwin (Microsoft 365)"
-        statut={<Statut ok={e?.azure} oui="Connecté" non="Mode démo" />}
+        statut={<Statut ok={e?.azure} oui="Identifiants enregistrés" non="Mode démo" />}
       >
         <p className="text-sm text-muted-foreground">
           Lecture seule du suivi Chine sur OneDrive (application Azure avec la permission Files.Read.All).{" "}
