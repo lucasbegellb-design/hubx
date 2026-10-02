@@ -10,6 +10,9 @@ Checklist des phases (cf. cahier des charges §9). Cocher au fur et à mesure.
 - [x] 6. Rapports : agrégation déterministe, synthèse IA, PDF, pg_cron hebdo/mensuel
 - [x] 7. Desktop : tray, notifications, raccourci global, autostart, updater, CI release
 - [x] 8. Qualité (typecheck, lint, tests, build), docs (README, SETUP, ARCHITECTURE, PASSATION), récap
+- [x] 9. Fluidité (cache persistant, préchargement, démarrage sans flash, mémoire WebView2), assistant de premier
+      lancement (installation du serveur + clés des services depuis l'app), installeur Windows validé par le workflow
+      « Build Windows » et assistant testé de bout en bout dans l'application de bureau
 
 ## Reprise
 
