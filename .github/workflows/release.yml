@@ -1,6 +1,6 @@
-# Publication d'une version : pousser un tag « v* » (ex. v0.2.0, identique à la version de package.json).
-# Construit l'installeur Windows (NSIS + MSI) et macOS (universel), crée la GitHub Release
-# et publie latest.json pour les mises à jour automatiques.
+# Publication d'une version : Actions > Release > Run workflow (ou pousser un tag « v* » identique à la
+# version de package.json). Construit l'installeur Windows (NSIS + MSI) et macOS (universel), crée la
+# GitHub Release « v<version> » et publie latest.json : les postes installés se mettent à jour seuls.
 #
 # Secrets du dépôt (Settings > Secrets and variables > Actions) — voir SETUP.md :
 #   VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY        : intégrés au build (clé publique uniquement)
@@ -70,8 +70,9 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
-          tagName: ${{ github.ref_name }}
-          releaseName: "Hub XTIM ${{ github.ref_name }}"
+          tagName: v__VERSION__
+          releaseName: "Hub XTIM v__VERSION__"
+          releaseCommitish: ${{ github.sha }}
           releaseBody: "Installer : télécharger le fichier .exe (Windows) ou .dmg (macOS) ci-dessous. Les postes déjà équipés se mettent à jour automatiquement."
           releaseDraft: false
           prerelease: false

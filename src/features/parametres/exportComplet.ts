@@ -1,25 +1,12 @@
+import { TABLES_EXPORT, type TableExport } from "@shared/export";
 import { strToU8, zipSync, type Zippable } from "fflate";
 import { supabase } from "@/lib/supabase";
 import { enregistrerFichier } from "@/lib/tauri";
 
-/** Tables exportées (toutes les données partagées ; les post-its privés des autres membres restent privés). */
-const TABLES = [
-  "membres",
-  "domaines",
-  "projets",
-  "taches",
-  "postits",
-  "process",
-  "process_versions",
-  "documents",
-  "chine_source",
-  "chine_snapshots",
-  "rapports",
-  "parametres",
-  "journal_activite",
-] as const;
+// Tables exportées : toutes les données partagées ; les post-its privés des autres membres restent privés (RLS).
+const TABLES = TABLES_EXPORT;
 
-async function lireTable(table: (typeof TABLES)[number]): Promise<Record<string, unknown>[]> {
+async function lireTable(table: TableExport): Promise<Record<string, unknown>[]> {
   const lignes: Record<string, unknown>[] = [];
   for (let de = 0; ; de += 1000) {
     const { data, error } = await supabase

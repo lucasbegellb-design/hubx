@@ -433,3 +433,6 @@ verify_jwt = false
 
 [functions.configuration]
 verify_jwt = false
+
+[functions.sauvegarde]
+verify_jwt = false

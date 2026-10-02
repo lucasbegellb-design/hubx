@@ -4,14 +4,12 @@
 const registre: ((req: Request) => Promise<Response>)[] = [];
 (globalThis as { __hubxFonctions?: typeof registre }).__hubxFonctions = registre;
 
-const NOMS = [
-  "sync-chine",
-  "analyze-document",
-  "structure-process",
-  "generate-report",
-  "manage-members",
-  "configuration",
-];
+// Toutes les fonctions du dossier (hors _shared), sans liste à maintenir
+const NOMS: string[] = [];
+for await (const e of Deno.readDir(new URL("../supabase/functions/", import.meta.url))) {
+  if (e.isDirectory && !e.name.startsWith("_") && !e.name.startsWith(".")) NOMS.push(e.name);
+}
+NOMS.sort();
 const routes = new Map<string, (req: Request) => Promise<Response>>();
 for (const nom of NOMS) {
   const avant = registre.length;

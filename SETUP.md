@@ -121,37 +121,42 @@ Les nouvelles versions sont construites par GitHub (onglet **Actions**). Pour qu
 
 ### 6.1 Clé de signature des mises à jour (une fois)
 
-Sur un PC avec Node.js (https://nodejs.org) et le dépôt cloné :
+La clé publique est déjà dans `src-tauri/tauri.conf.json`. La **clé privée** correspondante (`hub-xtim.key`, sans mot de
+passe) t'a été transmise une seule fois :
 
-```powershell
-npx tauri signer generate -w "$HOME\.tauri\hub-xtim.key"
-```
+1. GitHub → dépôt → **Settings → Secrets and variables → Actions → New repository secret** :
+   nom `TAURI_SIGNING_PRIVATE_KEY`, valeur = tout le contenu du fichier `hub-xtim.key`.
+2. Ranger `hub-xtim.key` dans le coffre-fort de l'entreprise : sans elle, impossible de publier une mise à jour que les
+   postes accepteront (il faudrait réinstaller l'app partout avec une nouvelle clé).
 
-- Choisir un mot de passe et le noter dans le coffre-fort.
-- Dans `src-tauri/tauri.conf.json`, remplacer `REMPLACER_PAR_LA_CLE_PUBLIQUE_DE_MISE_A_JOUR` par le contenu de
-  `hub-xtim.key.pub`, puis committer.
-- ⚠️ Sauvegarder `hub-xtim.key` (clé privée) dans le coffre-fort : sans elle, plus de mises à jour automatiques possibles.
-- GitHub → dépôt → **Settings → Secrets and variables → Actions** : créer `TAURI_SIGNING_PRIVATE_KEY` (contenu de
-  `hub-xtim.key`) et `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`.
-- Facultatif : `VITE_SUPABASE_URL` et `VITE_SUPABASE_ANON_KEY` intègrent l'adresse du serveur à l'installeur (l'assistant
-  ne demande alors plus que l'identifiant et le mot de passe). Sans eux, le code d'invitation fait la même chose.
+Facultatif : `VITE_SUPABASE_URL` et `VITE_SUPABASE_ANON_KEY` intègrent l'adresse du serveur à l'installeur (l'assistant ne
+demande alors plus que l'identifiant et le mot de passe). Sans eux, le code d'invitation fait la même chose.
 
 ### 6.2 Visibilité du dépôt
 
-Les applications téléchargent les mises à jour depuis `https://github.com/lucasbegellb-design/hubx/releases/latest/download/latest.json`.
-Les fichiers d'une release d'un **dépôt privé** ne sont pas téléchargeables sans authentification : rendre le dépôt public
-(il ne contient aucun secret), ou publier les releases dans un second dépôt public et modifier `endpoints` dans
-`src-tauri/tauri.conf.json`.
+Les applications téléchargent les mises à jour depuis
+`https://github.com/lucasbegellb-design/hubx/releases/latest/download/latest.json` : le dépôt doit rester **public** (il
+ne contient aucun secret). Pour le rendre privé, publier les releases dans un second dépôt public et modifier `endpoints`
+dans `src-tauri/tauri.conf.json`.
 
 ### 6.3 Publier une version
 
-1. Incrémenter la version dans `package.json` (ex. `0.2.0`), committer sur `main`.
-2. Créer le tag correspondant et le pousser : `git tag v0.2.0 && git push origin v0.2.0`
-   (ou GitHub → **Releases → Draft a new release → Choose a tag : v0.2.0**).
-3. Le workflow **Release** construit Windows et macOS (≈ 15 min) et publie la release. Les postes proposent
-   « Nouvelle version disponible → Installer » au démarrage : **Edwin n'a rien à faire**.
+1. Incrémenter la version dans `package.json` et `src-tauri/Cargo.toml` (ex. `0.3.1`), committer, pousser.
+2. GitHub → **Actions → Release → Run workflow** (ou pousser un tag `v0.3.1`).
+3. Le workflow construit Windows et macOS (≈ 15 min) et publie la release `v0.3.1` avec `latest.json`. Au démarrage, les
+   postes affichent « Nouvelle version disponible → Installer » : **Edwin n'a rien à faire**.
 4. Si la nouvelle version apporte des changements au serveur, l'application de l'administrateur affiche un bandeau
    **Mettre à jour le serveur** : il suffit de cliquer et de coller un jeton d'accès Supabase (§ 2.2).
+
+Les versions installées avant la 0.3.0 ne connaissent pas la clé : les mettre à jour une dernière fois à la main avec
+l'installeur de la release.
+
+### 6.4 Sauvegardes automatiques
+
+Chaque dimanche vers 3 h, le serveur range une copie de toutes les données dans le stockage privé `sauvegardes`
+(8 dernières semaines). Paramètres › Mises à jour et export : liste, téléchargement, **Sauvegarder maintenant**.
+Les fichiers déposés restent dans le stockage `documents` (le manifeste de chaque sauvegarde en donne la liste) et les
+post-its privés ne sont pas copiés. Restaurer : voir PASSATION.md § 4.
 
 ## 7. Dépannage
 

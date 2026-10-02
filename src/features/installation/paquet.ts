@@ -11,6 +11,7 @@ export const FONCTIONS = [
   "generate-report",
   "manage-members",
   "configuration",
+  "sauvegarde",
 ] as const;
 
 export interface Migration {

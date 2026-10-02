@@ -2,6 +2,7 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { fermetureImports, importsRelatifs, lireNomMigration, resoudre } from "@/features/installation/imports";
+import { FONCTIONS as FONCTIONS_EMBARQUEES } from "@/features/installation/paquet";
 import { codeInvitation, lireCodeInvitation, refProjet } from "@/lib/config";
 
 const RACINE = "supabase/functions";
@@ -25,14 +26,9 @@ describe("empaquetage des Edge Functions", () => {
   });
 
   it("chaque fonction embarque tous ses fichiers, sans chemin sortant", async () => {
-    expect(FONCTIONS.sort()).toEqual([
-      "analyze-document",
-      "configuration",
-      "generate-report",
-      "manage-members",
-      "structure-process",
-      "sync-chine",
-    ]);
+    expect([...FONCTIONS_EMBARQUEES].sort()).toEqual(FONCTIONS.sort());
+    const config = readFileSync("supabase/config.toml", "utf8");
+    for (const f of FONCTIONS) expect(config).toContain(`[functions.${f}]\nverify_jwt = false`);
     for (const f of FONCTIONS) {
       const fichiers = await fermetureImports(`${f}/index.ts`, lire);
       const noms = fichiers.map((x) => x.nom);

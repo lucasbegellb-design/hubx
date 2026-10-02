@@ -14,6 +14,17 @@ Checklist des phases (cf. cahier des charges §9). Cocher au fur et à mesure.
       lancement (installation du serveur + clés des services depuis l'app), installeur Windows validé par le workflow
       « Build Windows » et assistant testé de bout en bout dans l'application de bureau
 
+## Version « ultime » (un lot = une version)
+
+- [x] 10. v0.3.0 — mises à jour automatiques signées, sauvegarde automatique hebdomadaire
+- [ ] 11. v0.4.0 — tâches récurrentes, sous-tâches, commentaires et @mentions
+- [ ] 12. v0.5.0 — calendrier + abonnement Outlook
+- [ ] 13. v0.6.0 — santé des process + « Exécuter ce process »
+- [ ] 14. v0.7.0 — recherche intelligente, « Demande à Hub », brief du matin
+- [ ] 15. v0.8.0 — hors ligne complet
+- [ ] 16. v0.9.0 — version mobile (web) sur GitHub Pages
+- [ ] 17. v1.0.0 — e-mails → tâches (glisser-déposer + boîte dédiée)
+
 ## Reprise
 
 Lire CLAUDE.md (stack, commandes, conventions) puis DECISIONS.md. Un commit par phase.

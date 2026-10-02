@@ -19,7 +19,7 @@ Interface 100 % en français. Source de vérité du besoin : cahier des charges 
 - Fixture Chine : `npm run fixture:chine` (régénère `fixtures/suivi_chine_exemple.xlsx`, `supabase/functions/sync-chine/fixture.ts` et `supabase/seeds/chine.sql`).
 - Fonctions en local sans edge-runtime : `npm run fonctions:dev` (Deno du poste, port 54399) + `VITE_FUNCTIONS_URL=http://localhost:54399` dans `.env` ; secrets dans `supabase/functions/.env.local`.
 - Vérifier les fonctions : `cd supabase/functions && deno check --allow-import --node-modules-dir=none <fn>/index.ts`.
-- Release : tag `v*` (= version de package.json) → `.github/workflows/release.yml`. Build Windows sans publication : workflow manuel « Build Windows ».
+- Release : Actions → « Release » → Run workflow (tag `v<version de package.json>` créé par tauri-action, `latest.json` pour les mises à jour automatiques signées). Build Windows sans publication : workflow manuel « Build Windows ».
 
 ## Arborescence
 
@@ -39,7 +39,7 @@ Interface 100 % en français. Source de vérité du besoin : cahier des charges 
 - Couleurs uniquement via tokens Tailwind (`bg-card`, `text-muted-foreground`, `text-urgent`, `text-retard`, `text-fait`…). Pas d'ombres décoratives, bordures fines.
 - Toute écriture passe par une mutation qui appelle `verifierEcriture()` (hors ligne → refus immédiat) puis `valider(schema…)` (`src/lib/schemas.ts`, aligné sur les CHECK SQL) ; les requêtes utilisent les clés `[table, ...]` (invalidées par le realtime).
 - Appels d'Edge Functions : toujours via `appelerFonction()` (`src/lib/fonctions.ts`) qui traduit les erreurs `{ erreur }` en messages lisibles.
-- Nouvelle Edge Function : dossier `supabase/functions/<nom>` + entrée `[functions.<nom>] verify_jwt = false` dans `config.toml` + `FONCTIONS` dans `src/features/installation/paquet.ts` + `scripts/fonctions-dev.ts` (le test `tests/installation.test.ts` vérifie la liste).
+- Nouvelle Edge Function : dossier `supabase/functions/<nom>` + entrée `[functions.<nom>] verify_jwt = false` dans `config.toml` + `FONCTIONS` dans `src/features/installation/paquet.ts` (le test `tests/installation.test.ts` vérifie la cohérence ; `scripts/fonctions-dev.ts` découvre les dossiers seul). Planification : `cron.schedule(..., 'select public.appeler_fonction(''<nom>'')')`.
 - Clés des services : lues via `secret()` (`_shared/secrets.ts` : variable d'env puis Vault `hubx_<nom>`), écrites par l'admin via `definir_secret` ; jamais renvoyées au client.
 - Nouvelle migration : elle sera appliquée par l'assistant / « Mettre à jour le serveur » (SQL exécuté d'un bloc) — l'écrire rejouable autant que possible.
 - Nouvelle table : migration + RLS + ajout à la publication `supabase_realtime` + `npm run gen:types` + clé realtime dans `src/lib/realtime.ts` + export complet (`exportComplet.ts`).

@@ -21,7 +21,7 @@ process documentés, documentation technique complète.
 | **Suivi Chine** | Lecture seule du fichier Excel d'Edwin (OneDrive), onglets filtrables, mapping des colonnes, montants, alertes, historique des évolutions.                    |
 | **Documents**   | Bibliothèque par glisser-déposer, analyse IA (catégorie, résumé, infos clés, tâches suggérées).                                                               |
 | **Rapports**    | À la demande ou automatiques (vendredi 17 h, dernier jour ouvré 17 h), chiffres calculés, synthèse IA, export PDF.                                            |
-| **Paramètres**  | Comptes et rôles, domaines et projets, source Chine, modèle IA, raccourcis, thème, démarrage auto, mises à jour, export complet.                              |
+| **Paramètres**  | Comptes et rôles, domaines et projets, source Chine, IA, raccourcis, thème, démarrage auto, mises à jour automatiques, export et sauvegardes hebdomadaires.   |
 
 ## Installation
 

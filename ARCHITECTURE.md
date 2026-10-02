@@ -18,10 +18,12 @@
 └──────────────┬────────────────────────────────────────────────────────────────────────┘
                │ HTTPS / WSS (clé publique « anon » + JWT de l'utilisateur)
 ┌──────────────▼──────────────────────────── Supabase ───────────────────────────────────┐
-│ Auth (e-mail / mot de passe)   Postgres + RLS   Realtime   Storage (bucket documents)  │
+│ Auth (e-mail / mot de passe)   Postgres + RLS   Realtime   Storage (documents,         │
+│                                                            sauvegardes)                │
 │ Edge Functions (Deno) : sync-chine · analyze-document · structure-process ·            │
-│                         generate-report · manage-members                              │
-│ pg_cron + pg_net ─► sync-chine (*/15 min), generate-report (vendredi / fin de mois)    │
+│                         generate-report · manage-members · configuration · sauvegarde │
+│ pg_cron + pg_net ─► sync-chine (*/15 min), generate-report (vendredi / fin de mois),   │
+│                     sauvegarde (dimanche)                                              │
 └──────┬─────────────────────────────────────────┬───────────────────────────────────────┘
        │ client credentials (Files.Read.All)     │ clé API (secret serveur)
 ┌──────▼──────────────┐                 ┌────────▼──────────────┐
@@ -75,6 +77,13 @@ Toutes les tables ont `id uuid`, `created_at`, `updated_at` (trigger) et la RLS 
 - Le client ne contient que l'URL et la clé publique. Clé serveur, secrets Azure et clé d'IA : secrets des fonctions ou Vault.
 
 ## Flux principaux
+
+### Sauvegardes et mises à jour
+
+- `sauvegarde` (cron du dimanche ou bouton admin) : JSON de toutes les tables (`TABLES_EXPORT`, `_shared/logic/export.ts`,
+  partagé avec l'export complet de l'app) zippé dans le bucket privé `sauvegardes` (lecture admin, 8 conservées).
+- Mises à jour de l'app : release signée (`release.yml`, `tagName: v__VERSION__`, `latest.json`), clé publique dans
+  `tauri.conf.json`, vérification au démarrage (`src/lib/misesAJour.ts`).
 
 ### Temps réel
 

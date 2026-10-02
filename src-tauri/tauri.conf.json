@@ -72,7 +72,7 @@
   },
   "plugins": {
     "updater": {
-      "pubkey": "REMPLACER_PAR_LA_CLE_PUBLIQUE_DE_MISE_A_JOUR",
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDY5RUJFM0QwQTA1MzA5OTcKUldTWENWT2cwT1ByYVEwOXNNcHJHL0p4Ry9wYnM0WUpvOUhsZ0l4MitETmR5RUxIMUdOYmV2K00K",
       "endpoints": [
         "https://github.com/lucasbegellb-design/hubx/releases/latest/download/latest.json"
       ],

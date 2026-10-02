@@ -20,7 +20,7 @@ publier des mises à jour et le faire évoluer. Il complète [SETUP.md](SETUP.md
 - [ ] Compte **Supabase** : inviter le successeur dans l'organisation (Organization → Team → Invite, rôle _Owner_).
 - [ ] Compte **GitHub** : ajouter le successeur comme administrateur du dépôt `hubx` (Settings → Collaborators),
       ou transférer le dépôt à un compte / une organisation XTIM (Settings → Transfer).
-- [ ] **Clé privée de mise à jour** (`hub-xtim.key`) et son mot de passe.
+- [ ] **Clé privée de mise à jour** (`hub-xtim.key`, sans mot de passe) : sans elle, plus de mises à jour automatiques.
 - [ ] Compte du **fournisseur d'IA** (Mistral par défaut, console.mistral.ai) : ajouter le successeur à l'organisation,
       ou créer une nouvelle clé à son nom (Paramètres › Clés et connexions) et révoquer l'ancienne.
 - [ ] Application **Azure** « Hub XTIM – lecture Suivi Chine » : ajouter le successeur comme propriétaire ;
@@ -55,6 +55,8 @@ publier des mises à jour et le faire évoluer. Il complète [SETUP.md](SETUP.md
 - **Export complet** : Paramètres › Mises à jour et export → _Exporter toutes les données_. Produit un zip contenant
   chaque table en JSON (fidèle, réimportable) et en CSV (ouvrable dans Excel, séparateur `;`), plus tous les documents
   déposés (`fichiers/`). Les post-its privés des autres membres n'y figurent pas (ils restent privés).
+- **Sauvegardes automatiques Hub XTIM** : chaque dimanche, zip de toutes les tables dans le stockage privé `sauvegardes`
+  (8 semaines), téléchargeable dans Paramètres › Mises à jour et export (administrateur).
 - **Sauvegardes Supabase** : quotidiennes sur l'offre Pro (Database → Backups), avec restauration à un instant donné en option.
 - **Sauvegarde brute de la base** (pour un informaticien) : `npx supabase db dump --linked -f sauvegarde.sql`
   (+ `--data-only` pour les données seules).
@@ -72,8 +74,8 @@ publier des mises à jour et le faire évoluer. Il complète [SETUP.md](SETUP.md
 ## 5. Mettre à jour l'application
 
 1. Modifier le code (voir § 6), vérifier : `npm run check`.
-2. Incrémenter la version : `npm version 0.2.0 --no-git-tag-version`, committer.
-3. Taguer et pousser : `git tag v0.2.0 && git push origin main --tags`.
+2. Incrémenter la version : `npm version 0.3.1 --no-git-tag-version` et `version` de `src-tauri/Cargo.toml`, committer, pousser.
+3. GitHub → Actions → **Release** → Run workflow (crée le tag `v0.3.1` et la release).
 4. GitHub Actions construit Windows + macOS et publie la release : les postes proposent la mise à jour au démarrage.
 5. Si le serveur a changé (migration ou fonction), l'administrateur clique **Mettre à jour le serveur** dans le bandeau
    qui apparaît après la mise à jour de l'app (ou, en ligne de commande : `npx supabase db push` puis
@@ -110,4 +112,4 @@ sections de rapport (`construireRapport` + `rendreMarkdown` + `VueRapport` + PDF
 - Montants Chine additionnés par devise, sans conversion de change.
 - Les exports PDF n'affichent pas les caractères chinois (police latine).
 - Sans certificat de signature de code, Windows SmartScreen avertit à l'installation (pas lors des mises à jour).
-- Les mises à jour automatiques exigent des releases publiquement téléchargeables (SETUP.md § 9.3).
+- Les mises à jour automatiques exigent des releases publiquement téléchargeables (dépôt public, SETUP.md § 6.2).
